@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Weplay Shibax</title>
+    <meta name="description" content="Chat entre amis et mini-jeux shiba. Lance Draw It depuis ton salon, dessine, devine et gagne de l’XP !" />
+    <meta name="theme-color" content="#FFF8F0" />
+    <meta name="color-scheme" content="light" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Shibax" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta property="og:title" content="Weplay Shibax" />
+    <meta property="og:description" content="Chat entre amis et mini-jeux shiba." />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <link rel="preload" href="/fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fredoka-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/img/logo-512.webp" as="image" type="image/webp" />
+    <script src="/boot.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="boot" id="boot">
+        <img class="boot-logo" src="/img/logo-256.webp" width="128" height="128" alt="" />
+        <p class="boot-title">Weplay Shibax</p>
+        <p class="boot-text" id="boot-text">Le shiba remue la queue…</p>
+      </div>
+    </div>
+    <noscript>Weplay Shibax a besoin de JavaScript pour fonctionner.</noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

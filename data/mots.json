@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Banque de mots de Draw It : 6 thèmes × 3 difficultés. Une entrée « a|b » accepte plusieurs réponses (la première est affichée).",
+  "themes": {
+    "animaux": {
+      "facile": ["chat", "chien", "poisson", "oiseau", "lapin", "vache", "cochon", "cheval", "mouton", "souris", "canard", "poule", "serpent", "escargot", "papillon", "abeille", "tortue"],
+      "moyen": ["girafe", "éléphant", "lion", "singe", "grenouille", "hibou", "dauphin", "requin", "pingouin|manchot", "crocodile", "kangourou", "zèbre", "ours", "renard", "araignée", "coccinelle", "baleine"],
+      "difficile": ["hérisson", "caméléon", "hippocampe", "pieuvre|poulpe", "chauve-souris", "flamant rose", "paresseux", "raton laveur", "écureuil", "méduse", "scorpion", "toucan", "castor", "homard", "rhinocéros", "chameau|dromadaire"]
+    },
+    "nourriture": {
+      "facile": ["pomme", "banane", "gâteau", "pizza", "pain", "fromage", "glace", "œuf", "carotte", "fraise", "cerise", "citron", "tomate", "bonbon", "frites|frite", "poire", "raisin"],
+      "moyen": ["hamburger|burger", "croissant", "spaghettis|spaghetti|pâtes", "ananas", "pastèque", "champignon", "sandwich", "crêpe", "sushi", "brocoli", "baguette", "chocolat", "pop-corn", "biscuit", "hot-dog", "soupe", "salade"],
+      "difficile": ["raclette", "croque-monsieur", "mille-feuille", "ratatouille", "fondue", "macaron", "choucroute", "artichaut", "brochette", "omelette", "barbe à papa", "kiwi", "aubergine", "éclair", "tarte aux pommes", "sucette"]
+    },
+    "objets": {
+      "facile": ["clé", "chaise", "table", "livre", "lunettes", "parapluie", "ballon", "téléphone", "lampe", "ciseaux", "crayon", "chapeau", "chaussure", "montre", "tasse", "bougie", "cadeau"],
+      "moyen": ["guitare", "ordinateur", "télévision|télé", "valise", "appareil photo", "bouteille", "fourchette", "horloge", "peigne", "aspirateur", "trompette", "marteau", "échelle", "cerf-volant", "sac à dos", "brosse à dents", "réveil"],
+      "difficile": ["boussole", "sablier", "trottinette", "télescope", "aimant", "entonnoir", "cadenas", "éventail", "harpe", "microscope", "tire-bouchon", "accordéon", "robinet", "ventilateur", "parachute", "extincteur"]
+    },
+    "lieux": {
+      "facile": ["maison", "plage", "école", "forêt", "montagne", "mer", "ville", "jardin", "île", "rivière", "château", "ferme", "parc", "désert", "pont", "rue", "piscine"],
+      "moyen": ["hôpital", "aéroport", "gare", "cinéma", "boulangerie", "volcan", "phare", "bibliothèque", "cirque", "musée", "igloo", "grotte", "cascade", "port", "stade", "zoo", "camping"],
+      "difficile": ["pyramide", "observatoire", "labyrinthe", "fête foraine", "gratte-ciel", "station spatiale", "banquise", "oasis", "moulin", "cathédrale", "marché", "tunnel", "carrefour", "jungle", "aquarium", "potager"]
+    },
+    "metiers": {
+      "facile": ["médecin|docteur", "pompier|pompière", "policier|policière", "boulanger|boulangère", "cuisinier|cuisinière", "professeur|professeure|prof", "facteur|factrice", "pilote", "chanteur|chanteuse", "danseur|danseuse", "peintre", "fermier|fermière", "dentiste", "pêcheur|pêcheuse", "coiffeur|coiffeuse", "clown", "magicien|magicienne"],
+      "moyen": ["astronaute", "plombier|plombière", "jardinier|jardinière", "infirmier|infirmière", "vétérinaire", "photographe", "pirate", "chevalier", "mécanicien|mécanicienne", "serveur|serveuse", "musicien|musicienne", "détective", "footballeur|footballeuse", "boucher|bouchère", "électricien|électricienne", "maçon|maçonne", "caissier|caissière"],
+      "difficile": ["archéologue", "apiculteur|apicultrice", "astronome", "chirurgien|chirurgienne", "plongeur|plongeuse", "bûcheron|bûcheronne", "cascadeur|cascadeuse", "architecte", "sculpteur|sculptrice", "horloger|horlogère", "jongleur|jongleuse", "dompteur|dompteuse", "berger|bergère", "forgeron|forgeronne", "journaliste", "ramoneur|ramoneuse"]
+    },
+    "actions": {
+      "facile": ["manger", "dormir", "courir", "nager", "danser", "chanter", "lire", "écrire", "sauter", "pleurer", "rire", "boire", "marcher", "voler", "dessiner", "jouer", "cuisiner"],
+      "moyen": ["pêcher", "skier", "tricoter", "jongler", "applaudir", "éternuer", "bâiller", "ronfler", "grimper", "plonger", "peindre", "pédaler", "glisser", "siffler", "câliner", "arroser", "patiner"],
+      "difficile": ["méditer", "bronzer", "chuchoter", "escalader", "surfer", "photographier", "déménager", "hésiter", "frissonner", "rêver", "souffler", "s'étirer", "bricoler", "jardiner", "se maquiller", "faire du vélo"]
+    }
+  }
+}
