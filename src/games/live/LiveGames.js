@@ -306,6 +306,10 @@ function ReflexeR({ v, gs }) {
 
 // ---------- Le juste nombre ----------
 
+/** Les années (question sans unité, entre 1000 et 2100) s'écrivent sans séparateur de milliers. */
+const isYear = (prompt, n) => !prompt?.unit && Number.isInteger(n) && n >= 1000 && n <= 2100
+const fmtEst = (prompt, n) => (isYear(prompt, n) ? String(n) : formatNumber(n))
+
 function JusteQ({ gs, canPlay }) {
   const p = gs.prompt
   const [val, setVal] = useState('')
@@ -334,7 +338,7 @@ function JusteQ({ gs, canPlay }) {
           ${p.unit && html`<span class="unit">${p.unit}</span>`}
           <button class="btn btn-primary" disabled=${!canPlay || !val.trim()}>${t('live.validate')}</button>
         </form>`
-      : html`<p class="guess-feedback"><span class="pill sky">${t('justenombre.sent', { n: typeof sent === 'number' ? formatNumber(sent) : sent, unit: p.unit || '' })}</span></p>`}
+      : html`<p class="guess-feedback"><span class="pill sky">${t('justenombre.sent', { n: typeof sent === 'number' ? fmtEst(p, sent) : sent, unit: p.unit || '' })}</span></p>`}
     <p class="live-hint">${t('justenombre.hint')}</p>
   </div>`
 }
@@ -356,12 +360,13 @@ function NumberLine({ v, rv }) {
   hi += pad
   const pos = (x) => `${((x - lo) / (hi - lo)) * 100}%`
   const sorted = entries.sort((a, b) => a.value - b.value)
-  return html`<div class="number-line" role="img" aria-label=${t('justenombre.lineAria', { n: formatNumber(target) })}>
+  const f = (n) => fmtEst(rv.prompt, n)
+  return html`<div class="number-line" role="img" aria-label=${t('justenombre.lineAria', { n: f(target) })}>
     <div class="nl-track"></div>
-    <div class="nl-target" style=${{ left: pos(target) }}><span class="nl-flag">🎯</span><b>${formatNumber(target)}</b></div>
+    <div class="nl-target" style=${{ left: pos(target) }}><span class="nl-flag">🎯</span><b>${f(target)}</b></div>
     ${sorted.map(
-      (e, i) => html`<div key=${e.uid} class=${`nl-mark ${i % 2 ? 'up' : 'down'}`} style=${{ left: pos(e.value) }} title=${`${playerOf(v, e.uid).pseudo} : ${formatNumber(e.value)}`}>
-        <${Avatar} user=${playerOf(v, e.uid)} size=${24} /><span class="tiny">${formatNumber(e.value)}</span>
+      (e, i) => html`<div key=${e.uid} class=${`nl-mark ${i % 2 ? 'up' : 'down'}`} style=${{ left: pos(e.value) }} title=${`${playerOf(v, e.uid).pseudo} : ${f(e.value)}`}>
+        <${Avatar} user=${playerOf(v, e.uid)} size=${24} /><span class="tiny">${f(e.value)}</span>
       </div>`,
     )}
   </div>`
@@ -373,10 +378,10 @@ function JusteR({ v, gs }) {
   const pct = (d) => (target ? Math.round((d.dist / target) * 100) : null)
   return html`<div class="live-card">
     <h2 class="live-q">${rv.prompt.q}</h2>
-    <p class="big-answer">${formatNumber(target)} ${rv.prompt.unit || ''}</p>
+    <p class="big-answer">${fmtEst(rv.prompt, target)} ${rv.prompt.unit || ''}</p>
     <${NumberLine} v=${v} rv=${rv} />
     <${RoundPoints} v=${v} rv=${rv} label=${(d) =>
-      `${formatNumber(d.value)} · ${d.dist === 0 ? t('justenombre.exact') : t('justenombre.off', { n: formatNumber(d.dist) })}${d.dist && pct(d) !== null ? ` (${pct(d)} %)` : ''}`} />
+      `${fmtEst(rv.prompt, d.value)} · ${d.dist === 0 ? t('justenombre.exact') : t('justenombre.off', { n: formatNumber(d.dist) })}${d.dist && pct(d) !== null && !isYear(rv.prompt, target) ? ` (${pct(d)} %)` : ''}`} />
   </div>`
 }
 

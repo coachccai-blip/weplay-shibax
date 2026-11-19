@@ -104,7 +104,7 @@ server/                   Règles serveur : comptes et appareils, groupes, messa
   games/                  Cadre des parties en direct, Draw It, moteur « par manches » (rounds.js) et ses 6 jeux (live.js)
   async/                  Cadre des jeux de conversation (index.js) et leurs 7 jeux (games.js)
 shared/                   Logique commune client/serveur : catalogue, comparaison des mots, barème, XP, modération
-data/                     Contenus bilingues : mots (FR et EN, 300 chacun), quiz, estimations, dilemmes, Petit Bac
+data/                     Contenus bilingues : 300 mots FR + 300 mots EN, 160 questions de quiz, 100 estimations, 130 dilemmes, 16 catégories de Petit Bac
 tests/                    Tests unitaires, d'intégration (API) et de bout en bout (navigateurs)
 ```
 
@@ -149,7 +149,7 @@ npm run test:e2e        # parcours type sur 3 navigateurs : PC, téléphone, tab
 npm run test:e2e:v2     # parcours v2 sur 2 navigateurs : anglais + français, photo, morpion, quiz
 ```
 
-Résultats obtenus en local : **54 tests unitaires**, **22 tests d'intégration** (dont plusieurs groupes et la limite de 50, photo visible des seuls membres avec lien signé, téléphone + PC synchronisés, morpion complet dans la conversation, dessin à deviner, manche de quiz sans fuite de la bonne réponse) et **deux parcours navigateur** complets (message reçu en moins de 3 s, dessin affiché chez les devineurs en 0,6 à 1,1 s, coup de morpion visible chez l'adversaire en 3 s environ).
+Résultats obtenus en local : **65 tests unitaires** (dont les règles et barèmes de chaque jeu : séries du quiz, chat-piège, contestations du Petit Bac, équations à trous, revanches, indices…), **25 tests d'intégration** (dont plusieurs groupes et la limite de 50, photo visible des seuls membres avec lien signé, téléphone + PC synchronisés, morpion complet puis revanche — deux demandes simultanées donnent une seule revanche —, contestation à la majorité au Petit Bac, « Autres mots » de Draw It, manche de quiz sans fuite de la bonne réponse) et **deux parcours navigateur** complets (onglets du hub, liste des jeux en cours, message reçu en moins de 3 s, dessin affiché chez les devineurs en 0,6 à 1 s, coup de morpion visible chez l'adversaire en 3 s environ).
 
 Bon à savoir : le magasin Blobs local de `netlify dev` ne renvoie pas d'ETag en lecture ; les écritures conditionnelles (`onlyIfMatch`) y sont donc moins strictes qu'en production. Les tests unitaires couvrent ces écritures avec un magasin en mémoire fidèle.
 

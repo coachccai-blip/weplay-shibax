@@ -360,6 +360,606 @@
       "cat": "corps",
       "fr": { "q": "Quelle partie de l’œil lui donne sa couleur ?", "a": ["L’iris", "La pupille", "La cornée", "La rétine"] },
       "en": { "q": "Which part of the eye gives it its colour?", "a": ["The iris", "The pupil", "The cornea", "The retina"] }
+    },
+    {
+      "id": "q061",
+      "cat": "animaux",
+      "fr": { "q": "Quel est le plus grand félin du monde ?", "a": ["Le tigre", "Le lion", "Le jaguar", "Le léopard"] },
+      "en": { "q": "What is the largest cat species in the world?", "a": ["The tiger", "The lion", "The jaguar", "The leopard"] }
+    },
+    {
+      "id": "q062",
+      "cat": "animaux",
+      "fr": { "q": "Comment appelle-t-on le petit de la vache ?", "a": ["Le veau", "Le poulain", "L’agneau", "Le chevreau"] },
+      "en": { "q": "What is a baby cow called?", "a": ["A calf", "A foal", "A lamb", "A kid"] }
+    },
+    {
+      "id": "q063",
+      "cat": "animaux",
+      "fr": { "q": "Combien de bosses a un dromadaire ?", "a": ["Une", "Deux", "Trois", "Aucune"] },
+      "en": { "q": "How many humps does a dromedary camel have?", "a": ["One", "Two", "Three", "None"] }
+    },
+    {
+      "id": "q064",
+      "cat": "animaux",
+      "fr": { "q": "Quel reptile est célèbre pour sa capacité à changer de couleur ?", "a": ["Le caméléon", "L’iguane", "La tortue", "Le crocodile"] },
+      "en": { "q": "Which reptile is famous for being able to change colour?", "a": ["The chameleon", "The iguana", "The tortoise", "The crocodile"] }
+    },
+    {
+      "id": "q065",
+      "cat": "animaux",
+      "fr": { "q": "De quoi le panda géant se nourrit-il principalement ?", "a": ["De bambou", "D’eucalyptus", "De poissons", "De fourmis"] },
+      "en": { "q": "What does the giant panda mainly eat?", "a": ["Bamboo", "Eucalyptus", "Fish", "Ants"] }
+    },
+    {
+      "id": "q066",
+      "cat": "animaux",
+      "fr": { "q": "Lequel de ces mammifères pond des œufs ?", "a": ["L’ornithorynque", "La loutre", "Le hérisson", "Le paresseux"] },
+      "en": { "q": "Which of these mammals lays eggs?", "a": ["The platypus", "The otter", "The hedgehog", "The sloth"] }
+    },
+    {
+      "id": "q067",
+      "cat": "animaux",
+      "fr": { "q": "Dans quel pays le koala vit-il à l’état sauvage ?", "a": ["En Australie", "En Afrique du Sud", "Au Brésil", "En Inde"] },
+      "en": { "q": "In which country do koalas live in the wild?", "a": ["Australia", "South Africa", "Brazil", "India"] }
+    },
+    {
+      "id": "q068",
+      "cat": "animaux",
+      "fr": { "q": "Comment appelle-t-on un groupe de loups ?", "a": ["Une meute", "Un troupeau", "Une nuée", "Un banc"] },
+      "en": { "q": "What is a group of wolves called?", "a": ["A pack", "A herd", "A swarm", "A school"] }
+    },
+    {
+      "id": "q069",
+      "cat": "animaux",
+      "fr": { "q": "Quel est l’animal le plus haut du monde ?", "a": ["La girafe", "L’éléphant", "L’autruche", "Le chameau"] },
+      "en": { "q": "What is the tallest animal in the world?", "a": ["The giraffe", "The elephant", "The ostrich", "The camel"] }
+    },
+    {
+      "id": "q070",
+      "cat": "animaux",
+      "fr": { "q": "Comment appelle-t-on le mâle de la poule ?", "a": ["Le coq", "Le jars", "Le bélier", "L’étalon"] },
+      "en": { "q": "What is a male chicken called?", "a": ["A rooster", "A gander", "A ram", "A stallion"] }
+    },
+    {
+      "id": "q071",
+      "cat": "animaux",
+      "fr": { "q": "Quel animal construit des barrages sur les rivières ?", "a": ["Le castor", "La loutre", "Le vison", "La marmotte"] },
+      "en": { "q": "Which animal builds dams across rivers?", "a": ["The beaver", "The otter", "The mink", "The marmot"] }
+    },
+    {
+      "id": "q072",
+      "cat": "animaux",
+      "fr": { "q": "Quelle race de chien est célèbre pour tirer des traîneaux sur la neige ?", "a": ["Le husky", "Le chihuahua", "Le teckel", "Le caniche"] },
+      "en": { "q": "Which dog breed is famous for pulling sleds through the snow?", "a": ["The husky", "The chihuahua", "The dachshund", "The poodle"] }
+    },
+    {
+      "id": "q073",
+      "cat": "animaux",
+      "fr": { "q": "Quel est le sens le plus développé chez le chien ?", "a": ["L’odorat", "La vue", "Le goût", "Le toucher"] },
+      "en": { "q": "What is a dog’s strongest sense?", "a": ["Smell", "Sight", "Taste", "Touch"] }
+    },
+    {
+      "id": "q074",
+      "cat": "geo",
+      "fr": { "q": "Quel est le plus long fleuve d’Afrique ?", "a": ["Le Nil", "Le Congo", "Le Niger", "Le Zambèze"] },
+      "en": { "q": "What is the longest river in Africa?", "a": ["The Nile", "The Congo", "The Niger", "The Zambezi"] }
+    },
+    {
+      "id": "q075",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la plus haute montagne du monde ?", "a": ["L’Everest", "Le K2", "Le mont Blanc", "Le Kilimandjaro"] },
+      "en": { "q": "What is the highest mountain in the world?", "a": ["Mount Everest", "K2", "Mont Blanc", "Kilimanjaro"] }
+    },
+    {
+      "id": "q076",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la capitale du Brésil ?", "a": ["Brasilia", "Rio de Janeiro", "São Paulo", "Salvador"] },
+      "en": { "q": "What is the capital of Brazil?", "a": ["Brasília", "Rio de Janeiro", "São Paulo", "Salvador"] }
+    },
+    {
+      "id": "q077",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la capitale du Maroc ?", "a": ["Rabat", "Casablanca", "Marrakech", "Fès"] },
+      "en": { "q": "What is the capital of Morocco?", "a": ["Rabat", "Casablanca", "Marrakesh", "Fez"] }
+    },
+    {
+      "id": "q078",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la capitale de la Nouvelle-Zélande ?", "a": ["Wellington", "Auckland", "Christchurch", "Queenstown"] },
+      "en": { "q": "What is the capital of New Zealand?", "a": ["Wellington", "Auckland", "Christchurch", "Queenstown"] }
+    },
+    {
+      "id": "q079",
+      "cat": "geo",
+      "fr": { "q": "Dans quel pays se trouvent les pyramides de Gizeh ?", "a": ["L’Égypte", "Le Mexique", "La Grèce", "Le Soudan"] },
+      "en": { "q": "In which country are the Pyramids of Giza?", "a": ["Egypt", "Mexico", "Greece", "Sudan"] }
+    },
+    {
+      "id": "q080",
+      "cat": "geo",
+      "fr": { "q": "Quel est le plus grand pays du monde par sa superficie ?", "a": ["La Russie", "Le Canada", "La Chine", "Les États-Unis"] },
+      "en": { "q": "What is the largest country in the world by area?", "a": ["Russia", "Canada", "China", "The United States"] }
+    },
+    {
+      "id": "q081",
+      "cat": "geo",
+      "fr": { "q": "Quelle mer sépare l’Europe de l’Afrique ?", "a": ["La Méditerranée", "La mer Rouge", "La mer Noire", "La mer Baltique"] },
+      "en": { "q": "Which sea separates Europe from Africa?", "a": ["The Mediterranean", "The Red Sea", "The Black Sea", "The Baltic Sea"] }
+    },
+    {
+      "id": "q082",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la plus grande île du monde ?", "a": ["Le Groenland", "Madagascar", "Bornéo", "L’Islande"] },
+      "en": { "q": "What is the largest island in the world?", "a": ["Greenland", "Madagascar", "Borneo", "Iceland"] }
+    },
+    {
+      "id": "q083",
+      "cat": "geo",
+      "fr": { "q": "Dans quel pays se trouve le Machu Picchu ?", "a": ["Le Pérou", "Le Mexique", "La Bolivie", "Le Chili"] },
+      "en": { "q": "In which country is Machu Picchu?", "a": ["Peru", "Mexico", "Bolivia", "Chile"] }
+    },
+    {
+      "id": "q084",
+      "cat": "geo",
+      "fr": { "q": "Quel pays surnomme-t-on « le pays du Soleil-Levant » ?", "a": ["Le Japon", "La Chine", "Le Viêt Nam", "Les Philippines"] },
+      "en": { "q": "Which country is known as “the Land of the Rising Sun”?", "a": ["Japan", "China", "Vietnam", "The Philippines"] }
+    },
+    {
+      "id": "q085",
+      "cat": "geo",
+      "fr": { "q": "Quelle chaîne de montagnes longe toute la côte ouest de l’Amérique du Sud ?", "a": ["La cordillère des Andes", "Les Rocheuses", "L’Himalaya", "L’Atlas"] },
+      "en": { "q": "Which mountain range runs along the whole west coast of South America?", "a": ["The Andes", "The Rockies", "The Himalayas", "The Atlas Mountains"] }
+    },
+    {
+      "id": "q086",
+      "cat": "geo",
+      "fr": { "q": "Quel est le plus grand lac d’Afrique par sa superficie ?", "a": ["Le lac Victoria", "Le lac Tanganyika", "Le lac Malawi", "Le lac Tchad"] },
+      "en": { "q": "What is the largest lake in Africa by area?", "a": ["Lake Victoria", "Lake Tanganyika", "Lake Malawi", "Lake Chad"] }
+    },
+    {
+      "id": "q087",
+      "cat": "science",
+      "fr": { "q": "Quelle planète est célèbre pour ses grands anneaux bien visibles ?", "a": ["Saturne", "Mars", "Vénus", "Mercure"] },
+      "en": { "q": "Which planet is famous for its large, clearly visible rings?", "a": ["Saturn", "Mars", "Venus", "Mercury"] }
+    },
+    {
+      "id": "q088",
+      "cat": "science",
+      "fr": { "q": "À quelle température l’eau bout-elle au niveau de la mer ?", "a": ["100 °C", "90 °C", "80 °C", "120 °C"] },
+      "en": { "q": "At what temperature does water boil at sea level?", "a": ["100 °C", "90 °C", "80 °C", "120 °C"] }
+    },
+    {
+      "id": "q089",
+      "cat": "science",
+      "fr": { "q": "Quel gaz compose la plus grande partie de l’air que nous respirons ?", "a": ["L’azote", "L’oxygène", "Le dioxyde de carbone", "L’hydrogène"] },
+      "en": { "q": "Which gas makes up most of the air we breathe?", "a": ["Nitrogen", "Oxygen", "Carbon dioxide", "Hydrogen"] }
+    },
+    {
+      "id": "q090",
+      "cat": "science",
+      "fr": { "q": "Combien de côtés a un hexagone ?", "a": ["6", "5", "7", "8"] },
+      "en": { "q": "How many sides does a hexagon have?", "a": ["6", "5", "7", "8"] }
+    },
+    {
+      "id": "q091",
+      "cat": "science",
+      "fr": { "q": "Combien de planètes compte le système solaire ?", "a": ["8", "9", "7", "10"] },
+      "en": { "q": "How many planets are there in the Solar System?", "a": ["8", "9", "7", "10"] }
+    },
+    {
+      "id": "q092",
+      "cat": "science",
+      "fr": { "q": "Quelle est la planète la plus chaude du système solaire ?", "a": ["Vénus", "Mercure", "Mars", "Jupiter"] },
+      "en": { "q": "What is the hottest planet in the Solar System?", "a": ["Venus", "Mercury", "Mars", "Jupiter"] }
+    },
+    {
+      "id": "q093",
+      "cat": "science",
+      "fr": { "q": "Quel savant est célèbre pour sa théorie de la relativité ?", "a": ["Albert Einstein", "Isaac Newton", "Marie Curie", "Charles Darwin"] },
+      "en": { "q": "Which scientist is famous for the theory of relativity?", "a": ["Albert Einstein", "Isaac Newton", "Marie Curie", "Charles Darwin"] }
+    },
+    {
+      "id": "q094",
+      "cat": "science",
+      "fr": { "q": "Selon la légende, quel savant a pensé à la gravitation en voyant tomber une pomme ?", "a": ["Isaac Newton", "Albert Einstein", "Galilée", "Thomas Edison"] },
+      "en": { "q": "According to legend, which scientist thought of gravity after seeing an apple fall?", "a": ["Isaac Newton", "Albert Einstein", "Galileo", "Thomas Edison"] }
+    },
+    {
+      "id": "q095",
+      "cat": "science",
+      "fr": { "q": "Dans quel état se trouve l’eau sous forme de vapeur ?", "a": ["Gazeux", "Liquide", "Solide", "Plasma"] },
+      "en": { "q": "What state of matter is water vapour?", "a": ["Gas", "Liquid", "Solid", "Plasma"] }
+    },
+    {
+      "id": "q096",
+      "cat": "science",
+      "fr": { "q": "Quel métal est liquide à température ambiante ?", "a": ["Le mercure", "Le plomb", "L’étain", "L’aluminium"] },
+      "en": { "q": "Which metal is liquid at room temperature?", "a": ["Mercury", "Lead", "Tin", "Aluminium"] }
+    },
+    {
+      "id": "q097",
+      "cat": "science",
+      "fr": { "q": "Quel astre est le principal responsable des marées sur Terre ?", "a": ["La Lune", "Le Soleil", "Mars", "Vénus"] },
+      "en": { "q": "Which body in the sky is mainly responsible for the tides on Earth?", "a": ["The Moon", "The Sun", "Mars", "Venus"] }
+    },
+    {
+      "id": "q098",
+      "cat": "science",
+      "fr": { "q": "Quelle partie de l’atome porte une charge électrique négative ?", "a": ["L’électron", "Le proton", "Le neutron", "Le noyau"] },
+      "en": { "q": "Which part of an atom has a negative electric charge?", "a": ["The electron", "The proton", "The neutron", "The nucleus"] }
+    },
+    {
+      "id": "q099",
+      "cat": "science",
+      "fr": { "q": "Quel instrument sert à mesurer la température ?", "a": ["Le thermomètre", "Le baromètre", "L’anémomètre", "Le chronomètre"] },
+      "en": { "q": "Which instrument is used to measure temperature?", "a": ["A thermometer", "A barometer", "An anemometer", "A stopwatch"] }
+    },
+    {
+      "id": "q100",
+      "cat": "nature",
+      "fr": { "q": "Quel pigment donne leur couleur verte aux feuilles des plantes ?", "a": ["La chlorophylle", "Le carotène", "La mélanine", "La cellulose"] },
+      "en": { "q": "Which pigment gives plant leaves their green colour?", "a": ["Chlorophyll", "Carotene", "Melanin", "Cellulose"] }
+    },
+    {
+      "id": "q101",
+      "cat": "nature",
+      "fr": { "q": "Quel conifère perd toutes ses aiguilles chaque automne ?", "a": ["Le mélèze", "Le sapin", "L’épicéa", "Le pin"] },
+      "en": { "q": "Which conifer sheds all its needles every autumn?", "a": ["The larch", "The fir", "The spruce", "The pine"] }
+    },
+    {
+      "id": "q102",
+      "cat": "nature",
+      "fr": { "q": "La feuille de quel arbre figure sur le drapeau du Canada ?", "a": ["L’érable", "Le chêne", "Le bouleau", "Le platane"] },
+      "en": { "q": "Which tree’s leaf appears on the flag of Canada?", "a": ["The maple", "The oak", "The birch", "The plane tree"] }
+    },
+    {
+      "id": "q103",
+      "cat": "nature",
+      "fr": { "q": "Comment dit-on d’un animal actif surtout la nuit ?", "a": ["Nocturne", "Diurne", "Migrateur", "Sauvage"] },
+      "en": { "q": "What do you call an animal that is mostly active at night?", "a": ["Nocturnal", "Diurnal", "Migratory", "Wild"] }
+    },
+    {
+      "id": "q104",
+      "cat": "nature",
+      "fr": { "q": "Comment appelle-t-on le long sommeil d’hiver de la marmotte ?", "a": ["L’hibernation", "La migration", "La mue", "La métamorphose"] },
+      "en": { "q": "What is the marmot’s long winter sleep called?", "a": ["Hibernation", "Migration", "Moulting", "Metamorphosis"] }
+    },
+    {
+      "id": "q105",
+      "cat": "nature",
+      "fr": { "q": "Comment appelle-t-on les billes de glace qui tombent parfois pendant un orage ?", "a": ["La grêle", "La neige", "La rosée", "Le givre"] },
+      "en": { "q": "What are the balls of ice that sometimes fall during a storm called?", "a": ["Hail", "Snow", "Dew", "Frost"] }
+    },
+    {
+      "id": "q106",
+      "cat": "nature",
+      "fr": { "q": "Que peut-on voir dans le ciel quand le soleil brille pendant la pluie ?", "a": ["Un arc-en-ciel", "Une aurore boréale", "Une étoile filante", "Un mirage"] },
+      "en": { "q": "What can you see in the sky when the sun shines during rain?", "a": ["A rainbow", "The northern lights", "A shooting star", "A mirage"] }
+    },
+    {
+      "id": "q107",
+      "cat": "nature",
+      "fr": { "q": "Quelle plante du désert stocke de l’eau et est souvent couverte d’épines ?", "a": ["Le cactus", "Le bambou", "Le lierre", "La fougère"] },
+      "en": { "q": "Which desert plant stores water and is often covered in spines?", "a": ["The cactus", "The bamboo", "The ivy", "The fern"] }
+    },
+    {
+      "id": "q108",
+      "cat": "nature",
+      "fr": { "q": "Quelle est la plus grande forêt tropicale du monde ?", "a": ["L’Amazonie", "La forêt du Congo", "La forêt de Bornéo", "La forêt de Sumatra"] },
+      "en": { "q": "What is the largest tropical rainforest in the world?", "a": ["The Amazon", "The Congo rainforest", "The Borneo rainforest", "The Sumatra rainforest"] }
+    },
+    {
+      "id": "q109",
+      "cat": "nature",
+      "fr": { "q": "Quel arbre peut devenir le plus haut du monde ?", "a": ["Le séquoia", "Le baobab", "Le chêne", "Le palmier"] },
+      "en": { "q": "Which tree can grow the tallest in the world?", "a": ["The sequoia (redwood)", "The baobab", "The oak", "The palm tree"] }
+    },
+    {
+      "id": "q110",
+      "cat": "nature",
+      "fr": { "q": "Quelle grande fleur jaune suit la course du soleil quand elle est jeune ?", "a": ["Le tournesol", "La tulipe", "La marguerite", "Le pissenlit"] },
+      "en": { "q": "Which big yellow flower follows the sun across the sky when it is young?", "a": ["The sunflower", "The tulip", "The daisy", "The dandelion"] }
+    },
+    {
+      "id": "q111",
+      "cat": "nature",
+      "fr": { "q": "Comment appelle-t-on les parties colorées d’une fleur qui attirent les insectes ?", "a": ["Les pétales", "Les racines", "La tige", "Les épines"] },
+      "en": { "q": "What are the colourful parts of a flower that attract insects called?", "a": ["The petals", "The roots", "The stem", "The thorns"] }
+    },
+    {
+      "id": "q112",
+      "cat": "cuisine",
+      "fr": { "q": "Avec quel ingrédient principal prépare-t-on le ketchup ?", "a": ["La tomate", "Le poivron rouge", "La fraise", "La betterave"] },
+      "en": { "q": "What is ketchup mainly made from?", "a": ["Tomatoes", "Red peppers", "Strawberries", "Beetroot"] }
+    },
+    {
+      "id": "q113",
+      "cat": "cuisine",
+      "fr": { "q": "À partir de quoi fabrique-t-on le chocolat ?", "a": ["Des fèves de cacao", "Des grains de café", "Des noisettes", "Des gousses de vanille"] },
+      "en": { "q": "What is chocolate made from?", "a": ["Cocoa beans", "Coffee beans", "Hazelnuts", "Vanilla pods"] }
+    },
+    {
+      "id": "q114",
+      "cat": "cuisine",
+      "fr": { "q": "Quel aliment est indispensable pour préparer des sushis ?", "a": ["Le riz", "Les pâtes", "Le pain", "La semoule"] },
+      "en": { "q": "Which food is essential for making sushi?", "a": ["Rice", "Pasta", "Bread", "Semolina"] }
+    },
+    {
+      "id": "q115",
+      "cat": "cuisine",
+      "fr": { "q": "Quel fromage met-on sur une pizza margherita ?", "a": ["La mozzarella", "Le parmesan", "Le gruyère", "La feta"] },
+      "en": { "q": "Which cheese goes on a margherita pizza?", "a": ["Mozzarella", "Parmesan", "Gruyère", "Feta"] }
+    },
+    {
+      "id": "q116",
+      "cat": "cuisine",
+      "fr": { "q": "Avec quel fruit à coque fabrique-t-on le massepain ?", "a": ["L’amande", "La noisette", "La noix", "La pistache"] },
+      "en": { "q": "Which nut is marzipan made from?", "a": ["Almonds", "Hazelnuts", "Walnuts", "Pistachios"] }
+    },
+    {
+      "id": "q117",
+      "cat": "cuisine",
+      "fr": { "q": "Quelle herbe aromatique est l’ingrédient principal du pesto ?", "a": ["Le basilic", "Le persil", "La menthe", "La coriandre"] },
+      "en": { "q": "Which herb is the main ingredient of pesto?", "a": ["Basil", "Parsley", "Mint", "Coriander"] }
+    },
+    {
+      "id": "q118",
+      "cat": "cuisine",
+      "fr": { "q": "De quel pays le goulash est-il originaire ?", "a": ["La Hongrie", "La Pologne", "L’Allemagne", "La Russie"] },
+      "en": { "q": "Which country does goulash come from?", "a": ["Hungary", "Poland", "Germany", "Russia"] }
+    },
+    {
+      "id": "q119",
+      "cat": "cuisine",
+      "fr": { "q": "Quelle épice précieuse est récoltée dans la fleur du crocus ?", "a": ["Le safran", "Le cumin", "La muscade", "Le clou de girofle"] },
+      "en": { "q": "Which precious spice is harvested from crocus flowers?", "a": ["Saffron", "Cumin", "Nutmeg", "Cloves"] }
+    },
+    {
+      "id": "q120",
+      "cat": "cuisine",
+      "fr": { "q": "Avec quelle plante fabrique-t-on le tofu ?", "a": ["Le soja", "Le riz", "Le blé", "Le maïs"] },
+      "en": { "q": "Which plant is tofu made from?", "a": ["Soybeans", "Rice", "Wheat", "Corn"] }
+    },
+    {
+      "id": "q121",
+      "cat": "cuisine",
+      "fr": { "q": "Quel fruit porte ses petites graines à l’extérieur ?", "a": ["La fraise", "La framboise", "La cerise", "La myrtille"] },
+      "en": { "q": "Which fruit has its tiny seeds on the outside?", "a": ["The strawberry", "The raspberry", "The cherry", "The blueberry"] }
+    },
+    {
+      "id": "q122",
+      "cat": "cuisine",
+      "fr": { "q": "Quel fruit tropical porte une couronne de feuilles sur le dessus ?", "a": ["L’ananas", "La mangue", "La papaye", "La noix de coco"] },
+      "en": { "q": "Which tropical fruit has a crown of leaves on top?", "a": ["The pineapple", "The mango", "The papaya", "The coconut"] }
+    },
+    {
+      "id": "q123",
+      "cat": "cuisine",
+      "fr": { "q": "Quel légume fait souvent pleurer quand on le coupe ?", "a": ["L’oignon", "La carotte", "Le poireau", "La pomme de terre"] },
+      "en": { "q": "Which vegetable often makes you cry when you cut it?", "a": ["The onion", "The carrot", "The leek", "The potato"] }
+    },
+    {
+      "id": "q124",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport les joueurs frappent-ils un palet avec une crosse ?", "a": ["Le hockey sur glace", "Le curling", "Le bobsleigh", "Le ski"] },
+      "en": { "q": "In which sport do players hit a puck with a stick?", "a": ["Ice hockey", "Curling", "Bobsleigh", "Skiing"] }
+    },
+    {
+      "id": "q125",
+      "cat": "sport",
+      "fr": { "q": "Dans quel pays les Jeux olympiques sont-ils nés dans l’Antiquité ?", "a": ["La Grèce", "L’Italie", "L’Égypte", "L’Espagne"] },
+      "en": { "q": "In which country were the Olympic Games born in ancient times?", "a": ["Greece", "Italy", "Egypt", "Spain"] }
+    },
+    {
+      "id": "q126",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport peut-on réussir un « trou en un » ?", "a": ["Le golf", "Le tennis", "Le baseball", "Le hockey"] },
+      "en": { "q": "In which sport can you score a “hole in one”?", "a": ["Golf", "Tennis", "Baseball", "Hockey"] }
+    },
+    {
+      "id": "q127",
+      "cat": "sport",
+      "fr": { "q": "Quelle distance parcourt-on lors d’un marathon ?", "a": ["42,195 km", "40 km", "45 km", "50 km"] },
+      "en": { "q": "How long is a marathon?", "a": ["42.195 km", "40 km", "45 km", "50 km"] }
+    },
+    {
+      "id": "q128",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport réalise-t-on des sauts appelés « axel » ?", "a": ["Le patinage artistique", "La gymnastique", "Le plongeon", "Le ski acrobatique"] },
+      "en": { "q": "In which sport do athletes perform jumps called “axels”?", "a": ["Figure skating", "Gymnastics", "Diving", "Freestyle skiing"] }
+    },
+    {
+      "id": "q129",
+      "cat": "sport",
+      "fr": { "q": "Au judo, quelle ceinture précède la ceinture noire ?", "a": ["La ceinture marron", "La ceinture bleue", "La ceinture verte", "La ceinture orange"] },
+      "en": { "q": "In judo, which belt comes just before the black belt?", "a": ["The brown belt", "The blue belt", "The green belt", "The orange belt"] }
+    },
+    {
+      "id": "q130",
+      "cat": "sport",
+      "fr": { "q": "Quel sport enchaîne natation, vélo et course à pied ?", "a": ["Le triathlon", "Le pentathlon", "Le décathlon", "Le biathlon"] },
+      "en": { "q": "Which sport combines swimming, cycling and running?", "a": ["Triathlon", "Pentathlon", "Decathlon", "Biathlon"] }
+    },
+    {
+      "id": "q131",
+      "cat": "sport",
+      "fr": { "q": "Quelle compétition réunit tous les quatre ans des équipes nationales de football du monde entier ?", "a": ["La Coupe du monde", "La Ligue des champions", "La Copa Libertadores", "La Ligue Europa"] },
+      "en": { "q": "Which competition brings together national football teams from all over the world every four years?", "a": ["The World Cup", "The Champions League", "The Copa Libertadores", "The Europa League"] }
+    },
+    {
+      "id": "q132",
+      "cat": "sport",
+      "fr": { "q": "Au volley-ball en salle, combien de joueurs chaque équipe a-t-elle sur le terrain ?", "a": ["6", "4", "5", "7"] },
+      "en": { "q": "In indoor volleyball, how many players does each team have on the court?", "a": ["6", "4", "5", "7"] }
+    },
+    {
+      "id": "q133",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport peut-on frapper un « home run » ?", "a": ["Le baseball", "Le cricket", "Le golf", "Le tennis"] },
+      "en": { "q": "In which sport can you hit a “home run”?", "a": ["Baseball", "Cricket", "Golf", "Tennis"] }
+    },
+    {
+      "id": "q134",
+      "cat": "sport",
+      "fr": { "q": "Sur quelle surface se joue le tournoi de tennis de Roland-Garros ?", "a": ["La terre battue", "Le gazon", "La surface dure", "La moquette"] },
+      "en": { "q": "On which surface is the French Open (Roland-Garros) played?", "a": ["Clay", "Grass", "Hard court", "Carpet"] }
+    },
+    {
+      "id": "q135",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport utilise-t-on un ruban, un cerceau et des massues ?", "a": ["La gymnastique rythmique", "Le patinage artistique", "La natation artistique", "Le trampoline"] },
+      "en": { "q": "Which sport uses a ribbon, a hoop and clubs?", "a": ["Rhythmic gymnastics", "Figure skating", "Artistic swimming", "Trampolining"] }
+    },
+    {
+      "id": "q136",
+      "cat": "culture",
+      "fr": { "q": "Qui a peint « La Nuit étoilée » ?", "a": ["Vincent van Gogh", "Claude Monet", "Paul Cézanne", "Pablo Picasso"] },
+      "en": { "q": "Who painted “The Starry Night”?", "a": ["Vincent van Gogh", "Claude Monet", "Paul Cézanne", "Pablo Picasso"] }
+    },
+    {
+      "id": "q137",
+      "cat": "culture",
+      "fr": { "q": "Qui a écrit la saga « Harry Potter » ?", "a": ["J. K. Rowling", "Roald Dahl", "J. R. R. Tolkien", "C. S. Lewis"] },
+      "en": { "q": "Who wrote the “Harry Potter” books?", "a": ["J. K. Rowling", "Roald Dahl", "J. R. R. Tolkien", "C. S. Lewis"] }
+    },
+    {
+      "id": "q138",
+      "cat": "culture",
+      "fr": { "q": "Qui a composé « Les Quatre Saisons » ?", "a": ["Antonio Vivaldi", "Wolfgang Amadeus Mozart", "Jean-Sébastien Bach", "Frédéric Chopin"] },
+      "en": { "q": "Who composed “The Four Seasons”?", "a": ["Antonio Vivaldi", "Wolfgang Amadeus Mozart", "Johann Sebastian Bach", "Frédéric Chopin"] }
+    },
+    {
+      "id": "q139",
+      "cat": "culture",
+      "fr": { "q": "Qui a sculpté « Le Penseur » ?", "a": ["Auguste Rodin", "Michel-Ange", "Camille Claudel", "Alberto Giacometti"] },
+      "en": { "q": "Who sculpted “The Thinker”?", "a": ["Auguste Rodin", "Michelangelo", "Camille Claudel", "Alberto Giacometti"] }
+    },
+    {
+      "id": "q140",
+      "cat": "culture",
+      "fr": { "q": "Comment s’appelle la célèbre souris créée par Walt Disney ?", "a": ["Mickey", "Jerry", "Speedy Gonzales", "Stuart Little"] },
+      "en": { "q": "What is the name of Walt Disney’s famous mouse?", "a": ["Mickey Mouse", "Jerry", "Speedy Gonzales", "Stuart Little"] }
+    },
+    {
+      "id": "q141",
+      "cat": "culture",
+      "fr": { "q": "Dans quel conte l’héroïne perd-elle une pantoufle de verre ?", "a": ["Cendrillon", "Blanche-Neige", "La Belle au bois dormant", "Raiponce"] },
+      "en": { "q": "In which fairy tale does the heroine lose a glass slipper?", "a": ["Cinderella", "Snow White", "Sleeping Beauty", "Rapunzel"] }
+    },
+    {
+      "id": "q142",
+      "cat": "culture",
+      "fr": { "q": "Quel grand instrument à cordes, en forme de triangle, se joue en pinçant les cordes ?", "a": ["La harpe", "Le violoncelle", "La contrebasse", "Le luth"] },
+      "en": { "q": "Which large, triangle-shaped string instrument is played by plucking the strings?", "a": ["The harp", "The cello", "The double bass", "The lute"] }
+    },
+    {
+      "id": "q143",
+      "cat": "culture",
+      "fr": { "q": "Quelle couleur obtient-on en mélangeant de la peinture bleue et de la peinture jaune ?", "a": ["Le vert", "Le violet", "L’orange", "Le marron"] },
+      "en": { "q": "What colour do you get by mixing blue and yellow paint?", "a": ["Green", "Purple", "Orange", "Brown"] }
+    },
+    {
+      "id": "q144",
+      "cat": "culture",
+      "fr": { "q": "Quel super-héros surnomme-t-on « l’Homme d’acier » ?", "a": ["Superman", "Batman", "Iron Man", "Spider-Man"] },
+      "en": { "q": "Which superhero is nicknamed “the Man of Steel”?", "a": ["Superman", "Batman", "Iron Man", "Spider-Man"] }
+    },
+    {
+      "id": "q145",
+      "cat": "culture",
+      "fr": { "q": "Qui a écrit « Vingt Mille Lieues sous les mers » ?", "a": ["Jules Verne", "H. G. Wells", "Alexandre Dumas", "Victor Hugo"] },
+      "en": { "q": "Who wrote “Twenty Thousand Leagues Under the Sea”?", "a": ["Jules Verne", "H. G. Wells", "Alexandre Dumas", "Victor Hugo"] }
+    },
+    {
+      "id": "q146",
+      "cat": "culture",
+      "fr": { "q": "Quel peintre est célèbre pour sa série des « Nymphéas » ?", "a": ["Claude Monet", "Vincent van Gogh", "Edgar Degas", "Paul Gauguin"] },
+      "en": { "q": "Which painter is famous for his “Water Lilies” series?", "a": ["Claude Monet", "Vincent van Gogh", "Edgar Degas", "Paul Gauguin"] }
+    },
+    {
+      "id": "q147",
+      "cat": "culture",
+      "fr": { "q": "Quelle héroïne suit un lapin blanc jusqu’au pays des merveilles ?", "a": ["Alice", "Wendy", "Dorothy", "Heidi"] },
+      "en": { "q": "Which heroine follows a white rabbit all the way to Wonderland?", "a": ["Alice", "Wendy", "Dorothy", "Heidi"] }
+    },
+    {
+      "id": "q148",
+      "cat": "culture",
+      "fr": { "q": "Quel pantin de bois voit son nez s’allonger quand il ment ?", "a": ["Pinocchio", "Geppetto", "Peter Pan", "Tom Pouce"] },
+      "en": { "q": "Which wooden puppet’s nose grows longer when he tells a lie?", "a": ["Pinocchio", "Geppetto", "Peter Pan", "Tom Thumb"] }
+    },
+    {
+      "id": "q149",
+      "cat": "corps",
+      "fr": { "q": "Quels organes font entrer l’oxygène de l’air dans le sang ?", "a": ["Les poumons", "Les reins", "Le foie", "L’estomac"] },
+      "en": { "q": "Which organs bring oxygen from the air into the blood?", "a": ["The lungs", "The kidneys", "The liver", "The stomach"] }
+    },
+    {
+      "id": "q150",
+      "cat": "corps",
+      "fr": { "q": "Quelle partie du squelette protège le cerveau ?", "a": ["Le crâne", "La cage thoracique", "Le bassin", "La colonne vertébrale"] },
+      "en": { "q": "Which part of the skeleton protects the brain?", "a": ["The skull", "The rib cage", "The pelvis", "The spine"] }
+    },
+    {
+      "id": "q151",
+      "cat": "corps",
+      "fr": { "q": "Quel sens nous permet de distinguer le sucré du salé ?", "a": ["Le goût", "L’odorat", "L’ouïe", "Le toucher"] },
+      "en": { "q": "Which sense lets us tell sweet from salty?", "a": ["Taste", "Smell", "Hearing", "Touch"] }
+    },
+    {
+      "id": "q152",
+      "cat": "corps",
+      "fr": { "q": "Quel organe fabrique la bile, qui aide à digérer les graisses ?", "a": ["Le foie", "L’estomac", "Le pancréas", "La rate"] },
+      "en": { "q": "Which organ makes bile, which helps to digest fats?", "a": ["The liver", "The stomach", "The pancreas", "The spleen"] }
+    },
+    {
+      "id": "q153",
+      "cat": "corps",
+      "fr": { "q": "Où se trouve la rotule ?", "a": ["Au genou", "Au coude", "À l’épaule", "À la cheville"] },
+      "en": { "q": "Where in the body is the patella?", "a": ["In the knee", "In the elbow", "In the shoulder", "In the ankle"] }
+    },
+    {
+      "id": "q154",
+      "cat": "corps",
+      "fr": { "q": "Quelle vitamine notre peau fabrique-t-elle grâce au soleil ?", "a": ["La vitamine D", "La vitamine C", "La vitamine A", "La vitamine B12"] },
+      "en": { "q": "Which vitamin does our skin make thanks to sunlight?", "a": ["Vitamin D", "Vitamin C", "Vitamin A", "Vitamin B12"] }
+    },
+    {
+      "id": "q155",
+      "cat": "corps",
+      "fr": { "q": "Comment s’appellent les grosses dents du fond qui broient les aliments ?", "a": ["Les molaires", "Les incisives", "Les canines", "Les dents de lait"] },
+      "en": { "q": "What are the big back teeth that grind food called?", "a": ["Molars", "Incisors", "Canines", "Baby teeth"] }
+    },
+    {
+      "id": "q156",
+      "cat": "corps",
+      "fr": { "q": "De quelle protéine les cheveux et les ongles sont-ils principalement faits ?", "a": ["La kératine", "Le collagène", "L’hémoglobine", "La caséine"] },
+      "en": { "q": "Which protein are hair and nails mainly made of?", "a": ["Keratin", "Collagen", "Haemoglobin", "Casein"] }
+    },
+    {
+      "id": "q157",
+      "cat": "corps",
+      "fr": { "q": "Où se trouvent les cordes vocales ?", "a": ["Dans la gorge", "Dans le nez", "Dans les poumons", "Dans la bouche"] },
+      "en": { "q": "Where are the vocal cords?", "a": ["In the throat", "In the nose", "In the lungs", "In the mouth"] }
+    },
+    {
+      "id": "q158",
+      "cat": "corps",
+      "fr": { "q": "Quelle articulation relie la main à l’avant-bras ?", "a": ["Le poignet", "Le coude", "La cheville", "L’épaule"] },
+      "en": { "q": "Which joint connects the hand to the forearm?", "a": ["The wrist", "The elbow", "The ankle", "The shoulder"] }
+    },
+    {
+      "id": "q159",
+      "cat": "corps",
+      "fr": { "q": "Combien de vertèbres compte le cou humain ?", "a": ["7", "5", "12", "3"] },
+      "en": { "q": "How many vertebrae are there in the human neck?", "a": ["7", "5", "12", "3"] }
+    },
+    {
+      "id": "q160",
+      "cat": "corps",
+      "fr": { "q": "Quelle est, environ, la température normale du corps humain ?", "a": ["37 °C", "32 °C", "35 °C", "40 °C"] },
+      "en": { "q": "Roughly what is the normal temperature of the human body?", "a": ["37 °C", "32 °C", "35 °C", "40 °C"] }
     }
   ]
 }

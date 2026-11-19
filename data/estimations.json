@@ -240,6 +240,366 @@
       "answer": 50,
       "fr": { "q": "Combien de mètres mesure une piscine olympique dans sa longueur ?", "unit": "mètres" },
       "en": { "q": "How long is an Olympic swimming pool, in metres?", "unit": "metres" }
+    },
+    {
+      "id": "n041",
+      "answer": 1903,
+      "fr": { "q": "En quelle année les frères Wright ont-ils réussi le premier vol en avion à moteur ?", "unit": "" },
+      "en": { "q": "In what year did the Wright brothers make the first powered aeroplane flight?", "unit": "" }
+    },
+    {
+      "id": "n042",
+      "answer": 1961,
+      "fr": { "q": "En quelle année Youri Gagarine est-il devenu le premier humain dans l’espace ?", "unit": "" },
+      "en": { "q": "In what year did Yuri Gagarin become the first human in space?", "unit": "" }
+    },
+    {
+      "id": "n043",
+      "answer": 1756,
+      "fr": { "q": "En quelle année Mozart est-il né ?", "unit": "" },
+      "en": { "q": "In what year was Mozart born?", "unit": "" }
+    },
+    {
+      "id": "n044",
+      "answer": 1930,
+      "fr": { "q": "En quelle année a eu lieu la première Coupe du monde de football ?", "unit": "" },
+      "en": { "q": "In what year was the first FIFA World Cup held?", "unit": "" }
+    },
+    {
+      "id": "n045",
+      "answer": 1886,
+      "fr": { "q": "En quelle année la statue de la Liberté a-t-elle été inaugurée à New York ?", "unit": "" },
+      "en": { "q": "In what year was the Statue of Liberty unveiled in New York?", "unit": "" }
+    },
+    {
+      "id": "n046",
+      "answer": 1924,
+      "fr": { "q": "En quelle année ont eu lieu les premiers Jeux olympiques d’hiver ?", "unit": "" },
+      "en": { "q": "In what year were the first Winter Olympic Games held?", "unit": "" }
+    },
+    {
+      "id": "n047",
+      "answer": 1901,
+      "fr": { "q": "En quelle année les premiers prix Nobel ont-ils été remis ?", "unit": "" },
+      "en": { "q": "In what year were the first Nobel Prizes awarded?", "unit": "" }
+    },
+    {
+      "id": "n048",
+      "answer": 1973,
+      "fr": { "q": "En quelle année l’opéra de Sydney a-t-il été inauguré ?", "unit": "" },
+      "en": { "q": "In what year was the Sydney Opera House opened?", "unit": "" }
+    },
+    {
+      "id": "n049",
+      "answer": 1928,
+      "fr": { "q": "En quelle année Mickey Mouse est-il apparu pour la première fois dans un dessin animé ?", "unit": "" },
+      "en": { "q": "In what year did Mickey Mouse first appear in a cartoon?", "unit": "" }
+    },
+    {
+      "id": "n050",
+      "answer": 1953,
+      "fr": { "q": "En quelle année des alpinistes ont-ils atteint pour la première fois le sommet de l’Everest ?", "unit": "" },
+      "en": { "q": "In what year did climbers first reach the summit of Mount Everest?", "unit": "" }
+    },
+    {
+      "id": "n051",
+      "answer": 384400,
+      "fr": { "q": "Quelle est la distance moyenne entre la Terre et la Lune ?", "unit": "kilomètres" },
+      "en": { "q": "What is the average distance between the Earth and the Moon?", "unit": "kilometres" }
+    },
+    {
+      "id": "n052",
+      "answer": 299792,
+      "fr": { "q": "À quelle vitesse la lumière se déplace-t-elle dans le vide, en kilomètres par seconde ?", "unit": "km/s" },
+      "en": { "q": "How fast does light travel in a vacuum, in kilometres per second?", "unit": "km/s" }
+    },
+    {
+      "id": "n053",
+      "answer": 40075,
+      "fr": { "q": "Quelle est la circonférence de la Terre à l’équateur ?", "unit": "kilomètres" },
+      "en": { "q": "What is the Earth’s circumference at the equator?", "unit": "kilometres" }
+    },
+    {
+      "id": "n054",
+      "answer": 150,
+      "fr": { "q": "À combien de millions de kilomètres du Soleil la Terre se trouve-t-elle, environ ?", "unit": "millions de km" },
+      "en": { "q": "Roughly how many million kilometres is the Earth from the Sun?", "unit": "million km" }
+    },
+    {
+      "id": "n055",
+      "answer": 343,
+      "fr": { "q": "À 20 °C, à quelle vitesse le son se propage-t-il dans l’air ?", "unit": "m/s" },
+      "en": { "q": "At 20 °C, how fast does sound travel through the air?", "unit": "m/s" }
+    },
+    {
+      "id": "n056",
+      "answer": 687,
+      "fr": { "q": "Combien de jours terrestres dure une année sur Mars ?", "unit": "jours" },
+      "en": { "q": "How many Earth days does a year on Mars last?", "unit": "days" }
+    },
+    {
+      "id": "n057",
+      "answer": 243,
+      "fr": { "q": "Combien de jours terrestres faut-il à Vénus pour faire un tour sur elle-même ?", "unit": "jours" },
+      "en": { "q": "How many Earth days does Venus take to spin once on its axis?", "unit": "days" }
+    },
+    {
+      "id": "n058",
+      "answer": 18,
+      "fr": { "q": "Quelle est la longueur d’un terrain de volley-ball ?", "unit": "mètres" },
+      "en": { "q": "How long is a volleyball court?", "unit": "metres" }
+    },
+    {
+      "id": "n059",
+      "answer": 180,
+      "fr": { "q": "Quelle est la somme des angles d’un triangle ?", "unit": "degrés" },
+      "en": { "q": "What do the angles of a triangle add up to?", "unit": "degrees" }
+    },
+    {
+      "id": "n060",
+      "answer": 10000,
+      "fr": { "q": "Combien de mètres carrés compte un hectare ?", "unit": "m²" },
+      "en": { "q": "How many square metres are there in a hectare?", "unit": "m²" }
+    },
+    {
+      "id": "n061",
+      "answer": 1000000,
+      "fr": { "q": "Combien de millimètres y a-t-il dans un kilomètre ?", "unit": "millimètres" },
+      "en": { "q": "How many millimetres are there in a kilometre?", "unit": "millimetres" }
+    },
+    {
+      "id": "n062",
+      "answer": 10,
+      "fr": { "q": "À quelle hauteur se trouve la plateforme de plongeon des Jeux olympiques ?", "unit": "mètres" },
+      "en": { "q": "How high is the Olympic diving platform?", "unit": "metres" }
+    },
+    {
+      "id": "n063",
+      "answer": 1000,
+      "fr": { "q": "Combien de litres d’eau peut contenir un mètre cube ?", "unit": "litres" },
+      "en": { "q": "How many litres of water fit in one cubic metre?", "unit": "litres" }
+    },
+    {
+      "id": "n064",
+      "answer": 90,
+      "fr": { "q": "Combien de degrés de latitude séparent l’équateur du pôle Nord ?", "unit": "degrés" },
+      "en": { "q": "How many degrees of latitude separate the equator from the North Pole?", "unit": "degrees" }
+    },
+    {
+      "id": "n065",
+      "answer": 80,
+      "fr": { "q": "Combien de minutes dure un match de rugby à XV, hors arrêts de jeu ?", "unit": "minutes" },
+      "en": { "q": "How many minutes does a rugby union match last, not counting stoppages?", "unit": "minutes" }
+    },
+    {
+      "id": "n066",
+      "answer": 60,
+      "fr": { "q": "Combien de minutes de jeu compte un match de hockey sur glace, hors prolongation ?", "unit": "minutes" },
+      "en": { "q": "How many minutes of play are there in an ice hockey match, without overtime?", "unit": "minutes" }
+    },
+    {
+      "id": "n067",
+      "answer": 11,
+      "fr": { "q": "Au football, à quelle distance de la ligne de but se trouve le point de penalty ?", "unit": "mètres" },
+      "en": { "q": "In football (soccer), how far from the goal line is the penalty spot?", "unit": "metres" }
+    },
+    {
+      "id": "n068",
+      "answer": 305,
+      "fr": { "q": "À quelle hauteur se trouve un panier de basket-ball ?", "unit": "centimètres" },
+      "en": { "q": "How high is a basketball hoop?", "unit": "centimetres" }
+    },
+    {
+      "id": "n069",
+      "answer": 732,
+      "fr": { "q": "Quelle est la largeur d’un but de football ?", "unit": "centimètres" },
+      "en": { "q": "How wide is a football (soccer) goal?", "unit": "centimetres" }
+    },
+    {
+      "id": "n070",
+      "answer": 400,
+      "fr": { "q": "Combien de mètres mesure un tour de piste d’athlétisme standard ?", "unit": "mètres" },
+      "en": { "q": "How long is one lap of a standard athletics track?", "unit": "metres" }
+    },
+    {
+      "id": "n071",
+      "answer": 10,
+      "fr": { "q": "Combien de haies les coureurs franchissent-ils lors d’un 110 mètres haies ?", "unit": "haies" },
+      "en": { "q": "How many hurdles do runners clear in the 110 metres hurdles?", "unit": "hurdles" }
+    },
+    {
+      "id": "n072",
+      "answer": 22,
+      "fr": { "q": "Combien de boules y a-t-il sur la table au début d’une partie de snooker, blanche comprise ?", "unit": "boules" },
+      "en": { "q": "How many balls are on the table at the start of a snooker frame, cue ball included?", "unit": "balls" }
+    },
+    {
+      "id": "n073",
+      "answer": 5,
+      "fr": { "q": "Combien de points vaut un essai au rugby à XV ?", "unit": "points" },
+      "en": { "q": "How many points is a try worth in rugby union?", "unit": "points" }
+    },
+    {
+      "id": "n074",
+      "answer": 7,
+      "fr": { "q": "Au handball, combien de joueurs chaque équipe a-t-elle sur le terrain, gardien compris ?", "unit": "joueurs" },
+      "en": { "q": "In handball, how many players does each team have on court, goalkeeper included?", "unit": "players" }
+    },
+    {
+      "id": "n075",
+      "answer": 9,
+      "fr": { "q": "Au baseball, combien de joueurs l’équipe en défense a-t-elle sur le terrain ?", "unit": "joueurs" },
+      "en": { "q": "In baseball, how many players does the fielding team have on the field?", "unit": "players" }
+    },
+    {
+      "id": "n076",
+      "answer": 225,
+      "fr": { "q": "Combien de cases compte le plateau du Scrabble ?", "unit": "cases" },
+      "en": { "q": "How many squares are there on a Scrabble board?", "unit": "squares" }
+    },
+    {
+      "id": "n077",
+      "answer": 40,
+      "fr": { "q": "Combien de cases compte le plateau du Monopoly classique ?", "unit": "cases" },
+      "en": { "q": "How many spaces are there on a classic Monopoly board?", "unit": "spaces" }
+    },
+    {
+      "id": "n078",
+      "answer": 42,
+      "fr": { "q": "Combien de trous compte la grille d’un Puissance 4 ?", "unit": "trous" },
+      "en": { "q": "How many holes are there in a Connect 4 grid?", "unit": "holes" }
+    },
+    {
+      "id": "n079",
+      "answer": 54,
+      "fr": { "q": "Combien de petits carrés colorés compte un Rubik’s Cube classique ?", "unit": "carrés" },
+      "en": { "q": "How many coloured squares are there on a classic Rubik’s Cube?", "unit": "squares" }
+    },
+    {
+      "id": "n080",
+      "answer": 361,
+      "fr": { "q": "Combien d’intersections compte un plateau de jeu de go classique ?", "unit": "intersections" },
+      "en": { "q": "How many intersections are there on a standard Go board?", "unit": "intersections" }
+    },
+    {
+      "id": "n081",
+      "answer": 24,
+      "fr": { "q": "Combien de carats compte l’or pur ?", "unit": "carats" },
+      "en": { "q": "How many carats is pure gold?", "unit": "carats" }
+    },
+    {
+      "id": "n082",
+      "answer": 9,
+      "fr": { "q": "Combien de symphonies Beethoven a-t-il composées ?", "unit": "symphonies" },
+      "en": { "q": "How many symphonies did Beethoven compose?", "unit": "symphonies" }
+    },
+    {
+      "id": "n083",
+      "answer": 7,
+      "fr": { "q": "Combien de nains accompagnent Blanche-Neige dans le conte ?", "unit": "nains" },
+      "en": { "q": "How many dwarfs does Snow White meet in the fairy tale?", "unit": "dwarfs" }
+    },
+    {
+      "id": "n084",
+      "answer": 101,
+      "fr": { "q": "Combien de dalmatiens compte le titre du célèbre dessin animé de Disney ?", "unit": "dalmatiens" },
+      "en": { "q": "How many Dalmatians are in the title of the famous Disney film?", "unit": "Dalmatians" }
+    },
+    {
+      "id": "n085",
+      "answer": 80,
+      "fr": { "q": "En combien de jours Phileas Fogg doit-il faire le tour du monde dans le roman de Jules Verne ?", "unit": "jours" },
+      "en": { "q": "In how many days must Phileas Fogg travel around the world in Jules Verne’s novel?", "unit": "days" }
+    },
+    {
+      "id": "n086",
+      "answer": 14,
+      "fr": { "q": "Combien de vers compte un sonnet ?", "unit": "vers" },
+      "en": { "q": "How many lines does a sonnet have?", "unit": "lines" }
+    },
+    {
+      "id": "n087",
+      "answer": 5,
+      "fr": { "q": "Combien de lignes compte une portée de musique ?", "unit": "lignes" },
+      "en": { "q": "How many lines make up a musical staff?", "unit": "lines" }
+    },
+    {
+      "id": "n088",
+      "answer": 24,
+      "fr": { "q": "Combien de lettres compte l’alphabet grec ?", "unit": "lettres" },
+      "en": { "q": "How many letters are there in the Greek alphabet?", "unit": "letters" }
+    },
+    {
+      "id": "n089",
+      "answer": 21,
+      "fr": { "q": "Combien de jours faut-il en moyenne pour qu’un œuf de poule éclose ?", "unit": "jours" },
+      "en": { "q": "On average, how many days does it take for a chicken egg to hatch?", "unit": "days" }
+    },
+    {
+      "id": "n090",
+      "answer": 63,
+      "fr": { "q": "Combien de jours dure en moyenne la gestation chez le chien ?", "unit": "jours" },
+      "en": { "q": "On average, how many days does a dog’s pregnancy last?", "unit": "days" }
+    },
+    {
+      "id": "n091",
+      "answer": 30,
+      "fr": { "q": "Combien de dents a un chat adulte ?", "unit": "dents" },
+      "en": { "q": "How many teeth does an adult cat have?", "unit": "teeth" }
+    },
+    {
+      "id": "n092",
+      "answer": 4,
+      "fr": { "q": "Combien de compartiments compte l’estomac d’une vache ?", "unit": "compartiments" },
+      "en": { "q": "How many compartments does a cow’s stomach have?", "unit": "compartments" }
+    },
+    {
+      "id": "n093",
+      "answer": 27,
+      "fr": { "q": "Combien d’os compte une main humaine, poignet compris ?", "unit": "os" },
+      "en": { "q": "How many bones are there in one human hand, wrist included?", "unit": "bones" }
+    },
+    {
+      "id": "n094",
+      "answer": 12,
+      "fr": { "q": "Combien de paires de côtes possède généralement l’être humain ?", "unit": "paires" },
+      "en": { "q": "How many pairs of ribs do humans usually have?", "unit": "pairs" }
+    },
+    {
+      "id": "n095",
+      "answer": 5,
+      "fr": { "q": "Combien de lobes comptent les deux poumons réunis ?", "unit": "lobes" },
+      "en": { "q": "How many lobes do the two lungs have in total?", "unit": "lobes" }
+    },
+    {
+      "id": "n096",
+      "answer": 50,
+      "fr": { "q": "Combien d’États composent les États-Unis ?", "unit": "États" },
+      "en": { "q": "How many states make up the United States?", "unit": "states" }
+    },
+    {
+      "id": "n097",
+      "answer": 32,
+      "fr": { "q": "Combien de pièces cousues compte un ballon de foot classique noir et blanc ?", "unit": "pièces" },
+      "en": { "q": "How many panels make up a classic black-and-white football (soccer ball)?", "unit": "panels" }
+    },
+    {
+      "id": "n098",
+      "answer": 4,
+      "fr": { "q": "Combien de planètes du système solaire possèdent des anneaux ?", "unit": "planètes" },
+      "en": { "q": "How many planets in the Solar System have rings?", "unit": "planets" }
+    },
+    {
+      "id": "n099",
+      "answer": 7,
+      "fr": { "q": "Combien de symboles différents utilise-t-on pour écrire les chiffres romains ?", "unit": "symboles" },
+      "en": { "q": "How many different symbols are used to write Roman numerals?", "unit": "symbols" }
+    },
+    {
+      "id": "n100",
+      "answer": 1852,
+      "fr": { "q": "Combien de mètres mesure un mille marin ?", "unit": "mètres" },
+      "en": { "q": "How many metres are there in a nautical mile?", "unit": "metres" }
     }
   ]
 }
