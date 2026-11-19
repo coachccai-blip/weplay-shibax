@@ -12,6 +12,8 @@ const testgame = {
   name: 'Jeu test',
   minPlayers: 2,
   maxPlayers: 8,
+  kind: 'sync',
+  hidden: true,
   xp: false,
   needsFounds: false,
 

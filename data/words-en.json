@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Draw It word bank (English), also used by the anagram and hangman games: 6 themes × 3 difficulty levels (theme and level keys are internal IDs, kept in French). An entry “a|b” accepts several answers (the first one is displayed).",
+  "themes": {
+    "animaux": {
+      "facile": ["cat|kitten", "dog|puppy", "fish", "bird", "rabbit|bunny", "cow", "pig", "horse", "sheep", "mouse", "duck", "chicken|hen", "snake", "snail", "butterfly", "bee", "turtle|tortoise"],
+      "moyen": ["giraffe", "elephant", "lion", "monkey", "frog", "owl", "dolphin", "shark", "penguin", "crocodile|croc|alligator", "kangaroo", "zebra", "bear", "fox", "spider", "ladybird|ladybug", "whale"],
+      "difficile": ["hedgehog", "chameleon", "seahorse", "octopus", "flamingo", "sloth", "raccoon|racoon", "squirrel", "jellyfish", "toucan", "beaver", "lobster", "rhinoceros|rhino", "camel|dromedary", "platypus", "peacock"]
+    },
+    "nourriture": {
+      "facile": ["apple", "banana", "cake", "pizza", "bread", "cheese", "ice cream", "egg", "carrot", "strawberry", "cherry|cherries", "lemon", "tomato", "candy|sweets|sweet", "fries|french fries|chips", "pear", "grapes|grape"],
+      "moyen": ["hamburger|burger", "croissant", "spaghetti|pasta", "pineapple", "watermelon", "mushroom", "sandwich", "pancake|pancakes|crepe", "sushi", "broccoli", "baguette", "chocolate", "popcorn", "cookie|biscuit", "hot dog", "soup", "salad"],
+      "difficile": ["cotton candy|candy floss", "lollipop|lolly", "kiwi|kiwi fruit", "eggplant|aubergine", "artichoke", "omelette|omelet", "kebab|kabob|skewer", "apple pie", "pretzel", "marshmallow", "avocado", "pomegranate", "asparagus", "gingerbread man", "lasagne|lasagna", "milkshake"]
+    },
+    "objets": {
+      "facile": ["key", "chair", "table", "book", "glasses|spectacles|eyeglasses", "umbrella", "ball", "phone|telephone|mobile phone|cell phone|smartphone", "lamp", "scissors", "pencil", "hat", "shoe|shoes", "watch|wristwatch", "cup|mug|teacup", "candle", "gift|present"],
+      "moyen": ["guitar", "computer|laptop", "television|tv|telly", "suitcase|luggage", "camera", "bottle", "fork", "clock", "sofa|couch", "vacuum cleaner|vacuum", "trumpet", "hammer", "ladder", "kite", "backpack|rucksack", "toothbrush", "airplane|aeroplane|plane"],
+      "difficile": ["compass", "hourglass|sand timer", "scooter", "telescope", "magnet", "funnel", "padlock|lock", "fan", "harp", "microscope", "accordion", "tap|faucet", "parachute", "fire extinguisher|extinguisher", "stapler", "wheelbarrow"]
+    },
+    "lieux": {
+      "facile": ["house|home", "beach", "school", "forest|woods", "mountain|mountains", "sea|ocean", "city|town", "garden", "island", "river", "castle", "farm", "park", "desert", "bridge", "street|road", "swimming pool|pool"],
+      "moyen": ["hospital", "airport", "train station|railway station|station", "cinema|movie theater|movie theatre", "bakery", "volcano", "lighthouse", "library", "circus", "museum", "igloo", "cave", "waterfall", "harbour|harbor|port", "stadium", "zoo", "campsite|campground|camping"],
+      "difficile": ["pyramid", "observatory", "maze|labyrinth", "funfair|fair|carnival", "skyscraper", "space station", "oasis", "windmill", "market|marketplace", "tunnel", "crossroads|intersection", "jungle", "aquarium", "greenhouse", "playground", "ice rink|skating rink"]
+    },
+    "metiers": {
+      "facile": ["doctor", "firefighter|fireman|firewoman", "police officer|policeman|policewoman|police", "baker", "chef", "teacher", "mail carrier|postman|postwoman|mailman", "pilot", "singer", "dancer", "painter|artist", "farmer", "dentist", "fisherman|fisherwoman", "hairdresser|hairstylist|barber", "clown", "magician"],
+      "moyen": ["astronaut", "plumber", "gardener", "nurse", "vet|veterinarian", "photographer", "pirate", "knight", "mechanic", "waiter|waitress|server", "musician", "detective", "footballer|soccer player|football player", "lifeguard", "electrician", "builder|bricklayer|construction worker", "cashier"],
+      "difficile": ["archaeologist|archeologist", "beekeeper", "astronomer", "surgeon", "diver|scuba diver", "lumberjack|woodcutter", "stuntman|stuntwoman|stunt performer", "architect", "sculptor", "watchmaker|clockmaker", "juggler", "zookeeper", "shepherd|shepherdess", "blacksmith", "journalist|reporter", "chimney sweep"]
+    },
+    "actions": {
+      "facile": ["eat|eating", "sleep|sleeping", "run|running", "swim|swimming", "dance|dancing", "sing|singing", "read|reading", "write|writing", "jump|jumping", "laugh|laughing", "drink|drinking", "walk|walking", "fly|flying", "draw|drawing", "play|playing", "cook|cooking", "smile|smiling"],
+      "moyen": ["fishing|go fishing", "ski|skiing", "knit|knitting", "juggle|juggling", "clap|clapping", "sneeze|sneezing", "yawn|yawning", "snore|snoring", "climb|climbing", "dive|diving", "paint|painting", "slide|sliding", "whistle|whistling", "hug|hugging", "skate|skating", "ride a bike|cycling|cycle|biking", "wave|waving"],
+      "difficile": ["meditate|meditating", "sunbathe|sunbathing", "whisper|whispering", "surf|surfing", "take a photo|taking a photo|take a picture", "stretch|stretching", "shiver|shivering", "dream|dreaming", "hike|hiking", "gardening", "blow bubbles|blowing bubbles", "high five", "tickle|tickling", "sail|sailing", "sew|sewing", "think|thinking"]
+    }
+  }
+}

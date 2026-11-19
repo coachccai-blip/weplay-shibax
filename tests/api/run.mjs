@@ -1,6 +1,7 @@
 // Tests d'intégration de l'API contre `netlify dev` (http://localhost:8888 par défaut).
 // Lancer : netlify dev (avec SHX_ENABLE_TEST_GAME=1), puis `npm run test:api`.
 import assert from 'node:assert/strict'
+import zlib from 'node:zlib'
 
 const BASE = process.env.SHX_BASE || 'http://localhost:8888'
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -356,6 +357,202 @@ await test('Hôte du salon : renommer, retirer un membre ; départ de l’hôte'
   await ok(ctx.a.token, 'POST', `rooms/${ctx.rid}/leave`)
   const room = await ok(ctx.b.token, 'GET', `rooms/${ctx.rid}`)
   assert.equal(room.room.hostId, ctx.b.me.id)
+})
+
+// ---------- v2 : plusieurs groupes, photos, téléphone + PC, jeux en direct et dans la conversation ----------
+
+function crc32(buf) {
+  let crc = ~0
+  for (const b of buf) {
+    crc ^= b
+    for (let k = 0; k < 8; k++) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1))
+  }
+  return ~crc >>> 0
+}
+function pngChunk(type, data) {
+  const len = Buffer.alloc(4)
+  len.writeUInt32BE(data.length)
+  const body = Buffer.concat([Buffer.from(type), data])
+  const crc = Buffer.alloc(4)
+  crc.writeUInt32BE(crc32(body))
+  return Buffer.concat([len, body, crc])
+}
+/** Petite image PNG valide (dégradé), sans dépendance. */
+function pngDataUrl(w = 24, h = 24) {
+  const raw = Buffer.alloc((w * 3 + 1) * h)
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = y * (w * 3 + 1) + 1 + x * 3
+      raw[i] = (x * 10) & 255
+      raw[i + 1] = (y * 10) & 255
+      raw[i + 2] = 160
+    }
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(w, 0)
+  ihdr.writeUInt32BE(h, 4)
+  ihdr[8] = 8
+  ihdr[9] = 2
+  const bytes = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), pngChunk('IHDR', ihdr), pngChunk('IDAT', zlib.deflateSync(raw)), pngChunk('IEND', Buffer.alloc(0))])
+  return `data:image/png;base64,${bytes.toString('base64')}`
+}
+
+await test('Plusieurs groupes : créer, rejoindre, liste par compte, limite de 50', async () => {
+  ctx.p = await newUser()
+  ctx.q = await newUser()
+  ctx.r = await newUser()
+  const g2 = await ok(ctx.p.token, 'POST', 'rooms', { name: 'Famille' })
+  const g3 = await ok(ctx.p.token, 'POST', 'rooms', { name: 'Bureau' })
+  const g4 = await ok(ctx.q.token, 'POST', 'rooms', { name: 'Club de foot' })
+  ctx.g2 = g2.room.id
+  for (const u of [ctx.q, ctx.r]) await ok(u.token, 'POST', `invites/${g2.room.invite}/join`)
+  await ok(ctx.p.token, 'POST', `invites/${g4.room.invite}/join`)
+  await ok(ctx.p.token, 'POST', `rooms/${g3.room.id}/messages`, { text: 'Réunion à 10 h', clientId: clientId() })
+  const listP = await ok(ctx.p.token, 'GET', 'rooms')
+  assert.deepEqual(listP.rooms.map((r) => r.name).sort(), ['Bureau', 'Club de foot', 'Famille'])
+  const bureau = listP.rooms.find((r) => r.name === 'Bureau')
+  assert.equal(bureau.last.type, 'text')
+  assert.equal(bureau.last.text, 'Réunion à 10 h')
+  const listQ = await ok(ctx.q.token, 'GET', 'rooms')
+  assert.deepEqual(listQ.rooms.map((r) => r.name).sort(), ['Club de foot', 'Famille'])
+  // Limite : 50 groupes par compte.
+  const many = await newUser()
+  for (let i = 0; i < 50; i++) await ok(many.token, 'POST', 'rooms', { name: `Groupe ${i + 1}` })
+  const over = await call(many.token, 'POST', 'rooms', { name: 'Un de trop' })
+  assert.equal(over.status, 409)
+  assert.equal(over.data.error.code, 'too_many_groups')
+  const overJoin = await call(many.token, 'POST', `invites/${g2.room.invite}/join`)
+  assert.equal(overJoin.data.error.code, 'too_many_groups')
+})
+
+await test('Photo de profil : visible des membres du groupe par lien signé, retrait', async () => {
+  const up = await ok(ctx.p.token, 'POST', 'me/photo', { image: pngDataUrl() })
+  assert.match(up.me.photoUrl, /^\/api\/photos\/SHX-[A-Z0-9]{6}\/\w+\?e=\d+&s=[\w-]+$/)
+  const room = await ok(ctx.q.token, 'GET', `rooms/${ctx.g2}`)
+  const pm = room.members.find((m) => m.id === ctx.p.me.id)
+  assert.ok(pm.photoUrl, 'les membres reçoivent l’adresse de la photo')
+  const img = await fetch(`${BASE}${pm.photoUrl}`)
+  assert.equal(img.status, 200)
+  assert.match(img.headers.get('content-type'), /^image\//)
+  assert.ok((await img.arrayBuffer()).byteLength > 50)
+  const forged = await fetch(`${BASE}${pm.photoUrl.replace(/s=[\w-]+$/, 's=AAAAAAAAAAAAAAAAAAAAAA')}`)
+  assert.ok([403, 409].includes(forged.status), `signature refusée (${forged.status})`) // 409 : équivalent local de 403
+  const outsider = await newUser()
+  const denied = await call(outsider.token, 'GET', `rooms/${ctx.g2}`)
+  assert.equal(denied.status >= 400 && denied.status < 500, true, 'un non-membre ne voit pas le groupe (ni les photos)')
+  const bad = await call(ctx.p.token, 'POST', 'me/photo', { image: 'data:text/plain;base64,SGVsbG8=' })
+  assert.equal(bad.status, 400)
+  const removed = await ok(ctx.q.token, 'POST', 'me/photo', { image: pngDataUrl(30, 30) })
+  assert.ok(removed.me.photoUrl)
+  const gone = await ok(ctx.q.token, 'POST', 'me/photo/remove')
+  assert.equal(gone.me.photoUrl, null)
+})
+
+await test('Téléphone + PC : même compte, appareils listés, réglages et messages synchronisés', async () => {
+  const link = await ok(ctx.p.token, 'POST', 'me/link')
+  const phone = await ok(null, 'POST', 'link/redeem', { token: link.token })
+  const before = await ok(ctx.p.token, 'POST', 'sync', { rooms: true })
+  const meBefore = await ok(ctx.p.token, 'GET', 'me')
+  assert.ok(meBefore.me.devices.length >= 2, 'deux appareils listés')
+  assert.equal(meBefore.me.devices.filter((d) => d.current).length, 1)
+  await ok(phone.token, 'PATCH', 'me', { settings: { lang: 'en' } })
+  await sleep(5200) // cache de compte par instance (5 s)
+  const after = await ok(ctx.p.token, 'POST', 'sync', { rooms: true })
+  assert.notEqual(after.meRev, before.meRev, 'le PC apprend que le profil a changé')
+  const meAfter = await ok(ctx.p.token, 'GET', 'me')
+  assert.equal(meAfter.me.settings.lang, 'en')
+  const room = await ok(ctx.p.token, 'GET', `rooms/${ctx.g2}`)
+  const sent = await ok(phone.token, 'POST', `rooms/${ctx.g2}/messages`, { text: 'Envoyé du téléphone', clientId: clientId() })
+  const s = await ok(ctx.p.token, 'POST', 'sync', { room: { rid: ctx.g2, after: room.messages.at(-1)?.id, recent: room.messages.map((m) => m.id) } })
+  assert.ok(s.room.messages.some((m) => m.id === sent.message.id))
+  await ok(phone.token, 'PATCH', 'me', { settings: { lang: 'fr' } })
+})
+
+await test('Morpion dans la conversation : carte, coups, suivi par l’interrogation, victoire et XP', async () => {
+  const xpBefore = (await ok(ctx.p.token, 'GET', 'me')).me.xp
+  const created = await ok(ctx.p.token, 'POST', `rooms/${ctx.g2}/async`, { type: 'morpion', options: { opponent: ctx.q.me.id } })
+  const id = created.game.id
+  assert.equal(created.game.status, 'open')
+  assert.equal(created.game.data.myTurn, true)
+  const sq = await ok(ctx.q.token, 'POST', 'sync', { room: { rid: ctx.g2, av: {} } })
+  const seen = sq.room.async.games.find((g) => g.id === id)
+  assert.ok(seen, 'l’adversaire reçoit le jeu par l’interrogation')
+  assert.equal(seen.data.myTurn, false)
+  assert.ok(sq.room.messages.some((m) => m.type === 'game' && m.kind === 'async' && m.agid === id), 'carte dans le fil')
+  const turn = await call(ctx.q.token, 'POST', `async/${id}/act`, { type: 'move', cell: 4 })
+  assert.equal(turn.data.error.code, 'not_your_turn')
+  const spectator = await call(ctx.r.token, 'POST', `async/${id}/act`, { type: 'move', cell: 4 })
+  assert.equal(spectator.status, 409)
+  const moves = [[ctx.p, 0], [ctx.q, 3], [ctx.p, 1], [ctx.q, 4]]
+  for (const [u, cell] of moves) await ok(u.token, 'POST', `async/${id}/act`, { type: 'move', cell })
+  const known = { [id]: (await ok(ctx.q.token, 'GET', `async/${id}`)).game.v }
+  const quiet = await ok(ctx.q.token, 'POST', 'sync', { room: { rid: ctx.g2, av: known } })
+  assert.ok(!quiet.room.async.games.some((g) => g.id === id), 'pas de renvoi d’un jeu inchangé')
+  const win = await ok(ctx.p.token, 'POST', `async/${id}/act`, { type: 'move', cell: 2 })
+  assert.equal(win.game.status, 'finished')
+  assert.deepEqual(win.game.result.winners, [ctx.p.me.id])
+  const changed = await ok(ctx.q.token, 'POST', 'sync', { room: { rid: ctx.g2, av: known } })
+  assert.equal(changed.room.async.games.find((g) => g.id === id)?.status, 'finished')
+  const room = await ok(ctx.r.token, 'GET', `rooms/${ctx.g2}`)
+  const sys = room.messages.find((m) => m.type === 'sys' && m.sys?.kind === 'asyncResult' && m.sys.gtype === 'morpion')
+  assert.ok(sys, 'message de résultat dans le fil')
+  assert.equal(sys.sys.winner, ctx.p.me.pseudo)
+  const xpAfter = (await ok(ctx.p.token, 'GET', 'me')).me.xp
+  assert.ok(xpAfter > xpBefore, 'le gagnant gagne de l’XP')
+  const outsider = await newUser()
+  const denied = await call(outsider.token, 'GET', `async/${id}`)
+  assert.ok(denied.status >= 400)
+})
+
+await test('Devine mon dessin : image publiée, mot caché, fin quand tout le monde a trouvé', async () => {
+  const created = await ok(ctx.p.token, 'POST', `rooms/${ctx.g2}/async`, { type: 'dessin', options: { word: 'pomme' }, image: pngDataUrl(40, 30) })
+  const id = created.game.id
+  const img = await fetch(`${BASE}/api/async/${id}/image`)
+  assert.equal(img.status, 200)
+  const forQ = await ok(ctx.q.token, 'GET', `async/${id}`)
+  assert.equal(forQ.game.data.word, null)
+  assert.ok(!leaks(forQ, 'pomme'), 'le mot n’est jamais envoyé aux devineurs')
+  const wrong = await ok(ctx.q.token, 'POST', `async/${id}/act`, { type: 'guess', text: 'poire' })
+  assert.notEqual(wrong.outcome.result, 'correct')
+  const okQ = await ok(ctx.q.token, 'POST', `async/${id}/act`, { type: 'guess', text: 'Pomme' })
+  assert.equal(okQ.outcome.result, 'correct')
+  assert.equal(okQ.game.data.word, 'pomme')
+  const okR = await ok(ctx.r.token, 'POST', `async/${id}/act`, { type: 'guess', text: 'pomme' })
+  assert.equal(okR.game.status, 'finished')
+  const noImage = await call(ctx.p.token, 'POST', `rooms/${ctx.g2}/async`, { type: 'dessin', options: { word: 'chat' } })
+  assert.equal(noImage.data.error.code, 'image')
+})
+
+await test('Quiz en direct : question sans la réponse, fin de manche dès que tous ont répondu', async () => {
+  const g = await ok(ctx.p.token, 'POST', `rooms/${ctx.g2}/games`, { type: 'quiz' })
+  const gid = g.game.id
+  await ok(ctx.q.token, 'POST', `games/${gid}/join`)
+  for (const u of [ctx.p, ctx.q]) await ok(u.token, 'POST', 'sync', { game: { gid, beat: true } })
+  await ok(ctx.p.token, 'POST', `games/${gid}/settings`, { settings: { rounds: 5, lang: 'en' } })
+  await ok(ctx.p.token, 'POST', `games/${gid}/start`)
+  const v1 = (await ok(ctx.q.token, 'GET', `games/${gid}`)).game
+  assert.equal(v1.status, 'playing')
+  assert.equal(v1.g.phase, 'question')
+  assert.equal(v1.g.prompt.choices.length, 4)
+  assert.equal(v1.g.reveal, undefined)
+  assert.ok(!JSON.stringify(v1).includes('"correct"'), 'la bonne réponse n’est pas envoyée pendant la question')
+  const a1 = await ok(ctx.p.token, 'POST', `games/${gid}/act`, { type: 'answer', round: 0, value: 0 })
+  assert.equal(a1.result, 'answered')
+  const twice = await call(ctx.p.token, 'POST', `games/${gid}/act`, { type: 'answer', round: 0, value: 1 })
+  assert.equal(twice.data.error.code, 'already_answered')
+  await ok(ctx.q.token, 'POST', `games/${gid}/act`, { type: 'answer', round: 0, value: 1 })
+  let view = null
+  for (let i = 0; i < 10; i++) {
+    view = (await ok(ctx.p.token, 'POST', 'sync', { game: { gid, beat: true, full: true } })).game.game
+    if (view.g.phase === 'reveal') break
+    await sleep(300)
+  }
+  assert.equal(view.g.phase, 'reveal')
+  assert.ok([0, 1, 2, 3].includes(view.g.reveal.secret.correct))
+  assert.equal(Object.keys(view.g.reveal.detail).length, 2)
+  const total = view.players.reduce((s, p) => s + p.score, 0)
+  if ([0, 1].includes(view.g.reveal.secret.correct)) assert.ok(total >= 50 && total <= 100, 'une seule des deux réponses est bonne')
+  else assert.equal(total, 0)
+  for (const u of [ctx.p, ctx.q]) await ok(u.token, 'POST', `games/${gid}/leave`)
 })
 
 console.log(`\n${passed}/${results.length} tests réussis`)

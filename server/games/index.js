@@ -3,17 +3,18 @@
 // Sans serveur permanent, c'est la première interrogation reçue après une échéance qui fait avancer la partie.
 import { K, lastSegment } from '../keys.js'
 import { SKIP, pMap } from '../db.js'
-import { fail, ensure, str, int, bool } from '../http.js'
+import { fail, ensure, str, int, bool, plainStatus } from '../http.js'
 import { isMember, postMessage } from '../messages.js'
 import { loadMemberRoom, touchPresence } from '../rooms.js'
 import { finishSideEffects } from '../rewards.js'
 import { activeIds, isPresent, ACTIVE_MS } from './common.js'
 import drawit from './drawit.js'
 import testgame from './testgame.js'
+import { LIVE_GAMES } from './live.js'
 import { GAME_ID_RE, newGameId, DEVICE_ID_RE } from '../../shared/ids.js'
 import { LIMITS } from '../../shared/constants.js'
 
-export const MODULES = { drawit, test: testgame }
+export const MODULES = { drawit, ...LIVE_GAMES, test: testgame }
 
 export const testGameEnabled = () => process.env.SHX_ENABLE_TEST_GAME === '1'
 
@@ -100,7 +101,7 @@ export function gameSummary(state) {
 // ---------- Faits nécessaires aux transitions ----------
 
 function parseRoundKeys(prefix, keys) {
-  const out = { strokes: [], guesses: [], foundIds: [], taps: [], hasFirst: false }
+  const out = { strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], hasFirst: false }
   for (const key of keys) {
     const rest = key.slice(prefix.length)
     if (rest === 'first') out.hasFirst = true
@@ -113,6 +114,7 @@ function parseRoundKeys(prefix, keys) {
       out.guesses.push({ id, ts: Number(ts), uid, kind })
     } else if (rest.startsWith('f/')) out.foundIds.push(rest.slice(2))
     else if (rest.startsWith('t/')) out.taps.push(rest.slice(2))
+    else if (rest.startsWith('a/')) out.answerIds.push(rest.slice(2))
   }
   return out
 }
@@ -133,7 +135,7 @@ function mergeSeen(facts, seen) {
 }
 
 export async function gatherFacts(db, state, now, { full = false, seen = null } = {}) {
-  const facts = { now, hb: {}, hbLoaded: false, round: -1, keys: [], strokes: [], guesses: [], foundIds: [], taps: [], founds: null, first: null }
+  const facts = { now, hb: {}, hbLoaded: false, round: -1, keys: [], strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], founds: null, first: null, answers: null }
   if (state.status === 'lobby') {
     if (full || now >= state.lobbyExpiresAt) {
       facts.hb = await loadHeartbeats(db, state)
@@ -151,15 +153,17 @@ export async function gatherFacts(db, state, now, { full = false, seen = null } 
   if (watched?.ts) facts.hb[watch] = watched.ts
   mergeSeen(facts, seen)
   if (full || mod.needsFullFacts(state, now, facts)) {
-    const [hb, founds, first] = await Promise.all([
+    const [hb, founds, first, answers] = await Promise.all([
       loadHeartbeats(db, state),
       mod.needsFounds && r >= 0 ? pMap(facts.foundIds, (uid) => db.get(K.found(state.id, r, uid)), 8) : [],
       mod.needsFounds && facts.hasFirst ? db.get(K.first(state.id, r)) : null,
+      mod.needsAnswers && r >= 0 ? pMap(facts.answerIds, (uid) => db.get(K.answer(state.id, r, uid)), 8) : [],
     ])
     facts.hb = { ...facts.hb, ...hb }
     facts.hbLoaded = true
     facts.founds = founds.filter(Boolean)
     facts.first = first
+    facts.answers = answers.filter(Boolean)
     mergeSeen(facts, seen)
   }
   return facts
@@ -304,7 +308,8 @@ export async function createGame(db, auth, rid, body) {
     r.game = { id: gid, type, status: 'lobby', at: now, hostId: auth.uid }
   })
 
-  const settings = prev ? mod.sanitizeSettings(prev.settings, mod.defaultSettings()) : mod.sanitizeSettings(body.settings || {}, mod.defaultSettings())
+  const defaults = mod.defaultSettings({ lang: auth.acct.settings?.lang })
+  const settings = prev ? mod.sanitizeSettings(prev.settings, defaults) : mod.sanitizeSettings(body.settings || {}, defaults)
   const user = await db.get(K.user(auth.uid))
   const players = { [auth.uid]: playerFrom(user, now) }
   const joinOrder = [auth.uid]
@@ -495,7 +500,7 @@ export async function getDrawing(db, gid, round) {
   ensure(GAME_ID_RE.test(String(gid)), 404, 'not_found', 'Dessin introuvable.')
   const r = int(round, -1)
   const item = await db.getBytes(K.drawing(gid, r))
-  if (!item) return new Response('Dessin introuvable', { status: 404, headers: { 'cache-control': 'no-store' } })
+  if (!item) return new Response('Dessin introuvable', { status: plainStatus(404), headers: { 'cache-control': 'no-store' } })
   return new Response(item.data, {
     headers: { 'content-type': item.metadata?.type || 'image/jpeg', 'cache-control': 'public, max-age=2592000, immutable' },
   })

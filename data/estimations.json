@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "n001",
+      "answer": 206,
+      "fr": { "q": "Combien d’os compte le squelette d’un adulte ?", "unit": "os" },
+      "en": { "q": "How many bones are in an adult human skeleton?", "unit": "bones" }
+    },
+    {
+      "id": "n002",
+      "answer": 8,
+      "fr": { "q": "Combien de pattes a une araignée ?", "unit": "pattes" },
+      "en": { "q": "How many legs does a spider have?", "unit": "legs" }
+    },
+    {
+      "id": "n003",
+      "answer": 3,
+      "fr": { "q": "Combien de cœurs a une pieuvre ?", "unit": "cœurs" },
+      "en": { "q": "How many hearts does an octopus have?", "unit": "hearts" }
+    },
+    {
+      "id": "n004",
+      "answer": 1969,
+      "fr": { "q": "En quelle année l’être humain a-t-il marché sur la Lune pour la première fois ?", "unit": "" },
+      "en": { "q": "In what year did humans first walk on the Moon?", "unit": "" }
+    },
+    {
+      "id": "n005",
+      "answer": 366,
+      "fr": { "q": "Combien de jours compte une année bissextile ?", "unit": "jours" },
+      "en": { "q": "How many days are there in a leap year?", "unit": "days" }
+    },
+    {
+      "id": "n006",
+      "answer": 88,
+      "fr": { "q": "Combien de touches compte un piano standard ?", "unit": "touches" },
+      "en": { "q": "How many keys does a standard piano have?", "unit": "keys" }
+    },
+    {
+      "id": "n007",
+      "answer": 1440,
+      "fr": { "q": "Combien de minutes y a-t-il dans une journée ?", "unit": "minutes" },
+      "en": { "q": "How many minutes are there in a day?", "unit": "minutes" }
+    },
+    {
+      "id": "n008",
+      "answer": 64,
+      "fr": { "q": "Combien de cases compte un échiquier ?", "unit": "cases" },
+      "en": { "q": "How many squares are there on a chessboard?", "unit": "squares" }
+    },
+    {
+      "id": "n009",
+      "answer": 6,
+      "fr": { "q": "Combien de cordes compte une guitare standard ?", "unit": "cordes" },
+      "en": { "q": "How many strings does a standard guitar have?", "unit": "strings" }
+    },
+    {
+      "id": "n010",
+      "answer": 5,
+      "fr": { "q": "Combien d’anneaux compte le symbole des Jeux olympiques ?", "unit": "anneaux" },
+      "en": { "q": "How many rings make up the Olympic symbol?", "unit": "rings" }
+    },
+    {
+      "id": "n011",
+      "answer": 52,
+      "fr": { "q": "Combien de cartes compte un jeu de cartes complet, sans les jokers ?", "unit": "cartes" },
+      "en": { "q": "How many cards are in a standard deck, without the jokers?", "unit": "cards" }
+    },
+    {
+      "id": "n012",
+      "answer": 11,
+      "fr": { "q": "Au football, combien de joueurs chaque équipe a-t-elle sur le terrain ?", "unit": "joueurs" },
+      "en": { "q": "In football (soccer), how many players does each team have on the pitch?", "unit": "players" }
+    },
+    {
+      "id": "n013",
+      "answer": 3600,
+      "fr": { "q": "Combien de secondes y a-t-il dans une heure ?", "unit": "secondes" },
+      "en": { "q": "How many seconds are there in an hour?", "unit": "seconds" }
+    },
+    {
+      "id": "n014",
+      "answer": 168,
+      "fr": { "q": "Combien d’heures y a-t-il dans une semaine ?", "unit": "heures" },
+      "en": { "q": "How many hours are there in a week?", "unit": "hours" }
+    },
+    {
+      "id": "n015",
+      "answer": 6,
+      "fr": { "q": "Combien de pattes a un insecte ?", "unit": "pattes" },
+      "en": { "q": "How many legs does an insect have?", "unit": "legs" }
+    },
+    {
+      "id": "n016",
+      "answer": 12,
+      "fr": { "q": "Combien d’arêtes compte un cube ?", "unit": "arêtes" },
+      "en": { "q": "How many edges does a cube have?", "unit": "edges" }
+    },
+    {
+      "id": "n017",
+      "answer": 32,
+      "fr": { "q": "Combien de pièces y a-t-il sur l’échiquier au début d’une partie d’échecs ?", "unit": "pièces" },
+      "en": { "q": "How many pieces are on the board at the start of a game of chess?", "unit": "pieces" }
+    },
+    {
+      "id": "n018",
+      "answer": 5,
+      "fr": { "q": "Au basket-ball, combien de joueurs chaque équipe a-t-elle sur le terrain ?", "unit": "joueurs" },
+      "en": { "q": "In basketball, how many players does each team have on the court?", "unit": "players" }
+    },
+    {
+      "id": "n019",
+      "answer": 18,
+      "fr": { "q": "Combien de trous compte un parcours de golf standard ?", "unit": "trous" },
+      "en": { "q": "How many holes are there on a standard golf course?", "unit": "holes" }
+    },
+    {
+      "id": "n020",
+      "answer": 1889,
+      "fr": { "q": "En quelle année la tour Eiffel a-t-elle été inaugurée ?", "unit": "" },
+      "en": { "q": "In what year was the Eiffel Tower inaugurated?", "unit": "" }
+    },
+    {
+      "id": "n021",
+      "answer": 32,
+      "fr": { "q": "Combien de dents compte une dentition adulte complète, dents de sagesse comprises ?", "unit": "dents" },
+      "en": { "q": "How many teeth are in a full set of adult teeth, wisdom teeth included?", "unit": "teeth" }
+    },
+    {
+      "id": "n022",
+      "answer": 20,
+      "fr": { "q": "Combien de dents de lait un enfant a-t-il en tout ?", "unit": "dents" },
+      "en": { "q": "How many baby teeth does a child have in total?", "unit": "teeth" }
+    },
+    {
+      "id": "n023",
+      "answer": 4,
+      "fr": { "q": "Combien de cavités compte le cœur humain ?", "unit": "cavités" },
+      "en": { "q": "How many chambers does the human heart have?", "unit": "chambers" }
+    },
+    {
+      "id": "n024",
+      "answer": 26,
+      "fr": { "q": "Combien de lettres compte l’alphabet ?", "unit": "lettres" },
+      "en": { "q": "How many letters are there in the alphabet?", "unit": "letters" }
+    },
+    {
+      "id": "n025",
+      "answer": 6,
+      "fr": { "q": "Combien de zéros compte le nombre un million ?", "unit": "zéros" },
+      "en": { "q": "How many zeros are there in one million?", "unit": "zeros" }
+    },
+    {
+      "id": "n026",
+      "answer": 360,
+      "fr": { "q": "Combien de degrés compte un tour complet ?", "unit": "degrés" },
+      "en": { "q": "How many degrees are there in a full circle?", "unit": "degrees" }
+    },
+    {
+      "id": "n027",
+      "answer": 7,
+      "fr": { "q": "Combien de mois de l’année ont 31 jours ?", "unit": "mois" },
+      "en": { "q": "How many months of the year have 31 days?", "unit": "months" }
+    },
+    {
+      "id": "n028",
+      "answer": 21,
+      "fr": { "q": "Combien de points y a-t-il en tout sur un dé à six faces ?", "unit": "points" },
+      "en": { "q": "How many dots are there in total on a six-sided die?", "unit": "dots" }
+    },
+    {
+      "id": "n029",
+      "answer": 28,
+      "fr": { "q": "Combien de dominos compte un jeu classique, du double blanc au double six ?", "unit": "dominos" },
+      "en": { "q": "How many tiles are in a standard double-six set of dominoes?", "unit": "tiles" }
+    },
+    {
+      "id": "n030",
+      "answer": 81,
+      "fr": { "q": "Combien de cases compte une grille de sudoku classique ?", "unit": "cases" },
+      "en": { "q": "How many squares are there in a classic sudoku grid?", "unit": "squares" }
+    },
+    {
+      "id": "n031",
+      "answer": 300,
+      "fr": { "q": "Quel est le score maximum possible lors d’une partie de bowling ?", "unit": "points" },
+      "en": { "q": "What is the highest possible score in a game of ten-pin bowling?", "unit": "points" }
+    },
+    {
+      "id": "n032",
+      "answer": 23,
+      "fr": { "q": "Combien de paires de chromosomes possède l’être humain ?", "unit": "paires" },
+      "en": { "q": "How many pairs of chromosomes do humans have?", "unit": "pairs" }
+    },
+    {
+      "id": "n033",
+      "answer": 42,
+      "fr": { "q": "Combien de dents a un chien adulte ?", "unit": "dents" },
+      "en": { "q": "How many teeth does an adult dog have?", "unit": "teeth" }
+    },
+    {
+      "id": "n034",
+      "answer": 4,
+      "fr": { "q": "Combien d’ailes a un papillon ?", "unit": "ailes" },
+      "en": { "q": "How many wings does a butterfly have?", "unit": "wings" }
+    },
+    {
+      "id": "n035",
+      "answer": 1896,
+      "fr": { "q": "En quelle année ont eu lieu les premiers Jeux olympiques modernes ?", "unit": "" },
+      "en": { "q": "In what year were the first modern Olympic Games held?", "unit": "" }
+    },
+    {
+      "id": "n036",
+      "answer": 50,
+      "fr": { "q": "Combien d’années de mariage fête-t-on lors des noces d’or ?", "unit": "ans" },
+      "en": { "q": "How many years of marriage does a golden wedding anniversary mark?", "unit": "years" }
+    },
+    {
+      "id": "n037",
+      "answer": 5,
+      "fr": { "q": "Combien d’yeux possède une abeille ?", "unit": "yeux" },
+      "en": { "q": "How many eyes does a bee have?", "unit": "eyes" }
+    },
+    {
+      "id": "n038",
+      "answer": 12,
+      "fr": { "q": "Combien de demi-tons compte une octave ?", "unit": "demi-tons" },
+      "en": { "q": "How many semitones are there in an octave?", "unit": "semitones" }
+    },
+    {
+      "id": "n039",
+      "answer": 180,
+      "fr": { "q": "Quel est le score maximum avec trois fléchettes sur une cible classique ?", "unit": "points" },
+      "en": { "q": "What is the highest score possible with three darts on a standard dartboard?", "unit": "points" }
+    },
+    {
+      "id": "n040",
+      "answer": 50,
+      "fr": { "q": "Combien de mètres mesure une piscine olympique dans sa longueur ?", "unit": "mètres" },
+      "en": { "q": "How long is an Olympic swimming pool, in metres?", "unit": "metres" }
+    }
+  ]
+}

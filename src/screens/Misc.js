@@ -8,7 +8,9 @@ import { previewInvite, joinByCode } from '../state/rooms.js'
 import { redeemLink, celebrations, shiftCelebration, celebrateNow, me, initApp } from '../state/core.js'
 import { invitePending } from '../state/invite.js'
 import { navigate, back, paths } from '../lib/router.js'
-import { ACCESSORIES, BADGES, rankFor } from '../../shared/progression.js'
+import { t, tn, errorText } from '../i18n/index.js'
+import { rankName, accName, badgeName, badgeDesc } from '../i18n/texts.js'
+import { ACCESSORIES, BADGES } from '../../shared/progression.js'
 import { LIMITS } from '../../shared/constants.js'
 
 export function JoinScreen({ code }) {
@@ -20,14 +22,14 @@ export function JoinScreen({ code }) {
         if (!alive) return
         if (p.status === 'member') navigate(paths.room(p.room.id), { replace: true })
         else if (p.status === 'ok' && invitePending.value?.code === code) {
-          // Arrivé par ce lien avant d'avoir un compte : on entre directement dans le salon.
+          // Arrivé par ce lien avant d'avoir un compte : on entre directement dans le groupe.
           invitePending.value = null
           joinByCode(code)
             .then((room) => navigate(paths.room(room.id), { replace: true }))
-            .catch((err) => setState({ status: 'error', message: err.message }))
+            .catch((err) => setState({ status: 'error', message: errorText(err) }))
         } else setState(p)
       })
-      .catch((err) => alive && setState({ status: 'error', message: err.message }))
+      .catch((err) => alive && setState({ status: 'error', message: errorText(err) }))
     return () => (alive = false)
   }, [code])
   const join = async () => {
@@ -36,21 +38,19 @@ export function JoinScreen({ code }) {
       const room = await joinByCode(code)
       navigate(paths.room(room.id), { replace: true })
     } catch (err) {
-      setState({ status: 'error', message: err.message })
+      setState({ status: 'error', message: errorText(err) })
     }
   }
-  const home = html`<button class="btn btn-secondary" onClick=${() => navigate(paths.home(), { replace: true })}>Mes salons</button>`
+  const home = html`<button class="btn btn-secondary" onClick=${() => navigate(paths.home(), { replace: true })}>${t('rooms.title')}</button>`
   let content
-  if (state.status === 'loading') content = html`<${Shiba} body wag size=${100} label="Vérification de l’invitation" />`
+  if (state.status === 'loading') content = html`<${Shiba} body wag size=${100} label=${t('join.checking')} />`
   else if (state.status === 'ok')
-    content = html`<${EmptyState} mood="fete" coat="roux" title=${`Rejoindre « ${state.room.name} » ?`}
-      text=${`${state.room.memberCount} membre${state.room.memberCount > 1 ? 's' : ''} t’attend${state.room.memberCount > 1 ? 'ent' : ''} pour discuter et jouer.`}>
-      <button class="btn btn-primary btn-big" onClick=${join} disabled=${state.busy}>Rejoindre le salon</button>${home}</${EmptyState}>`
+    content = html`<${EmptyState} mood="fete" coat="roux" title=${t('join.title', { name: state.room.name })} text=${tn('join.text', state.room.memberCount)}>
+      <button class="btn btn-primary btn-big" onClick=${join} disabled=${state.busy}>${t('join.button')}</button>${home}</${EmptyState}>`
   else if (state.status === 'full')
-    content = html`<${EmptyState} mood="triste" title="Salon complet" text=${`« ${state.room.name} » compte déjà ${LIMITS.roomMaxMembers} membres.`}>${home}</${EmptyState}>`
-  else if (state.status === 'expired')
-    content = html`<${EmptyState} mood="triste" title="Invitation expirée" text="Ce lien a été réinitialisé par l’hôte. Demande-lui un nouveau lien.">${home}</${EmptyState}>`
-  else content = html`<${EmptyState} mood="surpris" title="Invitation introuvable" text=${state.message || 'Ce code d’invitation n’existe pas.'}>${home}</${EmptyState}>`
+    content = html`<${EmptyState} mood="triste" title=${t('join.fullTitle')} text=${t('join.fullText', { name: state.room.name, max: LIMITS.roomMaxMembers })}>${home}</${EmptyState}>`
+  else if (state.status === 'expired') content = html`<${EmptyState} mood="triste" title=${t('join.expiredTitle')} text=${t('join.expiredText')}>${home}</${EmptyState}>`
+  else content = html`<${EmptyState} mood="surpris" title=${t('join.notFoundTitle')} text=${state.message || t('join.notFoundText')}>${home}</${EmptyState}>`
   return html`<main class="screen"><div class="fill-center">${content}</div></main>`
 }
 
@@ -63,40 +63,42 @@ export function LinkScreen({ token, onDone }) {
         onDone?.()
         navigate(paths.home(), { replace: true })
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => setError(errorText(err)))
   }, [token])
   return html`<main class="screen"><div class="fill-center">
     ${error
-      ? html`<${EmptyState} mood="triste" title="Connexion impossible" text=${error}>
+      ? html`<${EmptyState} mood="triste" title=${t('link.failed')} text=${error}>
           <button class="btn btn-primary" onClick=${() => {
             initApp()
             navigate(paths.home(), { replace: true })
-          }}>Continuer</button></${EmptyState}>`
-      : html`<${Shiba} body wag size=${110} label="Connexion en cours" /><p class="muted">Connexion à ton compte…</p>`}
+          }}>${t('common.continue')}</button></${EmptyState}>`
+      : html`<${Shiba} body wag size=${110} label=${t('link.connecting')} /><p class="muted">${t('link.connecting')}</p>`}
   </div></main>`
 }
 
 export function Privacy() {
   return html`<section class="screen" aria-labelledby="privacy-title">
     <header class="screen-header">
-      <button class="icon-btn" onClick=${() => back(paths.home())} aria-label="Retour"><${Icon} name="back" /></button>
-      <div class="titles"><h1 id="privacy-title">Confidentialité</h1></div>
+      <button class="icon-btn" onClick=${() => back(paths.home())} aria-label=${t('common.back')}><${Icon} name="back" /></button>
+      <div class="titles"><h1 id="privacy-title">${t('privacy.title')}</h1></div>
     </header>
     <div class="screen-body"><div class="privacy card">
-      <p>Weplay Shibax est conçu pour collecter le moins de données possible.</p>
-      <h2>Ce que l’on ne collecte pas</h2>
-      <ul><li>Ni e-mail, ni nom réel, ni numéro de téléphone.</li><li>Aucun cookie publicitaire, aucun traceur tiers.</li></ul>
-      <h2>Ce qui est enregistré</h2>
+      <p>${t('privacy.intro')}</p>
+      <h2>${t('privacy.notCollected')}</h2>
+      <ul><li>${t('privacy.no1')}</li><li>${t('privacy.no2')}</li></ul>
+      <h2>${t('privacy.stored')}</h2>
       <ul>
-        <li>Ton identifiant (SHX-…), ton pseudo, ton shiba et ta progression (XP, badges, série).</li>
-        <li>Ta clé de connexion, uniquement sous forme hachée : personne ne peut la relire.</li>
-        <li>Les messages de tes salons, conservés 90 jours.</li>
-        <li>Les dessins des parties, conservés 30 jours.</li>
+        <li>${t('privacy.s1')}</li>
+        <li>${t('privacy.s2')}</li>
+        <li>${t('privacy.s3')}</li>
+        <li>${t('privacy.s4')}</li>
+        <li>${t('privacy.s5')}</li>
+        <li>${t('privacy.s6')}</li>
       </ul>
-      <h2>Où et pourquoi</h2>
-      <p>Les données sont stockées chez Netlify (Netlify Blobs), uniquement pour faire fonctionner l’application : salons, parties et classements.</p>
-      <h2>Tes droits</h2>
-      <p>Tu peux modifier ton pseudo à tout moment, quitter un salon, et te déconnecter de chaque appareil. L’hôte d’un salon peut retirer un membre.</p>
+      <h2>${t('privacy.where')}</h2>
+      <p>${t('privacy.whereText')}</p>
+      <h2>${t('privacy.rights')}</h2>
+      <p>${t('privacy.rightsText')}</p>
     </div></div>
   </section>`
 }
@@ -110,15 +112,15 @@ export function Celebration() {
   if (!item) return null
   const close = () => shiftCelebration()
   if (item.type === 'level') {
-    const acc = (item.accessories || []).map((id) => ACCESSORIES.find((a) => a.id === id)).filter(Boolean)
-    return html`<div class="celebration" role="dialog" aria-modal="true" aria-label=${`Niveau ${item.level} atteint`} onClick=${close}>
+    const acc = (item.accessories || []).filter((id) => ACCESSORIES.some((a) => a.id === id))
+    return html`<div class="celebration" role="dialog" aria-modal="true" aria-label=${t('celebrate.levelAria', { n: item.level })} onClick=${close}>
       <div class="celebration-card">
-        <p class="title-font" style=${{ fontSize: '1.4rem' }}>Niveau supérieur !</p>
+        <p class="title-font" style=${{ fontSize: '1.4rem' }}>${t('celebrate.levelUp')}</p>
         <span class="big-level">${item.level}</span>
-        <${Shiba} body mood="fete" coat=${me.value?.coat} acc=${acc.map((a) => a.id).concat(me.value?.acc || [])} size=${150} />
-        <p><b>${rankFor(item.level)}</b></p>
-        ${acc.length > 0 && html`<p class="pill butter" style=${{ padding: '6px 14px' }}>Accessoire débloqué : ${acc.map((a) => a.name).join(', ')} !</p>`}
-        <button class="btn btn-primary" autofocus onClick=${close}>Trop bien !</button>
+        <${Shiba} body mood="fete" coat=${me.value?.coat} acc=${acc.concat(me.value?.acc || [])} size=${150} />
+        <p><b>${rankName(item.level)}</b></p>
+        ${acc.length > 0 && html`<p class="pill butter" style=${{ padding: '6px 14px' }}>${t('celebrate.accUnlocked', { names: acc.map(accName).join(', ') })}</p>`}
+        <button class="btn btn-primary" autofocus onClick=${close}>${t('celebrate.great')}</button>
       </div>
     </div>`
   }
@@ -136,18 +138,18 @@ export function Celebration() {
   const closeAll = () => {
     for (let i = 0; i < Math.max(1, group.length); i++) shiftCelebration()
   }
-  return html`<div class="celebration" role="dialog" aria-modal="true" aria-label=${`Badge obtenu : ${group.map((b) => b.name).join(', ')}`} onClick=${closeAll}>
+  return html`<div class="celebration" role="dialog" aria-modal="true" aria-label=${t('celebrate.badgeAria', { names: group.map((b) => badgeName(b.id)).join(', ') })} onClick=${closeAll}>
     <div class="celebration-card" style=${{ maxWidth: '760px' }}>
-      <p class="title-font" style=${{ fontSize: '1.3rem' }}>${group.length > 1 ? `${group.length} badges obtenus !` : 'Badge obtenu !'}</p>
+      <p class="title-font" style=${{ fontSize: '1.3rem' }}>${group.length > 1 ? t('celebrate.badges', { n: group.length }) : t('celebrate.badge')}</p>
       <div class="row wrap" style=${{ justifyContent: 'center', gap: '12px' }}>
         ${group.map(
           (badge, i) => html`<div class=${`flip ${group.length > 1 ? 'small' : ''}`} key=${badge.id}><div class="flip-inner" style=${{ animationDelay: `${250 + i * 220}ms` }}>
             <div class="flip-face flip-front"><${Shiba} mood="surpris" size=${group.length > 1 ? 72 : 100} /></div>
-            <div class="flip-face flip-back"><${BadgeIcon} icon=${badge.icon} size=${group.length > 1 ? 60 : 84} /><b class="title-font">${badge.name}</b><small>${badge.desc}</small></div>
+            <div class="flip-face flip-back"><${BadgeIcon} icon=${badge.icon} size=${group.length > 1 ? 60 : 84} /><b class="title-font">${badgeName(badge.id)}</b><small>${badgeDesc(badge.id)}</small></div>
           </div></div>`,
         )}
       </div>
-      <button class="btn btn-primary" autofocus onClick=${closeAll}>Super !</button>
+      <button class="btn btn-primary" autofocus onClick=${closeAll}>${t('celebrate.super')}</button>
     </div>
   </div>`
 }

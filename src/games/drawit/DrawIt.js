@@ -12,12 +12,14 @@ import { play, buzz } from '../../lib/fx.js'
 import { Surface, exportImage } from './surface.js'
 import { DRAW_COLORS, BRUSHES, ERASER, LIMITS } from '../../../shared/constants.js'
 import { validateCustomWord } from '../../../shared/text.js'
+import { t, tn, errorText } from '../../i18n/index.js'
+import { ordinal } from '../../i18n/texts.js'
 
-const DIFF_LABEL = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile', perso: 'Mot perso' }
+const diffLabel = (d) => t(`drawit.diff.${d}`)
 const FLUSH_MS = 200
 
 function pseudoOf(view, uid) {
-  return view.players.find((p) => p.id === uid)?.pseudo || 'Un shiba'
+  return view.players.find((p) => p.id === uid)?.pseudo || t('common.aShiba')
 }
 
 export function DrawIt() {
@@ -42,12 +44,12 @@ export function DrawIt() {
     }
   }, [Math.ceil(remaining / 1000), gs.phase])
 
-  const roundLabel = `Manche ${Math.min(gs.round + 1, gs.totalRounds)}/${gs.totalRounds} · Tour ${Math.min(gs.tour, gs.tours)}/${gs.tours}`
+  const roundLabel = t('drawit.roundLabel', { n: Math.min(gs.round + 1, gs.totalRounds), total: gs.totalRounds, tour: Math.min(gs.tour, gs.tours), tours: gs.tours })
 
   return html`<div class="drawit">
     <div class="di-top">
       <span class="di-round">${roundLabel}</span>
-      <span class=${`timer ${alert ? 'alert' : ''}`} role="timer" aria-live="off" aria-label=${`${Math.ceil(remaining / 1000)} secondes restantes`}>
+      <span class=${`timer ${alert ? 'alert' : ''}`} role="timer" aria-live="off" aria-label=${tn('live.secondsLeft', Math.ceil(remaining / 1000))}>
         <${Icon} name=${alert ? 'alert' : 'clock'} size=${20} /> ${Math.ceil(remaining / 1000)} s
       </span>
       <div class="word-zone"><${WordZone} v=${v} gs=${gs} isDrawer=${isDrawer} now=${now} /></div>
@@ -56,7 +58,7 @@ export function DrawIt() {
       <${Board} v=${v} gs=${gs} isDrawer=${isDrawer} late=${late} now=${now} />
       ${!myPlayer && html`<${SpectatorBar} v=${v} />`}
       ${myPlayer && !isDrawer && gs.phase === 'drawing' && !late && html`<${GuessForm} v=${v} gs=${gs} />`}
-      ${myPlayer && late && html`<p class="guess-feedback"><span class="pill sky">Tu joues dès la manche suivante !</span></p>`}
+      ${myPlayer && late && html`<p class="guess-feedback"><span class="pill sky">${t('game.lateNext')}</span></p>`}
     </div>
     <div class="di-side">
       <${Scoreboard} v=${v} gs=${gs} />
@@ -68,17 +70,17 @@ export function DrawIt() {
 function WordZone({ v, gs, isDrawer, now }) {
   if (gs.phase === 'choosing') {
     return isDrawer
-      ? html`<span class="pill apricot">À toi de dessiner : choisis ton mot !</span>`
-      : html`<span class="pill sky">${pseudoOf(v, gs.drawerId)} choisit un mot…</span>`
+      ? html`<span class="pill apricot">${t('drawit.yourTurnChoose')}</span>`
+      : html`<span class="pill sky">${t('drawit.choosing', { pseudo: pseudoOf(v, gs.drawerId) })}</span>`
   }
-  if (gs.phase === 'reveal') return html`<span class="pill butter">Le mot était « ${gs.last?.word || '—'} »</span>`
+  if (gs.phase === 'reveal') return html`<span class="pill butter">${t('drawit.wordWas', { word: gs.last?.word || '—' })}</span>`
   if (isDrawer) {
-    return html`<span class="secret-word" aria-label=${`Ton mot : ${gs.word}`}>${gs.word}</span>
-      <span class="pill">${DIFF_LABEL[gs.difficulty]} ×${String(gs.mult).replace('.', ',')}</span>`
+    return html`<span class="secret-word" aria-label=${t('drawit.yourWord', { word: gs.word })}>${gs.word}</span>
+      <span class="pill">${diffLabel(gs.difficulty)} ${t('drawit.mult', { m: gs.mult })}</span>`
   }
   const cells = gs.hint?.cells || []
   const letters = cells.filter((c) => c.t === 'l').length
-  return html`<div class="hint" aria-label=${`Mot de ${letters} lettres`}>
+  return html`<div class="hint" aria-label=${tn('drawit.wordOf', letters)}>
     ${cells.map((c, i) =>
       c.t === 'l'
         ? html`<span key=${i} class=${`cell ${c.c ? 'revealed' : ''}`}>${c.c || ''}</span>`
@@ -86,7 +88,7 @@ function WordZone({ v, gs, isDrawer, now }) {
           ? html`<span key=${i} class="gap"></span>`
           : html`<span key=${i} class="mark">${c.t === 'd' ? '-' : '’'}</span>`,
     )}
-    <span class="pill white" style=${{ marginLeft: '6px' }}>${letters} lettres${gs.mult > 1 ? ` · ×${String(gs.mult).replace('.', ',')}` : ''}</span>
+    <span class="pill white" style=${{ marginLeft: '6px' }}>${tn('common.letters', letters)}${gs.mult > 1 ? ` · ${t('drawit.mult', { m: gs.mult })}` : ''}</span>
   </div>`
 }
 
@@ -173,9 +175,9 @@ function Board({ v, gs, isDrawer, late, now }) {
       if (e.button !== undefined && e.button > 0) return
       e.preventDefault()
       canvas.setPointerCapture?.(e.pointerId)
-      const t = toolRef.current
-      const c = t.eraser ? ERASER : t.color
-      active = sender.current.begin(c, t.brush)
+      const tl = toolRef.current
+      const c = tl.eraser ? ERASER : tl.color
+      active = sender.current.begin(c, tl.brush)
       const p = surfaceRef.current.toLogical(e)
       addPoint(p)
     }
@@ -221,8 +223,8 @@ function Board({ v, gs, isDrawer, late, now }) {
     const mine = gs.drawerId === me.value.id
     if (!mine && (drawerHere || backup !== me.value.id)) return
     uploaded.current.add(gs.last.i)
-    const t = setTimeout(() => uploadDrawing(game.value.gid, gs.last.i, exportImage(surfaceRef.current.model)), mine ? 150 : 1800)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => uploadDrawing(game.value.gid, gs.last.i, exportImage(surfaceRef.current.model)), mine ? 150 : 1800)
+    return () => clearTimeout(timer)
   }, [gs.phase, gs.last?.i])
 
   const undo = () => {
@@ -243,34 +245,34 @@ function Board({ v, gs, isDrawer, late, now }) {
 
   return html`<div class="col" style=${{ gap: '8px' }}>
     <div class=${`canvas-wrap ${canDraw ? 'drawing' : ''}`} ref=${wrapRef}>
-      <canvas ref=${canvasRef} role="img" aria-label=${canDraw ? 'Zone de dessin : dessine ton mot ici' : 'Dessin en cours'}></canvas>
+      <canvas ref=${canvasRef} role="img" aria-label=${canDraw ? t('drawit.canvasDraw') : t('drawit.canvasWatch')}></canvas>
       ${gs.phase === 'choosing' && html`<${ChoosingOverlay} v=${v} gs=${gs} isDrawer=${isDrawer} now=${now} />`}
       ${gs.phase === 'reveal' && html`<${RevealOverlay} v=${v} gs=${gs} />`}
     </div>
     ${canDraw &&
-    html`<div class="tools" role="toolbar" aria-label="Outils de dessin">
-      <div class="swatches" role="group" aria-label="Couleurs">
+    html`<div class="tools" role="toolbar" aria-label=${t('draw.tools')}>
+      <div class="swatches" role="group" aria-label=${t('draw.colors')}>
         ${DRAW_COLORS.map(
-          (c, i) => html`<button class="swatch" style=${{ background: c.hex }} aria-label=${c.name} title=${c.name}
+          (c, i) => html`<button class="swatch" style=${{ background: c.hex }} aria-label=${t(`color.${c.id}`)} title=${t(`color.${c.id}`)}
             aria-pressed=${String(!tool.eraser && tool.color === i)} onClick=${() => setTool({ color: i, eraser: false })}></button>`,
         )}
       </div>
       <span class="tool-sep" aria-hidden="true"></span>
-      <div class="tool-group" role="group" aria-label="Épaisseur">
+      <div class="tool-group" role="group" aria-label=${t('draw.size')}>
         ${BRUSHES.map(
-          (b, i) => html`<button class="tool" aria-label=${`Crayon ${b.name.toLowerCase()}`} title=${b.name} aria-pressed=${String(tool.brush === i)}
+          (b, i) => html`<button class="tool" aria-label=${t(`brush.${b.id}`)} title=${t(`brush.${b.id}`)} aria-pressed=${String(tool.brush === i)}
             onClick=${() => setTool({ brush: i })}><span class="brush-dot" style=${{ width: `${6 + i * 6}px`, height: `${6 + i * 6}px` }}></span></button>`,
         )}
       </div>
       <span class="tool-sep" aria-hidden="true"></span>
       <div class="tool-group">
-        <button class="tool" aria-label="Gomme" title="Gomme" aria-pressed=${String(tool.eraser)} onClick=${() => setTool({ eraser: !tool.eraser })}><${Icon} name="eraser" /></button>
-        <button class="tool" aria-label="Annuler le dernier trait" title="Annuler" onClick=${undo}><${Icon} name="undo" /></button>
-        <button class="tool" aria-label="Tout effacer" title="Tout effacer" onClick=${clearAll}><${Icon} name="trash" /></button>
+        <button class="tool" aria-label=${t('draw.eraser')} title=${t('draw.eraser')} aria-pressed=${String(tool.eraser)} onClick=${() => setTool({ eraser: !tool.eraser })}><${Icon} name="eraser" /></button>
+        <button class="tool" aria-label=${t('draw.undo')} title=${t('draw.undo')} onClick=${undo}><${Icon} name="undo" /></button>
+        <button class="tool" aria-label=${t('draw.clear')} title=${t('draw.clear')} onClick=${clearAll}><${Icon} name="trash" /></button>
       </div>
-      <button class="btn btn-small btn-danger" onClick=${skip}><${Icon} name="skip" /> Passer</button>
+      <button class="btn btn-small btn-danger" onClick=${skip}><${Icon} name="skip" /> ${t('drawit.skip')}</button>
     </div>
-    <p class="draw-rule">Règle : n’écris pas le mot en toutes lettres 😉 Si tu passes, tu ne marques pas de points.</p>`}
+    <p class="draw-rule">${t('drawit.rule')}</p>`}
   </div>`
 }
 
@@ -386,7 +388,7 @@ function ChoosingOverlay({ v, gs, isDrawer, now }) {
     try {
       await act({ ...body, round: gs.round })
     } catch (err) {
-      setError(err.message)
+      setError(errorText(err))
       setBusy(false)
     }
   }
@@ -394,61 +396,55 @@ function ChoosingOverlay({ v, gs, isDrawer, now }) {
     const drawer = v.players.find((p) => p.id === gs.drawerId)
     return html`<div class="stage-overlay"><div class="stage-card">
       <${Shiba} coat=${drawer?.coat} acc=${drawer?.acc} mood="concentre" size=${90} />
-      <h2>${drawer?.pseudo || 'Le dessinateur'} choisit un mot…</h2>
-      <p class="muted">Prépare-toi à deviner ! (${left} s)</p>
+      <h2>${t('drawit.choosing', { pseudo: drawer?.pseudo || t('drawit.theDrawer') })}</h2>
+      <p class="muted">${t('drawit.getReady', { s: left })}</p>
     </div></div>`
   }
   const submitCustom = (e) => {
     e.preventDefault()
     const check = validateCustomWord(custom)
-    if (!check.ok) return setError(check.error)
+    if (!check.ok) return setError(t(`word.${check.code || 'chars'}`))
     choose({ type: 'custom', word: check.value })
   }
   return html`<div class="stage-overlay"><div class="stage-card">
-    <h2>À toi de dessiner !</h2>
-    <p class="small muted">Choisis un mot (${left} s). Sans choix, le mot facile est retenu.</p>
+    <h2>${t('drawit.yourTurn')}</h2>
+    <p class="small muted">${t('drawit.chooseHint', { s: left })}</p>
     <div class="word-choices">
       ${(gs.choices || []).map(
         (c, i) => html`<button class=${`word-choice ${c.difficulty}`} disabled=${busy} onClick=${() => choose({ type: 'choose', index: i })}>
-          <span>${c.word}</span><small>${DIFF_LABEL[c.difficulty]} ×${String(c.mult).replace('.', ',')}</small>
+          <span>${c.word}</span><small>${diffLabel(c.difficulty)} ${t('drawit.mult', { m: c.mult })}</small>
         </button>`,
       )}
     </div>
     ${gs.canCustom &&
     html`<form class="guess-form" onSubmit=${submitCustom}>
-      <label for="custom-word" class="sr-only">Mon propre mot</label>
-      <input id="custom-word" class="input" placeholder="Mon propre mot" maxlength="25" value=${custom}
+      <label for="custom-word" class="sr-only">${t('drawit.ownWord')}</label>
+      <input id="custom-word" class="input" placeholder=${t('drawit.ownWord')} maxlength="25" value=${custom}
         onInput=${(e) => {
           setCustom(e.currentTarget.value)
           setError(null)
         }} />
-      <button class="btn btn-secondary" disabled=${busy || !custom.trim()}>OK</button>
+      <button class="btn btn-secondary" disabled=${busy || !custom.trim()}>${t('common.ok')}</button>
     </form>`}
     ${error && html`<p class="field-error" role="alert">${error}</p>`}
   </div></div>`
 }
 
-const REASONS = {
-  found: 'Tout le monde a trouvé, bien joué la meute !',
-  time: 'Temps écoulé !',
-  skip: 'Le dessinateur a passé son tour.',
-  left: 'Le dessinateur n’est plus là : on passe au suivant.',
-}
 
 function RevealOverlay({ v, gs }) {
   const last = gs.last
   if (!last) return null
   const rows = Object.entries(last.points || {}).sort((a, b) => b[1] - a[1])
   return html`<div class="stage-overlay"><div class="stage-card">
-    ${last.word ? html`<p class="small muted">Le mot était</p><p class="reveal-word">${last.word}</p>` : html`<${Shiba} mood="surpris" size=${70} />`}
-    <p class="small"><b>${REASONS[last.reason] || ''}</b></p>
+    ${last.word ? html`<p class="small muted">${t('drawit.wordWasShort')}</p><p class="reveal-word">${last.word}</p>` : html`<${Shiba} mood="surpris" size=${70} />`}
+    <p class="small"><b>${last.reason ? t(`drawit.reason.${last.reason}`) : ''}</b></p>
     ${rows.length > 0 &&
     html`<ul class="round-points">
       ${rows.map(([uid, pts]) => {
         const p = v.players.find((x) => x.id === uid)
         return html`<li key=${uid}><${Avatar} user=${p} size=${28} /> <span class="ellipsis">${p?.pseudo || '?'}</span>
-          ${uid === last.drawerId && html`<span class="pill apricot"><${Icon} name="pencil" size=${12} /> dessin</span>`}
-          ${uid === last.firstId && html`<span class="pill butter">1er !</span>`}
+          ${uid === last.drawerId && html`<span class="pill apricot"><${Icon} name="pencil" size=${12} /> ${t('drawit.drawing')}</span>`}
+          ${uid === last.firstId && html`<span class="pill butter">${t('drawit.first')}</span>`}
           <span class=${`pts ${pts > 0 ? 'plus' : ''}`}>+${pts}</span></li>`
       })}
     </ul>`}
@@ -466,11 +462,11 @@ function GuessForm({ v, gs }) {
   useEffect(() => setFeedback(null), [gs.round])
   useEffect(() => {
     if (!cooldown) return
-    const t = setTimeout(() => setCooldown(0), Math.max(0, cooldown - Date.now()))
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setCooldown(0), Math.max(0, cooldown - Date.now()))
+    return () => clearTimeout(timer)
   }, [cooldown])
   if (found || feedback?.kind === 'correct') {
-    return html`<p class="guess-feedback" role="status"><span class="pill mint"><${Icon} name="check" size=${16} /> Tu as trouvé ! ${feedback?.points ? `+${feedback.points} points` : ''}</span></p>`
+    return html`<p class="guess-feedback" role="status"><span class="pill mint"><${Icon} name="check" size=${16} /> ${t('drawit.youFound')} ${feedback?.points ? t('drawit.plusPoints', { n: feedback.points }) : ''}</span></p>`
   }
   const submit = async (e) => {
     e.preventDefault()
@@ -485,7 +481,7 @@ function GuessForm({ v, gs }) {
         play('found')
         buzz(60)
         document.querySelector('.scoreboard .me .shiba')?.classList.add('me-jump')
-        toast(`Bravo ! +${res.points} points${res.first ? ' (premier !)' : ''}`, 'success')
+        toast(t(res.first ? 'drawit.bravoFirst' : 'drawit.bravo', { n: res.points }), 'success')
       } else if (res.result === 'close') {
         setFeedback({ kind: 'close' })
         play('close')
@@ -499,15 +495,15 @@ function GuessForm({ v, gs }) {
   }
   return html`<div class="col" style=${{ gap: '4px' }}>
     <form class="guess-form" onSubmit=${submit}>
-      <label for="guess" class="sr-only">Ta proposition</label>
-      <input id="guess" ref=${inputRef} class="input" placeholder="Ta proposition…" maxlength="60" value=${text} autocomplete="off" autocorrect="off"
+      <label for="guess" class="sr-only">${t('drawit.guess')}</label>
+      <input id="guess" ref=${inputRef} class="input" placeholder=${t('drawit.guessPlaceholder')} maxlength="60" value=${text} autocomplete="off" autocorrect="off"
         autocapitalize="off" spellcheck="false" enterkeyhint="send" onInput=${(e) => setText(e.currentTarget.value)} />
-      <button class="btn btn-primary" disabled=${!text.trim() || !!cooldown}><${Icon} name="send" /> Proposer</button>
+      <button class="btn btn-primary" disabled=${!text.trim() || !!cooldown}><${Icon} name="send" /> ${t('drawit.propose')}</button>
     </form>
     <p class="guess-feedback" aria-live="polite">
-      ${feedback?.kind === 'close' && html`<span class="pill butter">🔥 Tu chauffes !</span>`}
-      ${feedback?.kind === 'masked' && html`<span class="pill sky">Ta proposition contient le mot : elle est masquée pour les autres.</span>`}
-      ${feedback?.kind === 'slow' && html`<span class="pill coral">Une proposition par seconde, pas plus !</span>`}
+      ${feedback?.kind === 'close' && html`<span class="pill butter">🔥 ${t('ag.close')}</span>`}
+      ${feedback?.kind === 'masked' && html`<span class="pill sky">${t('drawit.masked')}</span>`}
+      ${feedback?.kind === 'slow' && html`<span class="pill coral">${t('drawit.slow')}</span>`}
     </p>
   </div>`
 }
@@ -518,7 +514,7 @@ function Scoreboard({ v, gs }) {
   const myId = me.value.id
   const players = v.players.filter((p) => !p.left).sort((a, b) => b.score - a.score)
   const now = serverNow()
-  return html`<ol class="scoreboard" aria-label="Scores">
+  return html`<ol class="scoreboard" aria-label=${t('live.scores')}>
     ${players.map((p) => {
       const drawer = p.id === gs.drawerId && gs.phase !== 'reveal'
       const found = foundIds.includes(p.id)
@@ -526,14 +522,14 @@ function Scoreboard({ v, gs }) {
       return html`<li key=${p.id} class=${`${found ? 'found' : ''} ${drawer ? 'drawer' : ''} ${absent ? 'absent' : ''} ${p.id === myId ? 'me' : ''}`}>
         <${Avatar} user=${p} size=${32} mood=${found ? 'fete' : drawer ? 'concentre' : 'content'} />
         <span class="col" style=${{ gap: 0, minWidth: 0 }}>
-          <span class="score-name">${p.pseudo}${p.id === myId ? ' (toi)' : ''}</span>
+          <span class="score-name">${p.pseudo}${p.id === myId ? ` ${t('common.youParen')}` : ''}</span>
           <span class="score-tag">
-            ${drawer && html`<span class="row" style=${{ gap: '2px' }}><${Icon} name="pencil" size=${12} /> dessine</span>`}
-            ${found && html`<span class="row" style=${{ gap: '2px' }}><${Icon} name="check" size=${12} /> trouvé</span>`}
-            ${absent && html`<span>· absent</span>`}
+            ${drawer && html`<span class="row" style=${{ gap: '2px' }}><${Icon} name="pencil" size=${12} /> ${t('drawit.draws')}</span>`}
+            ${found && html`<span class="row" style=${{ gap: '2px' }}><${Icon} name="check" size=${12} /> ${t('drawit.found')}</span>`}
+            ${absent && html`<span>· ${t('live.absent')}</span>`}
           </span>
         </span>
-        <span class="score-pts">${p.score} pts</span>
+        <span class="score-pts">${t('results.pts', { n: p.score })}</span>
       </li>`
     })}
   </ol>`
@@ -546,12 +542,12 @@ function Feed({ v }) {
     const el = ref.current
     if (el) el.scrollTop = el.scrollHeight
   }, [guesses.length])
-  return html`<div class="feed" ref=${ref} role="log" aria-live="polite" aria-label="Propositions">
-    ${!guesses.length && html`<p class="small muted center" style=${{ margin: 'auto' }}>Les propositions apparaîtront ici.</p>`}
+  return html`<div class="feed" ref=${ref} role="log" aria-live="polite" aria-label=${t('drawit.guesses')}>
+    ${!guesses.length && html`<p class="small muted center" style=${{ margin: 'auto' }}>${t('drawit.guessesEmpty')}</p>`}
     ${guesses.map((x) => {
       const who = pseudoOf(v, x.uid)
-      if (x.k === 'f') return html`<div class="feed-item found" key=${x.id}>🎉 ${who} a trouvé !</div>`
-      if (x.k === 'm') return html`<div class="feed-item masked" key=${x.id}><b>${who}</b> : proposition masquée 🙈</div>`
+      if (x.k === 'f') return html`<div class="feed-item found" key=${x.id}>🎉 ${t('drawit.someoneFound', { pseudo: who })}</div>`
+      if (x.k === 'm') return html`<div class="feed-item masked" key=${x.id}><b>${who}</b> : ${t('drawit.maskedGuess')} 🙈</div>`
       return html`<div class="feed-item" key=${x.id}><b>${who}</b> : ${x.text}</div>`
     })}
   </div>`
@@ -560,7 +556,7 @@ function Feed({ v }) {
 function SpectatorBar({ v }) {
   const full = v.players.filter((p) => !p.left).length >= v.maxPlayers
   return html`<div class="game-banner">
-    <span class="grow">Tu regardes la partie. Rejoins-la pour jouer dès la manche suivante !</span>
-    <button class="btn btn-small btn-primary" disabled=${full} onClick=${() => joinGame().catch(() => {})}>${full ? 'Complet' : 'Rejoindre'}</button>
+    <span class="grow">${t('game.spectator')}</span>
+    <button class="btn btn-small btn-primary" disabled=${full} onClick=${() => joinGame().catch(() => {})}>${full ? t('game.full') : t('common.join')}</button>
   </div>`
 }

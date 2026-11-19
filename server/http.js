@@ -28,13 +28,26 @@ export function json(data, init = {}) {
   })
 }
 
-// `netlify dev` rejoue les réponses 403/404 avec des variantes « .html » (imitation du CDN pour les
-// fichiers statiques) : en local seulement, on les signale avec 409/410. Le code JSON reste identique.
+// `netlify dev` et `netlify serve` rejouent les réponses 403/404 avec des variantes « .html » (imitation
+// du CDN pour les fichiers statiques) : en local seulement, on les signale avec 409/410. Le code JSON
+// reste identique. Un serveur local se reconnaît à NETLIFY_DEV ou à son adresse (jamais en production).
 const DEV_STATUS = { 403: 409, 404: 410 }
+let localServer = process.env.NETLIFY_DEV === 'true'
+
+export function noteRequestHost(hostname) {
+  if (!localServer && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(hostname)) localServer = true
+}
+
+const localStatus = (status) => (localServer ? DEV_STATUS[status] || status : status)
+
+/** Statut d'une réponse brute (image) : même correspondance locale que pour les erreurs JSON. */
+export function plainStatus(status) {
+  return localStatus(status)
+}
 
 export function errorResponse(err) {
   if (err instanceof HttpError) {
-    const status = process.env.NETLIFY_DEV === 'true' ? DEV_STATUS[err.status] || err.status : err.status
+    const status = localStatus(err.status)
     return json({ error: { code: err.code, message: err.message, ...err.extra } }, { status })
   }
   console.error('[api] erreur inattendue', err)

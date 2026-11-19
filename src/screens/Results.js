@@ -9,13 +9,12 @@ import { me, refreshMe, queueCelebration, keyReminderPending, errorToast } from 
 import { navigate, paths } from '../lib/router.js'
 import { play, confetti } from '../lib/fx.js'
 import { load, save } from '../lib/storage.js'
-import { levelFromXp, BADGES } from '../../shared/progression.js'
+import { levelFromXp } from '../../shared/progression.js'
+import { t, tn } from '../i18n/index.js'
+import { xpLineText, badgeName } from '../i18n/texts.js'
 import { openLightbox } from './Lightbox.js'
 
-const ENDINGS = {
-  complete: 'Partie terminée : bien joué, la meute !',
-  not_enough: 'Partie terminée : il ne restait plus assez de joueurs. Les points acquis comptent.',
-}
+const ENDINGS = { complete: 'results.endComplete', not_enough: 'results.endNotEnough' }
 
 export function Results({ rid }) {
   const g = game.value
@@ -73,42 +72,42 @@ export function Results({ rid }) {
   return html`<div class="screen-body">
     <div class="results">
       <div class="center">
-        <h2>Fin de la partie !</h2>
-        <p class="muted small">${ENDINGS[v.endReason] || ENDINGS.complete}</p>
+        <h2>${t('results.title')}</h2>
+        <p class="muted small">${t(ENDINGS[v.endReason] || ENDINGS.complete)}</p>
       </div>
       ${v.nextGameId &&
-      html`<div class="game-banner"><span class="grow">Une nouvelle partie est ouverte avec les mêmes joueurs !</span>
-        <button class="btn btn-small btn-primary" onClick=${() => navigate(paths.game(rid, v.nextGameId))}>Y aller</button></div>`}
-      <div class="podium" aria-label="Podium">
+      html`<div class="game-banner"><span class="grow">${t('results.nextOpen')}</span>
+        <button class="btn btn-small btn-primary" onClick=${() => navigate(paths.game(rid, v.nextGameId))}>${t('results.goThere')}</button></div>`}
+      <div class="podium" aria-label=${t('results.podium')}>
         ${podium.map(
           (r) => html`<div class="podium-spot" key=${r.uid}>
             <${Shiba} body coat=${byId[r.uid]?.coat} acc=${byId[r.uid]?.acc} mood=${r.rank === 1 ? 'fete' : 'content'} size=${r.rank === 1 ? 110 : 84} />
-            <span class="who ellipsis">${byId[r.uid]?.pseudo}</span>
-            <span class="small">${r.score} pts</span>
+            <span class="who row" style=${{ gap: '6px', justifyContent: 'center' }}><${Avatar} user=${byId[r.uid]} size=${26} /><span class="ellipsis">${byId[r.uid]?.pseudo}</span></span>
+            <span class="small">${t('results.points', { n: r.score })}</span>
             <div class=${`podium-step r${r.rank}`}>${r.rank}</div>
           </div>`,
         )}
       </div>
-      ${!v.rewardsDone && html`<div class="row" style=${{ justifyContent: 'center' }}><${Shiba} body wag size=${48} /><span class="muted">Calcul des récompenses…</span></div>`}
+      ${!v.rewardsDone && html`<div class="row" style=${{ justifyContent: 'center' }}><${Shiba} body wag size=${48} /><span class="muted">${t('results.computing')}</span></div>`}
       ${v.rewardsDone && v.results && !v.results.valid &&
-      html`<p class="card small center">Partie trop courte pour gagner de l’XP : il faut au moins 3 manches jouées.</p>`}
+      html`<p class="card small center">${t('results.tooShort')}</p>`}
       ${mine && mine.valid &&
       html`<section class="card col">
-        <div class="row"><b class="grow">Ton XP : +${mine.xp}</b><span class="pill butter">Niveau ${mine.levelAfter}</span></div>
+        <div class="row"><b class="grow">${t('results.yourXp', { n: mine.xp })}</b><span class="pill butter">${t('common.level', { n: mine.levelAfter })}</span></div>
         <${XpBarAnimated} fill=${fill} />
-        <ul class="xp-lines">${mine.lines.map((l) => html`<li key=${l.label}><span>${l.label}</span><b>+${l.xp}</b></li>`)}</ul>
+        <ul class="xp-lines">${mine.lines.map((l, i) => html`<li key=${i}><span>${l.key ? xpLineText(l) : l.label}</span><b>+${l.xp}</b></li>`)}</ul>
         ${mine.badges?.length > 0 &&
-        html`<p class="small"><b>Badges débloqués :</b> ${mine.badges.map((b) => BADGES.find((x) => x.id === b)?.name).join(', ')}</p>`}
+        html`<p class="small"><b>${t('results.badges')}</b> ${mine.badges.map(badgeName).join(', ')}</p>`}
       </section>`}
       <section>
-        <h3 class="section-title">Classement complet</h3>
+        <h3 class="section-title">${t('results.ranking')}</h3>
         <ol class="ranking">
           ${ranking.map(
             (r) => html`<li key=${r.uid} class=${r.uid === myId ? 'me' : ''}>
               <span class="rank">${r.rank}</span>
               <${Avatar} user=${byId[r.uid]} size=${36} />
-              <span class="grow"><b>${byId[r.uid]?.pseudo}</b>${byId[r.uid]?.left ? html` <span class="pill white tiny">parti</span>` : ''}<br />
-                <span class="tiny muted">${r.score} points · ${r.found} mot${r.found > 1 ? 's' : ''} trouvé${r.found > 1 ? 's' : ''}</span></span>
+              <span class="grow"><b>${byId[r.uid]?.pseudo}</b>${byId[r.uid]?.left ? html` <span class="pill white tiny">${t('results.left')}</span>` : ''}<br />
+                <span class="tiny muted">${t('results.points', { n: r.score })} · ${tn(v.type === 'drawit' ? 'results.wordsFound' : 'results.goodAnswers', r.found)}</span></span>
               ${rewards[r.uid] && html`<span class="xp-gain">+${rewards[r.uid].xp} XP</span>`}
             </li>`,
           )}
@@ -116,12 +115,12 @@ export function Results({ rid }) {
       </section>
       ${drawings.length > 0 &&
       html`<section>
-        <h3 class="section-title">Les dessins de la partie</h3>
+        <h3 class="section-title">${t('results.drawings')}</h3>
         <div class="thumbs" style=${{ flexWrap: 'wrap' }}>
           ${drawings.map(
-            (d, i) => html`<button class="thumb" key=${d.r} style=${{ width: '140px' }} aria-label=${`Agrandir le dessin « ${d.word} »`}
+            (d, i) => html`<button class="thumb" key=${d.r} style=${{ width: '140px' }} aria-label=${t('card.zoomDrawing', { word: d.word })}
               onClick=${() => openLightbox(drawings.map((x) => ({ src: `/api/games/${v.id}/drawings/${x.r}`, word: x.word })), i)}>
-              <img src=${`/api/games/${v.id}/drawings/${d.r}`} alt=${`Dessin : ${d.word}`} loading="lazy" onError=${(e) => (e.currentTarget.style.visibility = 'hidden')} />
+              <img src=${`/api/games/${v.id}/drawings/${d.r}`} alt=${t('card.drawingAlt', { word: d.word })} loading="lazy" onError=${(e) => (e.currentTarget.style.visibility = 'hidden')} />
               <span class="word">${d.word} · ${byId[d.drawerId]?.pseudo || ''}</span>
             </button>`,
           )}
@@ -129,8 +128,8 @@ export function Results({ rid }) {
       </section>`}
     </div>
     <div class="results-actions" style=${{ maxWidth: '760px', margin: '0 auto' }}>
-      <button class="btn btn-primary btn-big" onClick=${replay} disabled=${busy}><${Icon} name="refresh" /> Rejouer</button>
-      <button class="btn btn-secondary btn-big" onClick=${() => navigate(paths.room(rid))}><${Icon} name="chat" /> Retour au salon</button>
+      <button class="btn btn-primary btn-big" onClick=${replay} disabled=${busy}><${Icon} name="refresh" /> ${t('common.replay')}</button>
+      <button class="btn btn-secondary btn-big" onClick=${() => navigate(paths.room(rid))}><${Icon} name="chat" /> ${t('room.backToGroup')}</button>
     </div>
   </div>`
 }
@@ -141,12 +140,12 @@ function XpBarAnimated({ fill }) {
   useEffect(() => {
     if (!fill) return
     setP(fill.from.progress)
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setP(fill.to.level > fill.from.level ? 1 : fill.to.progress)
       if (fill.to.level > fill.from.level) setTimeout(() => setP(fill.to.progress), 1300)
     }, 300)
-    setLabel(`${fill.to.into} / ${fill.to.needed} XP vers le niveau ${fill.to.level + 1}`)
-    return () => clearTimeout(t)
+    setLabel(t('common.xpToNext', { into: fill.to.into, needed: fill.to.needed, n: fill.to.level + 1 }))
+    return () => clearTimeout(timer)
   }, [fill])
   return html`<div class="col" style=${{ gap: '4px' }}><${XpBar} progress=${p} /><span class="tiny muted">${label}</span></div>`
 }

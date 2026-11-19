@@ -29,12 +29,20 @@ function strip(text) {
     .replace(/[013457@$€!|]/g, (c) => LEET[c] || c)
 }
 
+// Mots composés courants qui contiennent un terme de la liste sans rien d'offensant.
+const SAFE = [
+  [/pique[\s'-]*niqu/g, 'piqueniqu'],
+  [/cul[\s-]*de[\s-]*sac/g, 'culdesac'],
+  [/con[\s-]+carne/g, 'concarne'],
+]
+
 const WORD_SET = WORD.map((w) => strip(w))
 const PART_SET = PART.map((w) => strip(w).replace(/[^a-z]/g, ''))
 
 /** Vrai si le texte contient un terme interdit. */
 export function containsBanned(text) {
-  const s = strip(text)
+  let s = strip(text)
+  for (const [re, safe] of SAFE) s = s.replace(re, safe)
   const spaced = ` ${s.replace(/[^a-z]+/g, ' ').trim()} `
   for (const w of WORD_SET) {
     if (spaced.includes(` ${w} `)) return true

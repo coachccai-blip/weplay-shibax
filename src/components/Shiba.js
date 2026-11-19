@@ -1,6 +1,9 @@
 // Mascotte originale : shiba en formes simples et aplats (vectoriel).
 // 4 pelages × expressions × accessoires gagnés. Sert d'avatar, d'illustration et d'indicateur de chargement.
+import { useState } from 'preact/hooks'
 import { html } from '../lib/html.js'
+import { people } from '../state/people.js'
+import { t } from '../i18n/index.js'
 
 export const COAT_COLORS = {
   roux: { fur: '#EE9D5C', dark: '#D7823F', mask: '#FFF3E6', earIn: '#F8CBA5', brow: '#FFF3E6' },
@@ -144,9 +147,18 @@ export function Shiba({ coat = 'roux', mood = 'content', acc = [], size = 40, bo
   </svg>`
 }
 
-/** Avatar d'un membre (profil public). */
-export function Avatar({ user, size = 40, mood = 'content' }) {
-  return html`<${Shiba} coat=${user?.coat || 'creme'} acc=${user?.acc || []} mood=${mood} size=${size} />`
+/** Avatar d'un membre : sa photo s'il en a ajouté une (visible des membres de ses groupes), sinon son shiba. */
+export function Avatar({ user, size = 40, mood = 'content', label }) {
+  const known = user?.id ? people.value[user.id] : null
+  const url = user?.photoUrl || known?.photoUrl || null
+  const [broken, setBroken] = useState(null)
+  if (url && broken !== url) {
+    return html`<span class="avatar-photo" style=${{ width: `${size}px`, height: `${size}px` }}>
+      <img src=${url} width=${size} height=${size} alt=${label || ''} loading="lazy" decoding="async" onError=${() => setBroken(url)} />
+    </span>`
+  }
+  const base = known || user
+  return html`<${Shiba} coat=${base?.coat || user?.coat || 'creme'} acc=${base?.acc || user?.acc || []} mood=${mood} size=${size} label=${label} />`
 }
 
 const REACTION_MOODS = { coeur: 'love', rire: 'laugh', wouah: 'surpris', snif: 'triste', bravo: 'fete', ouaf: 'wink' }
@@ -158,9 +170,9 @@ export function ReactionIcon({ id, size = 26 }) {
 }
 
 /** Shiba dont la queue remue : indicateur de chargement. */
-export function ShibaLoader({ text = 'Chargement…', size = 96, coat = 'roux' }) {
+export function ShibaLoader({ text, size = 96, coat = 'roux' }) {
   return html`<div class="loader" role="status" aria-live="polite">
     <${Shiba} body wag coat=${coat} size=${size} />
-    <span>${text}</span>
+    <span>${text || t('common.loading')}</span>
   </div>`
 }

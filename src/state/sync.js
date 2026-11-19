@@ -7,6 +7,7 @@ import { room, roomCursor, applyRoomSync, applyRoomsList } from './rooms.js'
 import { game, gameCursor, applyGameSync } from './game.js'
 import { atBottom } from '../screens/Room.js'
 import { bus } from './bus.js'
+import { applyMeRev } from './core.js'
 
 let poller = null
 let tick = 0
@@ -43,6 +44,7 @@ function plan() {
 }
 
 function onResult(res, body) {
+  if (res.meRev !== undefined) applyMeRev(res.meRev)
   if (res.rooms && Array.isArray(res.rooms)) applyRoomsList(res.rooms)
   if (res.room && body.room) applyRoomSync(res.room, body.room)
   if (res.game && body.game) applyGameSync(res.game, body.game)

@@ -1,0 +1,365 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "q001",
+      "cat": "animaux",
+      "fr": { "q": "De quel pays le shiba inu est-il originaire ?", "a": ["Japon", "Chine", "Corée", "Thaïlande"] },
+      "en": { "q": "Which country does the Shiba Inu come from?", "a": ["Japan", "China", "Korea", "Thailand"] }
+    },
+    {
+      "id": "q002",
+      "cat": "animaux",
+      "fr": { "q": "Que signifie le mot japonais « inu » ?", "a": ["Chien", "Renard", "Loup", "Ami"] },
+      "en": { "q": "What does the Japanese word “inu” mean?", "a": ["Dog", "Fox", "Wolf", "Friend"] }
+    },
+    {
+      "id": "q003",
+      "cat": "animaux",
+      "fr": { "q": "Comment le shiba inu porte-t-il généralement sa queue ?", "a": ["Enroulée sur le dos", "Pendante vers le sol", "Coincée entre les pattes", "Tendue à l’horizontale"] },
+      "en": { "q": "How does a Shiba Inu usually carry its tail?", "a": ["Curled over its back", "Hanging down to the ground", "Tucked between its legs", "Held out straight"] }
+    },
+    {
+      "id": "q004",
+      "cat": "animaux",
+      "fr": { "q": "De quel animal sauvage le chien descend-il ?", "a": ["Le loup", "Le renard", "Le chacal", "La hyène"] },
+      "en": { "q": "Which wild animal is the dog descended from?", "a": ["The wolf", "The fox", "The jackal", "The hyena"] }
+    },
+    {
+      "id": "q005",
+      "cat": "animaux",
+      "fr": { "q": "Quel est le plus gros animal vivant sur Terre ?", "a": ["La baleine bleue", "L’éléphant d’Afrique", "Le requin-baleine", "L’hippopotame"] },
+      "en": { "q": "What is the biggest animal living on Earth?", "a": ["The blue whale", "The African elephant", "The whale shark", "The hippopotamus"] }
+    },
+    {
+      "id": "q006",
+      "cat": "animaux",
+      "fr": { "q": "Quel est l’animal terrestre le plus rapide ?", "a": ["Le guépard", "Le lion", "Le lévrier", "Le cheval"] },
+      "en": { "q": "What is the fastest land animal?", "a": ["The cheetah", "The lion", "The greyhound", "The horse"] }
+    },
+    {
+      "id": "q007",
+      "cat": "animaux",
+      "fr": { "q": "Lequel de ces oiseaux ne sait pas voler ?", "a": ["L’autruche", "L’aigle", "Le pigeon", "La mouette"] },
+      "en": { "q": "Which of these birds cannot fly?", "a": ["The ostrich", "The eagle", "The pigeon", "The seagull"] }
+    },
+    {
+      "id": "q008",
+      "cat": "animaux",
+      "fr": { "q": "Comment appelle-t-on le petit de la grenouille ?", "a": ["Le têtard", "La chenille", "Le poussin", "Le poulain"] },
+      "en": { "q": "What is a baby frog called?", "a": ["A tadpole", "A caterpillar", "A chick", "A foal"] }
+    },
+    {
+      "id": "q009",
+      "cat": "animaux",
+      "fr": { "q": "Quel est le seul mammifère capable de vraiment voler ?", "a": ["La chauve-souris", "Le colibri", "La loutre", "La taupe"] },
+      "en": { "q": "What is the only mammal that can truly fly?", "a": ["The bat", "The hummingbird", "The otter", "The mole"] }
+    },
+    {
+      "id": "q010",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la capitale de l’Australie ?", "a": ["Canberra", "Sydney", "Melbourne", "Perth"] },
+      "en": { "q": "What is the capital of Australia?", "a": ["Canberra", "Sydney", "Melbourne", "Perth"] }
+    },
+    {
+      "id": "q011",
+      "cat": "geo",
+      "fr": { "q": "Quel est le plus grand océan du monde ?", "a": ["L’océan Pacifique", "L’océan Atlantique", "L’océan Indien", "L’océan Arctique"] },
+      "en": { "q": "What is the largest ocean in the world?", "a": ["The Pacific Ocean", "The Atlantic Ocean", "The Indian Ocean", "The Arctic Ocean"] }
+    },
+    {
+      "id": "q012",
+      "cat": "geo",
+      "fr": { "q": "Sur quel continent se trouve le Brésil ?", "a": ["L’Amérique du Sud", "L’Afrique", "L’Asie", "L’Océanie"] },
+      "en": { "q": "On which continent is Brazil?", "a": ["South America", "Africa", "Asia", "Oceania"] }
+    },
+    {
+      "id": "q013",
+      "cat": "geo",
+      "fr": { "q": "Quel fleuve traverse Paris ?", "a": ["La Seine", "La Loire", "Le Rhône", "La Garonne"] },
+      "en": { "q": "Which river flows through Paris?", "a": ["The Seine", "The Loire", "The Rhône", "The Garonne"] }
+    },
+    {
+      "id": "q014",
+      "cat": "geo",
+      "fr": { "q": "Quelle est la capitale du Canada ?", "a": ["Ottawa", "Toronto", "Montréal", "Vancouver"] },
+      "en": { "q": "What is the capital of Canada?", "a": ["Ottawa", "Toronto", "Montreal", "Vancouver"] }
+    },
+    {
+      "id": "q015",
+      "cat": "geo",
+      "fr": { "q": "Quel pays a la forme d’une botte ?", "a": ["L’Italie", "L’Espagne", "La Grèce", "Le Portugal"] },
+      "en": { "q": "Which country is shaped like a boot?", "a": ["Italy", "Spain", "Greece", "Portugal"] }
+    },
+    {
+      "id": "q016",
+      "cat": "geo",
+      "fr": { "q": "Quelle chaîne de montagnes sépare la France de l’Espagne ?", "a": ["Les Pyrénées", "Les Alpes", "Les Vosges", "Le Jura"] },
+      "en": { "q": "Which mountain range separates France from Spain?", "a": ["The Pyrenees", "The Alps", "The Vosges", "The Jura"] }
+    },
+    {
+      "id": "q017",
+      "cat": "geo",
+      "fr": { "q": "Quel est le plus grand désert chaud du monde ?", "a": ["Le Sahara", "Le désert de Gobi", "Le Kalahari", "Le désert d’Atacama"] },
+      "en": { "q": "What is the largest hot desert in the world?", "a": ["The Sahara", "The Gobi Desert", "The Kalahari", "The Atacama Desert"] }
+    },
+    {
+      "id": "q018",
+      "cat": "science",
+      "fr": { "q": "Quelle planète est la plus proche du Soleil ?", "a": ["Mercure", "Vénus", "Mars", "La Terre"] },
+      "en": { "q": "Which planet is closest to the Sun?", "a": ["Mercury", "Venus", "Mars", "Earth"] }
+    },
+    {
+      "id": "q019",
+      "cat": "science",
+      "fr": { "q": "Quelle est la formule chimique de l’eau ?", "a": ["H2O", "CO2", "O2", "NaCl"] },
+      "en": { "q": "What is the chemical formula of water?", "a": ["H2O", "CO2", "O2", "NaCl"] }
+    },
+    {
+      "id": "q020",
+      "cat": "science",
+      "fr": { "q": "Quelle planète surnomme-t-on « la planète rouge » ?", "a": ["Mars", "Jupiter", "Vénus", "Saturne"] },
+      "en": { "q": "Which planet is nicknamed “the Red Planet”?", "a": ["Mars", "Jupiter", "Venus", "Saturn"] }
+    },
+    {
+      "id": "q021",
+      "cat": "science",
+      "fr": { "q": "À quelle température l’eau pure se transforme-t-elle en glace ?", "a": ["0 °C", "4 °C", "−10 °C", "10 °C"] },
+      "en": { "q": "At what temperature does pure water turn into ice?", "a": ["0 °C", "4 °C", "−10 °C", "10 °C"] }
+    },
+    {
+      "id": "q022",
+      "cat": "science",
+      "fr": { "q": "Combien de temps la lumière du Soleil met-elle environ pour arriver sur Terre ?", "a": ["8 minutes", "8 secondes", "8 heures", "8 jours"] },
+      "en": { "q": "Roughly how long does sunlight take to reach Earth?", "a": ["8 minutes", "8 seconds", "8 hours", "8 days"] }
+    },
+    {
+      "id": "q023",
+      "cat": "science",
+      "fr": { "q": "Quelle est la plus grande planète du système solaire ?", "a": ["Jupiter", "Saturne", "Neptune", "La Terre"] },
+      "en": { "q": "What is the largest planet in the Solar System?", "a": ["Jupiter", "Saturn", "Neptune", "Earth"] }
+    },
+    {
+      "id": "q024",
+      "cat": "science",
+      "fr": { "q": "Quel est le symbole chimique de l’or ?", "a": ["Au", "Ag", "Fe", "Cu"] },
+      "en": { "q": "What is the chemical symbol for gold?", "a": ["Au", "Ag", "Fe", "Cu"] }
+    },
+    {
+      "id": "q025",
+      "cat": "science",
+      "fr": { "q": "Quelle est l’étoile la plus proche de la Terre ?", "a": ["Le Soleil", "L’étoile polaire", "Sirius", "La Lune"] },
+      "en": { "q": "What is the closest star to Earth?", "a": ["The Sun", "The North Star", "Sirius", "The Moon"] }
+    },
+    {
+      "id": "q026",
+      "cat": "nature",
+      "fr": { "q": "Quel gaz les plantes absorbent-elles pour faire la photosynthèse ?", "a": ["Le dioxyde de carbone", "L’oxygène", "L’azote", "L’hélium"] },
+      "en": { "q": "Which gas do plants absorb for photosynthesis?", "a": ["Carbon dioxide", "Oxygen", "Nitrogen", "Helium"] }
+    },
+    {
+      "id": "q027",
+      "cat": "nature",
+      "fr": { "q": "Quel arbre produit des glands ?", "a": ["Le chêne", "Le sapin", "Le bouleau", "L’érable"] },
+      "en": { "q": "Which tree produces acorns?", "a": ["The oak", "The fir", "The birch", "The maple"] }
+    },
+    {
+      "id": "q028",
+      "cat": "nature",
+      "fr": { "q": "En quoi la chenille se transforme-t-elle avant de devenir papillon ?", "a": ["En chrysalide", "En têtard", "En coquille", "En bourgeon"] },
+      "en": { "q": "What does a caterpillar turn into before becoming a butterfly?", "a": ["A chrysalis", "A tadpole", "A shell", "A bud"] }
+    },
+    {
+      "id": "q029",
+      "cat": "nature",
+      "fr": { "q": "En quelle saison les feuilles de nombreux arbres changent-elles de couleur et tombent-elles ?", "a": ["En automne", "Au printemps", "En été", "En hiver"] },
+      "en": { "q": "In which season do the leaves of many trees change colour and fall?", "a": ["Autumn (fall)", "Spring", "Summer", "Winter"] }
+    },
+    {
+      "id": "q030",
+      "cat": "nature",
+      "fr": { "q": "Comment appelle-t-on un animal qui ne mange que des plantes ?", "a": ["Un herbivore", "Un carnivore", "Un omnivore", "Un insectivore"] },
+      "en": { "q": "What do you call an animal that eats only plants?", "a": ["A herbivore", "A carnivore", "An omnivore", "An insectivore"] }
+    },
+    {
+      "id": "q031",
+      "cat": "nature",
+      "fr": { "q": "Quelle partie de la plante puise l’eau dans le sol ?", "a": ["Les racines", "Les feuilles", "Les fleurs", "Les fruits"] },
+      "en": { "q": "Which part of a plant takes up water from the soil?", "a": ["The roots", "The leaves", "The flowers", "The fruit"] }
+    },
+    {
+      "id": "q032",
+      "cat": "nature",
+      "fr": { "q": "Comment appelle-t-on la roche en fusion qui s’écoule d’un volcan ?", "a": ["La lave", "Le granite", "Le sable", "Le calcaire"] },
+      "en": { "q": "What is the molten rock that flows out of a volcano called?", "a": ["Lava", "Granite", "Sand", "Limestone"] }
+    },
+    {
+      "id": "q033",
+      "cat": "cuisine",
+      "fr": { "q": "Quel est l’ingrédient principal du guacamole ?", "a": ["L’avocat", "La tomate", "Le concombre", "Le petit pois"] },
+      "en": { "q": "What is the main ingredient of guacamole?", "a": ["Avocado", "Tomato", "Cucumber", "Peas"] }
+    },
+    {
+      "id": "q034",
+      "cat": "cuisine",
+      "fr": { "q": "Quelle épice donne sa couleur jaune à la poudre de curry ?", "a": ["Le curcuma", "La cannelle", "Le poivre noir", "Le paprika"] },
+      "en": { "q": "Which spice gives curry powder its yellow colour?", "a": ["Turmeric", "Cinnamon", "Black pepper", "Paprika"] }
+    },
+    {
+      "id": "q035",
+      "cat": "cuisine",
+      "fr": { "q": "Quel est l’ingrédient principal du houmous ?", "a": ["Les pois chiches", "Les lentilles", "Les haricots rouges", "Les fèves"] },
+      "en": { "q": "What is the main ingredient of hummus?", "a": ["Chickpeas", "Lentils", "Kidney beans", "Broad beans"] }
+    },
+    {
+      "id": "q036",
+      "cat": "cuisine",
+      "fr": { "q": "Comment appelle-t-on le raisin une fois séché ?", "a": ["Le raisin sec", "Le pruneau", "La datte", "La figue sèche"] },
+      "en": { "q": "What are dried grapes called?", "a": ["Raisins", "Prunes", "Dates", "Dried figs"] }
+    },
+    {
+      "id": "q037",
+      "cat": "cuisine",
+      "fr": { "q": "Avec quelle céréale fait-on le pop-corn ?", "a": ["Le maïs", "Le blé", "Le riz", "L’orge"] },
+      "en": { "q": "Which cereal grain is used to make popcorn?", "a": ["Corn (maize)", "Wheat", "Rice", "Barley"] }
+    },
+    {
+      "id": "q038",
+      "cat": "cuisine",
+      "fr": { "q": "De quel pays la paella est-elle originaire ?", "a": ["L’Espagne", "L’Italie", "Le Portugal", "Le Mexique"] },
+      "en": { "q": "Which country does paella come from?", "a": ["Spain", "Italy", "Portugal", "Mexico"] }
+    },
+    {
+      "id": "q039",
+      "cat": "cuisine",
+      "fr": { "q": "Quelle partie de l’œuf utilise-t-on pour faire une meringue ?", "a": ["Le blanc", "Le jaune", "La coquille", "L’œuf entier"] },
+      "en": { "q": "Which part of the egg is used to make meringue?", "a": ["The white", "The yolk", "The shell", "The whole egg"] }
+    },
+    {
+      "id": "q040",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport frappe-t-on un volant avec une raquette ?", "a": ["Le badminton", "Le tennis", "Le squash", "Le ping-pong"] },
+      "en": { "q": "In which sport do you hit a shuttlecock with a racket?", "a": ["Badminton", "Tennis", "Squash", "Table tennis"] }
+    },
+    {
+      "id": "q041",
+      "cat": "sport",
+      "fr": { "q": "Au bowling, comment appelle-t-on le fait de faire tomber toutes les quilles au premier lancer ?", "a": ["Un strike", "Un spare", "Un smash", "Un ace"] },
+      "en": { "q": "In bowling, what is it called when you knock down all the pins with your first ball?", "a": ["A strike", "A spare", "A smash", "An ace"] }
+    },
+    {
+      "id": "q042",
+      "cat": "sport",
+      "fr": { "q": "Quel sport pratique-t-on au tournoi de Wimbledon ?", "a": ["Le tennis", "Le golf", "Le cricket", "Le badminton"] },
+      "en": { "q": "Which sport is played at the Wimbledon tournament?", "a": ["Tennis", "Golf", "Cricket", "Badminton"] }
+    },
+    {
+      "id": "q043",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport joue-t-on avec un ballon ovale ?", "a": ["Le rugby", "Le handball", "Le volley-ball", "Le water-polo"] },
+      "en": { "q": "Which sport is played with an oval ball?", "a": ["Rugby", "Handball", "Volleyball", "Water polo"] }
+    },
+    {
+      "id": "q044",
+      "cat": "sport",
+      "fr": { "q": "De quelle couleur est le maillot du leader du classement général du Tour de France ?", "a": ["Jaune", "Vert", "À pois rouges", "Blanc"] },
+      "en": { "q": "What colour is the jersey worn by the overall leader of the Tour de France?", "a": ["Yellow", "Green", "Red polka dots", "White"] }
+    },
+    {
+      "id": "q045",
+      "cat": "sport",
+      "fr": { "q": "Combien de temps dure un match de football, hors arrêts de jeu et prolongations ?", "a": ["90 minutes", "80 minutes", "100 minutes", "120 minutes"] },
+      "en": { "q": "How long is a football (soccer) match, not counting stoppage time or extra time?", "a": ["90 minutes", "80 minutes", "100 minutes", "120 minutes"] }
+    },
+    {
+      "id": "q046",
+      "cat": "sport",
+      "fr": { "q": "Dans quel sport peut-on marquer grâce à un « dunk » ?", "a": ["Le basket-ball", "Le volley-ball", "Le handball", "Le tennis"] },
+      "en": { "q": "In which sport can players score with a slam dunk?", "a": ["Basketball", "Volleyball", "Handball", "Tennis"] }
+    },
+    {
+      "id": "q047",
+      "cat": "culture",
+      "fr": { "q": "Qui a peint « La Joconde » ?", "a": ["Léonard de Vinci", "Michel-Ange", "Raphaël", "Pablo Picasso"] },
+      "en": { "q": "Who painted the “Mona Lisa”?", "a": ["Leonardo da Vinci", "Michelangelo", "Raphael", "Pablo Picasso"] }
+    },
+    {
+      "id": "q048",
+      "cat": "culture",
+      "fr": { "q": "Qui a composé « La Lettre à Élise » ?", "a": ["Beethoven", "Mozart", "Chopin", "Bach"] },
+      "en": { "q": "Who composed “Für Elise”?", "a": ["Beethoven", "Mozart", "Chopin", "Bach"] }
+    },
+    {
+      "id": "q049",
+      "cat": "culture",
+      "fr": { "q": "Quelle est la langue principale du Brésil ?", "a": ["Le portugais", "L’espagnol", "Le brésilien", "L’italien"] },
+      "en": { "q": "What is the main language of Brazil?", "a": ["Portuguese", "Spanish", "Brazilian", "Italian"] }
+    },
+    {
+      "id": "q050",
+      "cat": "culture",
+      "fr": { "q": "Combien de cordes compte un violon classique ?", "a": ["4", "5", "6", "3"] },
+      "en": { "q": "How many strings does a standard violin have?", "a": ["4", "5", "6", "3"] }
+    },
+    {
+      "id": "q051",
+      "cat": "culture",
+      "fr": { "q": "Qui a écrit « Le Petit Prince » ?", "a": ["Antoine de Saint-Exupéry", "Victor Hugo", "Jules Verne", "Albert Camus"] },
+      "en": { "q": "Who wrote “The Little Prince”?", "a": ["Antoine de Saint-Exupéry", "Victor Hugo", "Jules Verne", "Albert Camus"] }
+    },
+    {
+      "id": "q052",
+      "cat": "culture",
+      "fr": { "q": "Qui a écrit la pièce « Roméo et Juliette » ?", "a": ["William Shakespeare", "Molière", "Charles Dickens", "Oscar Wilde"] },
+      "en": { "q": "Who wrote the play “Romeo and Juliet”?", "a": ["William Shakespeare", "Molière", "Charles Dickens", "Oscar Wilde"] }
+    },
+    {
+      "id": "q053",
+      "cat": "culture",
+      "fr": { "q": "Aux échecs, quelle pièce se déplace en forme de « L » ?", "a": ["Le cavalier", "Le fou", "La tour", "La dame"] },
+      "en": { "q": "In chess, which piece moves in an “L” shape?", "a": ["The knight", "The bishop", "The rook", "The queen"] }
+    },
+    {
+      "id": "q054",
+      "cat": "corps",
+      "fr": { "q": "Quel est le plus grand organe du corps humain ?", "a": ["La peau", "Le foie", "Les poumons", "Le cerveau"] },
+      "en": { "q": "What is the largest organ of the human body?", "a": ["The skin", "The liver", "The lungs", "The brain"] }
+    },
+    {
+      "id": "q055",
+      "cat": "corps",
+      "fr": { "q": "Quel organe pompe le sang dans tout le corps ?", "a": ["Le cœur", "Les poumons", "Le foie", "L’estomac"] },
+      "en": { "q": "Which organ pumps blood around the body?", "a": ["The heart", "The lungs", "The liver", "The stomach"] }
+    },
+    {
+      "id": "q056",
+      "cat": "corps",
+      "fr": { "q": "Quel est l’os le plus long du corps humain ?", "a": ["Le fémur", "Le tibia", "L’humérus", "Le radius"] },
+      "en": { "q": "What is the longest bone in the human body?", "a": ["The femur", "The tibia", "The humerus", "The radius"] }
+    },
+    {
+      "id": "q057",
+      "cat": "corps",
+      "fr": { "q": "Où se trouve le plus petit os du corps humain ?", "a": ["Dans l’oreille", "Dans le nez", "Dans le petit orteil", "Dans la main"] },
+      "en": { "q": "Where is the smallest bone in the human body?", "a": ["In the ear", "In the nose", "In the little toe", "In the hand"] }
+    },
+    {
+      "id": "q058",
+      "cat": "corps",
+      "fr": { "q": "Quelles cellules du sang transportent l’oxygène ?", "a": ["Les globules rouges", "Les globules blancs", "Les plaquettes", "Les neurones"] },
+      "en": { "q": "Which blood cells carry oxygen?", "a": ["Red blood cells", "White blood cells", "Platelets", "Neurons"] }
+    },
+    {
+      "id": "q059",
+      "cat": "corps",
+      "fr": { "q": "Quel est le principal muscle de la respiration ?", "a": ["Le diaphragme", "Le cœur", "Le biceps", "Le triceps"] },
+      "en": { "q": "What is the main muscle used for breathing?", "a": ["The diaphragm", "The heart", "The biceps", "The triceps"] }
+    },
+    {
+      "id": "q060",
+      "cat": "corps",
+      "fr": { "q": "Quelle partie de l’œil lui donne sa couleur ?", "a": ["L’iris", "La pupille", "La cornée", "La rétine"] },
+      "en": { "q": "Which part of the eye gives it its colour?", "a": ["The iris", "The pupil", "The cornea", "The retina"] }
+    }
+  ]
+}

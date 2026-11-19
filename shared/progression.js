@@ -89,21 +89,36 @@ export function streakBonusPercent(streak) {
 }
 
 /**
- * XP gagnée dans une partie.
- * @returns {{ total:number, lines:Array<{label:string, xp:number}> }}
+ * XP gagnée dans une partie. Chaque ligne porte une clé de traduction (`key`) et ses paramètres.
+ * @returns {{ total:number, lines:Array<{key:string, xp:number, points?:number, rank?:number, streak?:number, pct?:number}> }}
  */
 export function computeGameXp({ valid, finished, points, rank, firstGameOfDay, streak }) {
   if (!valid) return { total: 0, lines: [] }
   const lines = []
-  if (finished) lines.push({ label: 'Partie terminée', xp: XP_GAME_FINISHED })
+  if (finished) lines.push({ key: 'finished', xp: XP_GAME_FINISHED })
   const fromPoints = Math.floor(Math.max(0, points) / 10)
-  if (fromPoints > 0) lines.push({ label: `Points marqués (${points})`, xp: fromPoints })
-  if (PODIUM_XP[rank]) lines.push({ label: `Podium : ${rank === 1 ? '1er' : `${rank}e`}`, xp: PODIUM_XP[rank] })
-  if (firstGameOfDay) lines.push({ label: 'Première partie du jour', xp: XP_FIRST_GAME_OF_DAY })
+  if (fromPoints > 0) lines.push({ key: 'points', xp: fromPoints, points })
+  if (PODIUM_XP[rank]) lines.push({ key: 'podium', xp: PODIUM_XP[rank], rank })
+  if (firstGameOfDay) lines.push({ key: 'firstOfDay', xp: XP_FIRST_GAME_OF_DAY })
   const base = lines.reduce((s, l) => s + l.xp, 0)
   const pct = streakBonusPercent(streak)
   const bonus = Math.round((base * pct) / 100)
-  if (bonus > 0) lines.push({ label: `Série de ${streak} jours (+${pct} %)`, xp: bonus })
+  if (bonus > 0) lines.push({ key: 'streak', xp: bonus, streak, pct })
+  return { total: base + bonus, lines }
+}
+
+/** XP des jeux asynchrones (dans la conversation) : participation et victoire. */
+export const ASYNC_XP = { played: 5, won: 10 }
+
+export function computeAsyncXp({ played, won, firstGameOfDay, streak }) {
+  if (!played) return { total: 0, lines: [] }
+  const lines = [{ key: 'asyncPlayed', xp: ASYNC_XP.played }]
+  if (won) lines.push({ key: 'asyncWon', xp: ASYNC_XP.won })
+  if (firstGameOfDay) lines.push({ key: 'firstOfDay', xp: XP_FIRST_GAME_OF_DAY })
+  const base = lines.reduce((s, l) => s + l.xp, 0)
+  const pct = streakBonusPercent(streak)
+  const bonus = Math.round((base * pct) / 100)
+  if (bonus > 0) lines.push({ key: 'streak', xp: bonus, streak, pct })
   return { total: base + bonus, lines }
 }
 

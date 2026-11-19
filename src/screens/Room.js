@@ -1,4 +1,4 @@
-// Salon : fil de messages, saisie, bouton « Jouer », membres, classement, bandeau de partie en cours.
+// Groupe : fil de messages, saisie, bouton « Jouer », membres, classement, bandeau de partie en cours.
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks'
 import { signal } from '@preact/signals'
 import { html } from '../lib/html.js'
@@ -10,12 +10,13 @@ import { api } from '../lib/transport.js'
 import { me, openModal, closeModal, toast, errorToast } from '../state/core.js'
 import { navigate, back, paths, absoluteUrl } from '../lib/router.js'
 import { layout, finePointer, useNow } from '../lib/layout.js'
-import { hhmm, dayLabel, sameDay, isEmojiOnly, plural } from '../lib/format.js'
+import { hhmm, dayLabel, sameDay, isEmojiOnly } from '../lib/format.js'
 import { serverNow } from '../lib/clock.js'
 import { GameCard } from './GameCard.js'
 import { MembersPanel, LeaderboardPanel, InviteBox } from './RoomSide.js'
 import { REACTIONS, LIMITS } from '../../shared/constants.js'
-import { systemText } from '../../shared/messages.js'
+import { systemText, gameName, membersLabel } from '../i18n/texts.js'
+import { t, tn, errorText } from '../i18n/index.js'
 import { graphemeLength } from '../../shared/text.js'
 
 /** Vrai quand le fil est lu en bas (sert à faire avancer le curseur de lecture). */
@@ -30,25 +31,24 @@ export function RoomScreen({ rid }) {
   }, [rid])
   const r = room.value
   if (!r || r.rid !== rid || r.loading) {
-    return html`<div class="fill-center"><${Shiba} body wag size=${100} label="Chargement du salon" /></div>`
+    return html`<div class="fill-center"><${Shiba} body wag size=${100} label=${t('room.loading')} /></div>`
   }
   if (r.removed) {
-    return html`<div class="fill-center"><${EmptyState} mood="triste" title="Tu ne fais plus partie de ce salon"
-      text="L’hôte t’a retiré du salon, ou tu l’as quitté depuis un autre appareil.">
-      <button class="btn btn-primary" onClick=${() => navigate(paths.home())}>Retour à mes salons</button>
+    return html`<div class="fill-center"><${EmptyState} mood="triste" title=${t('room.removedTitle')} text=${t('room.removedText')}>
+      <button class="btn btn-primary" onClick=${() => navigate(paths.home())}>${t('room.backToGroups')}</button>
     </${EmptyState}></div>`
   }
   if (r.error) {
     const gone = r.error.code === 'not_member' || r.error.code === 'room_not_found'
     return html`<div class="fill-center">${gone
-      ? html`<${EmptyState} mood="triste" title="Salon introuvable" text=${r.error.message}>
-          <button class="btn btn-primary" onClick=${() => navigate(paths.home())}>Retour à mes salons</button></${EmptyState}>`
+      ? html`<${EmptyState} mood="triste" title=${t('room.notFound')} text=${errorText(r.error)}>
+          <button class="btn btn-primary" onClick=${() => navigate(paths.home())}>${t('room.backToGroups')}</button></${EmptyState}>`
       : html`<${ErrorState} error=${r.error} onRetry=${() => {
           room.value = null
           openRoom(rid)
         }} />`}</div>`
   }
-  return html`<section class="room-screen" aria-label=${`Salon ${r.info.name}`}>
+  return html`<section class="room-screen" aria-label=${t('room.aria', { name: r.info.name })}>
     <${RoomHeader} r=${r} />
     <${GameBanner} r=${r} />
     <${Thread} r=${r} />
@@ -60,19 +60,19 @@ function RoomHeader({ r }) {
   const lay = layout.value
   const online = Object.values(r.presence || {}).filter((ts) => serverNow() - ts < LIMITS.presenceMs).length
   return html`<header class="screen-header">
-    ${lay === 'mobile' && html`<button class="icon-btn" onClick=${() => back(paths.home())} aria-label="Retour à mes salons"><${Icon} name="back" /></button>`}
+    ${lay === 'mobile' && html`<button class="icon-btn" onClick=${() => back(paths.home())} aria-label=${t('room.backToGroups')}><${Icon} name="back" /></button>`}
     ${lay === 'tablet' &&
     html`<button class="icon-btn" aria-pressed=${String(!listCollapsed.value)} onClick=${() => (listCollapsed.value = !listCollapsed.value)}
-      aria-label=${listCollapsed.value ? 'Afficher la liste des salons' : 'Replier la liste des salons'}><${Icon} name="sidebar" /></button>`}
+      aria-label=${listCollapsed.value ? t('room.showList') : t('room.hideList')}><${Icon} name="sidebar" /></button>`}
     <button class="titles" style=${{ border: 0, background: 'none', textAlign: 'left', cursor: 'pointer', padding: 0, minHeight: '44px' }}
-      onClick=${() => openModal('roomInfo')} aria-label=${`Infos du salon ${r.info.name}`}>
+      onClick=${() => openModal('roomInfo')} aria-label=${t('room.info', { name: r.info.name })}>
       <h1 class="ellipsis">${r.info.name}</h1>
-      <span class="subtitle"><span class="dot on" aria-hidden="true"></span> ${plural(r.members.length, 'membre', 'membres')} · ${online} en ligne</span>
+      <span class="subtitle"><span class="dot on" aria-hidden="true"></span> ${membersLabel(r.members.length)} · ${t('room.online', { n: online })}</span>
     </button>
     ${lay !== 'desktop' &&
-    html`<button class="icon-btn" onClick=${() => openModal('members')} aria-label="Membres du salon"><${Icon} name="users" /></button>
-      <button class="icon-btn" onClick=${() => openModal('leaderboard')} aria-label="Classement du salon"><${Icon} name="trophy" /></button>`}
-    <button class="icon-btn" onClick=${() => openModal('roomMenu')} aria-label="Options du salon"><${Icon} name="dots" /></button>
+    html`<button class="icon-btn" onClick=${() => openModal('members')} aria-label=${t('room.members')}><${Icon} name="users" /></button>
+      <button class="icon-btn" onClick=${() => openModal('leaderboard')} aria-label=${t('room.leaderboard')}><${Icon} name="trophy" /></button>`}
+    <button class="icon-btn" onClick=${() => openModal('roomMenu')} aria-label=${t('room.options')}><${Icon} name="dots" /></button>
   </header>`
 }
 
@@ -91,10 +91,10 @@ function GameBanner({ r }) {
   }
   return html`<div class="game-banner" role="status">
     <${Icon} name="gamepad" />
-    <span class="grow">${g.status === 'playing' ? 'Partie de Draw It en cours' : 'Lobby Draw It ouvert'} · ${g.players.length} joueur${g.players.length > 1 ? 's' : ''}</span>
+    <span class="grow">${g.status === 'playing' ? t('banner.playing', { game: gameName(g.type) }) : t('banner.lobby', { game: gameName(g.type) })} · ${tn('common.players', g.players.length)}</span>
     ${mine
-      ? html`<button class="btn btn-small btn-primary" onClick=${go}>Retourner à la partie</button>`
-      : html`<button class="btn btn-small btn-primary" onClick=${join}>Rejoindre</button>`}
+      ? html`<button class="btn btn-small btn-primary" onClick=${go}>${t('banner.back')}</button>`
+      : html`<button class="btn btn-small btn-primary" onClick=${join}>${t('common.join')}</button>`}
   </div>`
 }
 
@@ -170,7 +170,7 @@ function Thread({ r }) {
   for (const m of msgs) {
     if (!prev || !sameDay(prev.ts, m.ts)) items.push(html`<div class="day-sep" key=${`d${m.id}`}>${dayLabel(m.ts)}</div>`)
     if (m.id === separatorId) {
-      items.push(html`<div class="new-sep" key="sep" role="separator"><span>Nouveaux messages</span></div>`)
+      items.push(html`<div class="new-sep" key="sep" role="separator"><span>${t('room.newMessages')}</span></div>`)
       group = null
     }
     if (m.type === 'text') {
@@ -194,24 +194,25 @@ function Thread({ r }) {
     setShowJump(false)
   }
 
-  return html`<div class="thread" ref=${ref} onScroll=${onScroll} role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label="Messages">
+  return html`<div class="thread" ref=${ref} onScroll=${onScroll} role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label=${t('room.messages')}>
     <div class="thread-inner">
       <div class="thread-top" ref=${topRef}>
         ${r.loadingOlder
-          ? html`<${Shiba} body wag size=${44} label="Chargement des messages précédents" />`
+          ? html`<${Shiba} body wag size=${44} label=${t('room.loadingOlder')} />`
           : r.hasMore
-            ? html`<button class="btn btn-small btn-ghost" onClick=${() => loadOlder()}>Messages précédents</button>`
-            : html`<p class="tiny muted">Début du salon « ${r.info.name} »</p>`}
+            ? html`<button class="btn btn-small btn-ghost" onClick=${() => loadOlder()}>${t('room.older')}</button>`
+            : html`<p class="tiny muted">${t('room.start', { name: r.info.name })}</p>`}
       </div>
       ${items.map((it) => (it.msgs ? html`<${MessageGroup} key=${it.key} g=${it} r=${r} />` : it))}
     </div>
-    ${showJump && html`<button class="btn btn-small btn-lavender jump-new" onClick=${jump}><${Icon} name="arrowDown" size=${18} /> Nouveaux messages</button>`}
+    ${showJump && html`<button class="btn btn-small btn-lavender jump-new" onClick=${jump}><${Icon} name="arrowDown" size=${18} /> ${t('room.newMessages')}</button>`}
   </div>`
 }
 
 function SystemMessage({ m }) {
-  return html`<div class=${`sys-msg ${m.sys?.kind === 'weekly' ? 'weekly' : ''}`}>
-    <${Icon} name=${m.sys?.kind === 'weekly' ? 'trophy' : m.sys?.kind === 'rename' ? 'edit' : m.sys?.kind === 'host' ? 'crown' : 'chat'} size=${18} />
+  const kind = m.sys?.kind
+  return html`<div class=${`sys-msg ${kind === 'weekly' || kind === 'asyncResult' ? 'weekly' : ''}`}>
+    <${Icon} name=${kind === 'weekly' || kind === 'asyncResult' ? 'trophy' : kind === 'rename' ? 'edit' : kind === 'host' ? 'crown' : 'chat'} size=${18} />
     <span>${systemText(m.sys)}</span>
   </div>`
 }
@@ -222,8 +223,9 @@ function MessageGroup({ g, r }) {
   const first = g.msgs[0]
   const member = r.members.find((x) => x.id === g.author)
   const author = member || { id: g.author, pseudo: first.a?.p || 'Shiba', coat: first.a?.c || 'creme', acc: first.a?.x || [] }
+  const label = author.pseudo
   return html`<div class=${`msg-group ${mine ? 'mine' : ''}`}>
-    ${!mine && html`<div class="msg-avatar"><${Avatar} user=${author} size=${36} /></div>`}
+    ${!mine && html`<div class="msg-avatar"><${Avatar} user=${author} size=${36} label=${label} /></div>`}
     <div class="msg-stack">
       ${!mine && html`<div class="msg-author"><span>${author.pseudo}</span></div>`}
       ${g.msgs.map((m, i) => html`<${Message} key=${m.id} m=${m} r=${r} mine=${mine} last=${i === g.msgs.length - 1} />`)}
@@ -259,7 +261,7 @@ function Message({ m, r, mine, last }) {
       }}>${m.text}</div>
     ${!m.local &&
     html`<div class="msg-tools">
-      <button class="icon-btn" aria-label="Réagir à ce message" onClick=${(e) => openPicker(e.currentTarget)}><${Icon} name="smile" size=${20} /></button>
+      <button class="icon-btn" aria-label=${t('room.react')} onClick=${(e) => openPicker(e.currentTarget)}><${Icon} name="smile" size=${20} /></button>
     </div>`}
     ${entries.length > 0 &&
     html`<div class="reactions">
@@ -267,17 +269,17 @@ function Message({ m, r, mine, last }) {
         const list = reactions[x.id]
         const minePick = list.includes(myId)
         return html`<button class=${`reaction ${minePick ? 'mine' : ''}`} onClick=${() => toggleReaction(m.id, x.id)}
-          aria-pressed=${String(minePick)} aria-label=${`${x.label} : ${list.length}`} title=${x.label}>
+          aria-pressed=${String(minePick)} aria-label=${`${t(`reaction.${x.id}`)} : ${list.length}`} title=${t(`reaction.${x.id}`)}>
           <${ReactionIcon} id=${x.id} size=${24} /> ${list.length}
         </button>`
       })}
     </div>`}
-    ${m.pending && html`<div class="msg-meta">En cours d’envoi…</div>`}
+    ${m.pending && html`<div class="msg-meta">${t('room.sending')}</div>`}
     ${m.failed &&
     html`<div class="msg-meta" role="alert">
-      <${Icon} name="alert" size=${14} /> ${m.error || 'Échec de l’envoi'}
-      <button class="link-btn" style=${{ padding: '0 6px' }} onClick=${() => retryMessage(m.id)}>Réessayer</button>
-      <button class="link-btn" style=${{ padding: '0 6px' }} onClick=${() => discardMessage(m.id)}>Supprimer</button>
+      <${Icon} name="alert" size=${14} /> ${m.error || t('room.sendFailed')}
+      <button class="link-btn" style=${{ padding: '0 6px' }} onClick=${() => retryMessage(m.id)}>${t('common.retry')}</button>
+      <button class="link-btn" style=${{ padding: '0 6px' }} onClick=${() => discardMessage(m.id)}>${t('common.delete')}</button>
     </div>`}
     ${last && !m.pending && !m.failed && html`<div class="msg-meta">${hhmm(m.ts)}</div>`}
   </div>`
@@ -304,9 +306,9 @@ export function ReactionPicker() {
   const left = Math.max(8, Math.min(innerWidth - width - 8, p.x - width / 2))
   const top = Math.max(8, p.y - 70)
   return html`<div class="reaction-popover" style=${{ left: `${left}px`, top: `${top}px` }}>
-    <div class="reaction-picker" role="menu" aria-label="Réactions">
+    <div class="reaction-picker" role="menu" aria-label=${t('room.reactions')}>
       ${REACTIONS.map(
-        (x, i) => html`<button role="menuitem" autofocus=${i === 0} aria-label=${x.label} title=${x.label}
+        (x, i) => html`<button role="menuitem" autofocus=${i === 0} aria-label=${t(`reaction.${x.id}`)} title=${t(`reaction.${x.id}`)}
           onClick=${() => {
             toggleReaction(p.msgId, x.id)
             picker.value = null
@@ -331,7 +333,7 @@ function Composer({ r }) {
   useLayoutEffect(resize, [text])
   const submit = () => {
     if (!text.trim()) return
-    if (count > LIMITS.messageMax) return toast('500 caractères au plus par message.', 'error')
+    if (count > LIMITS.messageMax) return toast(t('err.too_long', { max: LIMITS.messageMax }), 'error')
     if (!canSendNow()) return
     if (sendMessage(text)) {
       setText('')
@@ -345,16 +347,16 @@ function Composer({ r }) {
     }
   }
   return html`<div>
-    ${slow && html`<div class="slowdown" role="alert"><${Icon} name="hourglass" size=${18} /> Doucement ! Attends ${Math.ceil((slowUntil.value - now) / 1000)} s avant d’envoyer un nouveau message.</div>`}
+    ${slow && html`<div class="slowdown" role="alert"><${Icon} name="hourglass" size=${18} /> ${t('room.slowDown', { s: Math.ceil((slowUntil.value - now) / 1000) })}</div>`}
     <div class="composer">
       <div class="composer-field">
-        <label for="composer" class="sr-only">Écrire un message</label>
-        <textarea id="composer" ref=${ta} rows="1" value=${text} placeholder="Écris à la meute…" maxlength="2000"
+        <label for="composer" class="sr-only">${t('room.write')}</label>
+        <textarea id="composer" ref=${ta} rows="1" value=${text} placeholder=${t('room.placeholder')} maxlength="2000"
           onInput=${(e) => setText(e.currentTarget.value)} onKeyDown=${onKey} enterkeyhint="send"></textarea>
         ${count > 400 && html`<span class=${`count ${count > LIMITS.messageMax ? 'over' : ''}`} aria-live="polite">${count}/500</span>`}
-        <button class="send-btn" onClick=${submit} disabled=${!text.trim() || slow} aria-label="Envoyer"><${Icon} name="send" size=${22} /></button>
+        <button class="send-btn" onClick=${submit} disabled=${!text.trim() || slow} aria-label=${t('room.send')}><${Icon} name="send" size=${22} /></button>
       </div>
-      <button class="btn btn-lavender play-btn" onClick=${() => navigate(paths.hub(r.rid))}><${Icon} name="gamepad" /> Jouer</button>
+      <button class="btn btn-lavender play-btn" onClick=${() => navigate(paths.hub(r.rid))}><${Icon} name="gamepad" /> ${t('room.play')}</button>
     </div>
   </div>`
 }
@@ -366,23 +368,23 @@ export function RoomInfoSheet() {
   if (!r?.info) return null
   return html`<${Sheet} title=${r.info.name} onClose=${closeModal}>
     <${InviteBox} r=${r} />
-    <h3 class="section-title"><${Icon} name="users" size=${20} /> Membres</h3>
+    <h3 class="section-title"><${Icon} name="users" size=${20} /> ${t('room.membersTitle')}</h3>
     <${MembersPanel} />
   </${Sheet}>`
 }
 
 export function MembersSheet() {
-  return html`<${Sheet} title="Membres" onClose=${closeModal} drawer><${MembersPanel} withInvite /></${Sheet}>`
+  return html`<${Sheet} title=${t('room.membersTitle')} onClose=${closeModal} drawer><${MembersPanel} withInvite /></${Sheet}>`
 }
 
 export function LeaderboardSheet() {
-  return html`<${Sheet} title="Classement du salon" onClose=${closeModal} drawer><${LeaderboardPanel} /></${Sheet}>`
+  return html`<${Sheet} title=${t('room.leaderboard')} onClose=${closeModal} drawer><${LeaderboardPanel} /></${Sheet}>`
 }
 
 export function InviteSheet({ first }) {
   const r = room.value
   if (!r?.info) return null
-  return html`<${Sheet} title=${first ? 'Salon créé ! Invite ta meute' : 'Inviter des amis'} onClose=${closeModal}>
+  return html`<${Sheet} title=${first ? t('invite.createdTitle') : t('invite.title')} onClose=${closeModal}>
     <${InviteBox} r=${r} />
   </${Sheet}>`
 }
@@ -391,18 +393,18 @@ export function RoomMenuSheet() {
   const r = room.value
   if (!r?.info) return null
   const isHost = r.info.hostId === me.value.id
-  return html`<${Sheet} title="Options du salon" onClose=${closeModal}>
+  return html`<${Sheet} title=${t('room.options')} onClose=${closeModal}>
     <div class="col">
-      <button class="btn btn-secondary btn-block" onClick=${() => openModal('invite')}><${Icon} name="link" /> Inviter des amis</button>
+      <button class="btn btn-secondary btn-block" onClick=${() => openModal('invite')}><${Icon} name="link" /> ${t('invite.title')}</button>
       ${layout.value !== 'desktop' &&
-      html`<button class="btn btn-secondary btn-block" onClick=${() => openModal('members')}><${Icon} name="users" /> Membres</button>
-        <button class="btn btn-secondary btn-block" onClick=${() => openModal('leaderboard')}><${Icon} name="trophy" /> Classement</button>`}
-      ${isHost && html`<button class="btn btn-secondary btn-block" onClick=${() => openModal('rename')}><${Icon} name="edit" /> Renommer le salon</button>`}
+      html`<button class="btn btn-secondary btn-block" onClick=${() => openModal('members')}><${Icon} name="users" /> ${t('room.membersTitle')}</button>
+        <button class="btn btn-secondary btn-block" onClick=${() => openModal('leaderboard')}><${Icon} name="trophy" /> ${t('room.leaderboardShort')}</button>`}
+      ${isHost && html`<button class="btn btn-secondary btn-block" onClick=${() => openModal('rename')}><${Icon} name="edit" /> ${t('room.rename')}</button>`}
       <button class="btn btn-danger btn-block" onClick=${() =>
         openModal('confirm', {
-          title: 'Quitter le salon ?',
-          text: isHost ? 'Tu es l’hôte : le membre le plus ancien prendra le relais.' : 'Tu pourras revenir avec un nouveau lien d’invitation.',
-          confirm: 'Quitter',
+          title: t('room.leaveTitle'),
+          text: isHost ? t('room.leaveHost') : t('room.leaveText'),
+          confirm: t('room.leave'),
           danger: true,
           onConfirm: async () => {
             await leaveRoom(r.rid).catch((e) => {
@@ -411,7 +413,7 @@ export function RoomMenuSheet() {
             })
             navigate(paths.home(), { replace: true })
           },
-        })}><${Icon} name="door" /> Quitter le salon</button>
+        })}><${Icon} name="door" /> ${t('room.leaveTitleShort')}</button>
     </div>
   </${Sheet}>`
 }
@@ -426,17 +428,17 @@ export function RenameSheet() {
       await renameRoom(name.trim())
       closeModal()
     } catch (err) {
-      setError(err.message)
+      setError(errorText(err))
     }
   }
-  return html`<${Sheet} title="Renommer le salon" onClose=${closeModal}>
+  return html`<${Sheet} title=${t('room.rename')} onClose=${closeModal}>
     <form class="col" style=${{ gap: '16px' }} onSubmit=${submit}>
       <div class="field">
-        <label for="rename">Nouveau nom</label>
+        <label for="rename">${t('room.newName')}</label>
         <input id="rename" class="input" value=${name} maxlength="40" autofocus onInput=${(e) => setName(e.currentTarget.value)} />
       </div>
       ${error && html`<p class="field-error" role="alert">${error}</p>`}
-      <button class="btn btn-primary btn-block">Renommer</button>
+      <button class="btn btn-primary btn-block">${t('room.renameSubmit')}</button>
     </form>
   </${Sheet}>`
 }

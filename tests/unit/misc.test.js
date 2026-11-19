@@ -34,26 +34,50 @@ test('mots interdits : détectés, y compris déguisés, sans faux positifs cour
   for (const bad of ['connard', 'Gros con', 'S4L0P3', 'p.u.t.a.i.n', 'Enculé', 'pédé', 'nique ta mère']) assert.equal(containsBanned(bad), true, bad)
   for (const ok of ['Constant', 'Salopette', 'Encyclopédie', 'Grenouille', 'Chatouille', 'Habite', 'Technique', 'Dispute', 'Fichier', 'Culture', 'Mochi Malicieux'])
     assert.equal(containsBanned(ok), false, ok)
+  for (const ok of ['un pique-nique sur la Lune', 'pique-niquer au parc', 'une rue en cul-de-sac', 'chili con carne']) assert.equal(containsBanned(ok), false, ok)
+  assert.equal(containsBanned('nique ta mère'), true)
 })
 
-test('banque de mots : 300 mots, 6 thèmes × 3 difficultés, sans doublon ni terme interdit', () => {
-  const bank = JSON.parse(readFileSync(new URL('../../data/mots.json', import.meta.url), 'utf8'))
-  let total = 0
-  const seen = new Set()
-  for (const theme of THEME_IDS) {
-    for (const diff of ['facile', 'moyen', 'difficile']) {
-      const list = bank.themes[theme][diff]
-      assert.ok(list.length >= 15, `${theme}/${diff}`)
-      for (const entry of list) {
-        total++
-        for (const v of entry.split('|')) {
-          const k = compactWord(v)
-          assert.ok(!seen.has(k), `doublon : ${v}`)
-          seen.add(k)
-          assert.equal(containsBanned(v), false, v)
+for (const file of ['mots.json', 'words-en.json']) {
+  test(`banque de mots ${file} : 300 mots, 6 thèmes × 3 difficultés, sans doublon ni terme interdit`, () => {
+    const bank = JSON.parse(readFileSync(new URL(`../../data/${file}`, import.meta.url), 'utf8'))
+    let total = 0
+    const seen = new Set()
+    for (const theme of THEME_IDS) {
+      for (const diff of ['facile', 'moyen', 'difficile']) {
+        const list = bank.themes[theme][diff]
+        assert.ok(list.length >= 15, `${theme}/${diff}`)
+        for (const entry of list) {
+          total++
+          for (const v of entry.split('|')) {
+            const k = compactWord(v)
+            assert.ok(!seen.has(k), `doublon : ${v}`)
+            seen.add(k)
+            assert.equal(containsBanned(v), false, v)
+          }
         }
       }
     }
+    assert.equal(total, 300)
+  })
+}
+
+test('contenus des jeux : quiz, estimations, dilemmes et Petit Bac complets dans les deux langues', () => {
+  const read = (f) => JSON.parse(readFileSync(new URL(`../../data/${f}`, import.meta.url), 'utf8'))
+  const quiz = read('quiz.json').questions
+  assert.ok(quiz.length >= 50)
+  for (const q of quiz) for (const l of ['fr', 'en']) {
+    assert.ok(q[l].q.length > 5, q.id)
+    assert.equal(new Set(q[l].a).size, 4, `${q.id} : 4 réponses distinctes`)
   }
-  assert.equal(total, 300)
+  const est = read('estimations.json').questions
+  assert.ok(est.length >= 30)
+  for (const q of est) assert.ok(Number.isFinite(q.answer) && q.answer >= 0 && q.fr.q && q.en.q, q.id)
+  const dil = read('dilemmas.json').items
+  assert.ok(dil.length >= 40)
+  for (const d of dil) for (const l of ['fr', 'en']) assert.ok(d[l].length === 2 && d[l].every((x) => x.length >= 2 && !containsBanned(x)), d.id)
+  const bac = read('petitbac.json')
+  assert.ok(bac.categories.length >= 10)
+  for (const c of bac.categories) assert.ok(c.fr && c.en, c.id)
+  for (const l of ['fr', 'en']) assert.ok(/^[A-Z]{15,}$/.test(bac.letters[l]))
 })

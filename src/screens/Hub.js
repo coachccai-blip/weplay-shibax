@@ -1,28 +1,34 @@
-// Hub de jeux : le catalogue, ouvert par « Jouer ». Draw It est jouable, les autres arrivent bientôt.
+// Hub de jeux, ouvert par « Jouer » : 7 jeux en direct (lobby puis partie, tout le monde en même temps)
+// et 7 jeux dans la conversation (une carte dans le fil, chacun joue à son rythme).
 import { useState } from 'preact/hooks'
 import { html } from '../lib/html.js'
 import { Icon } from '../components/icons.js'
-import { Shiba } from '../components/Shiba.js'
 import { room } from '../state/rooms.js'
 import { createGame } from '../state/game.js'
-import { errorToast } from '../state/core.js'
+import { errorToast, openModal } from '../state/core.js'
 import { navigate, back, paths } from '../lib/router.js'
+import { t, tn } from '../i18n/index.js'
+import { gameName } from '../i18n/texts.js'
 import { GAME_CATALOG } from '../../shared/constants.js'
 
-function Art({ id }) {
-  if (id === 'drawit') {
-    return html`<svg width="150" height="110" viewBox="0 0 150 110" aria-hidden="true">
-      <rect x="64" y="14" width="80" height="62" rx="10" fill="#fff" />
-      <path d="M76 58c10-22 22 4 32-12s18 6 26-6" fill="none" stroke="#3fb6f0" stroke-width="5" stroke-linecap="round" />
-      <circle cx="118" cy="30" r="7" fill="#f6c700" />
-      <path d="M58 88l34-34 8 8-34 34-11 3z" fill="#f0569b" />
-      <path d="M92 54l8 8 5-5-8-8z" fill="#4A3B36" />
-    </svg>`
-  }
-  return html`<svg width="110" height="90" viewBox="0 0 110 90" aria-hidden="true">
-    <rect x="15" y="15" width="80" height="60" rx="14" fill="#fff" opacity="0.8" />
-    <text x="55" y="56" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="34" fill="#7A6A64">?</text>
-  </svg>`
+function facts(gm) {
+  const players = gm.duel ? t('hub.duel') : gm.mode === 'async' ? t('hub.wholeGroup') : t('hub.players', { min: gm.min, max: gm.max })
+  const time =
+    gm.mode === 'sync' ? t('hub.minutes', { a: gm.minutes[0], b: gm.minutes[1] }) : gm.hours >= 48 ? tn('hub.days', Math.round(gm.hours / 24)) : tn('hub.hours', gm.hours)
+  return { players, time }
+}
+
+function Tile({ gm, onClick, disabled }) {
+  const f = facts(gm)
+  return html`<button class=${`game-tile mode-${gm.mode}`} disabled=${disabled} onClick=${onClick} aria-label=${t('hub.launchAria', { game: gameName(gm.id) })}>
+    <span class="art" aria-hidden="true"><span class="tile-emoji">${gm.emoji}</span></span>
+    <h3>${gameName(gm.id)}</h3>
+    <span class="small">${t(`game.${gm.id}.tagline`)}</span>
+    <span class="facts">
+      <span class="pill white"><${Icon} name="users" size=${14} /> ${f.players}</span>
+      <span class="pill white"><${Icon} name=${gm.mode === 'sync' ? 'clock' : 'hourglass'} size=${14} /> ${f.time}</span>
+    </span>
+  </button>`
 }
 
 export function Hub({ rid }) {
@@ -41,27 +47,32 @@ export function Hub({ rid }) {
   }
   return html`<section class="screen" aria-labelledby="hub-title">
     <header class="screen-header">
-      <button class="icon-btn" onClick=${() => back(paths.room(rid))} aria-label="Retour au salon"><${Icon} name="back" /></button>
-      <div class="titles"><h1 id="hub-title">Jouer</h1><p class="subtitle">${r?.info?.name || ''}</p></div>
+      <button class="icon-btn" onClick=${() => back(paths.room(rid))} aria-label=${t('room.backToGroup')}><${Icon} name="back" /></button>
+      <div class="titles"><h1 id="hub-title">${t('hub.title')}</h1><p class="subtitle">${r?.info?.name || ''}</p></div>
     </header>
     <div class="screen-body">
-      ${active &&
-      html`<div class="game-banner" style=${{ margin: '0 0 16px' }}>
-        <${Icon} name="gamepad" /><span class="grow">Une partie est déjà en cours dans ce salon : une seule à la fois !</span>
-        <button class="btn btn-small btn-primary" onClick=${() => navigate(paths.game(rid, active.id))}>Voir la partie</button>
-      </div>`}
-      <div class="hub-grid">
-        ${GAME_CATALOG.map((gm) => {
-          const ok = gm.available && !active
-          return html`<button class="game-tile" key=${gm.id} disabled=${!ok || busy} onClick=${() => launch(gm.id)}
-            aria-label=${gm.available ? `Lancer ${gm.name}` : `${gm.name} : bientôt disponible`}>
-            ${!gm.available && html`<span class="soon-ribbon">Bientôt</span>`}
-            <span class="art">${gm.id === 'drawit' ? html`<span class="row"><${Shiba} body coat="roux" mood="concentre" size=${90} /><${Art} id=${gm.id} /></span>` : html`<${Art} id=${gm.id} />`}</span>
-            <h3>${gm.name}</h3>
-            <span class="small">${gm.tagline}</span>
-            <span class="facts"><span class="pill white"><${Icon} name="users" size=${14} /> ${gm.players}</span><span class="pill white"><${Icon} name="clock" size=${14} /> ${gm.duration}</span></span>
-          </button>`
-        })}
+      <div class="hub">
+        <div class="hub-head">
+          <h2 class="section-title"><${Icon} name="bolt" size=${22} /> ${t('hub.live')}</h2>
+          <p class="small muted">${t('hub.liveHint')}</p>
+        </div>
+        ${active &&
+        html`<div class="game-banner">
+          <${Icon} name="gamepad" /><span class="grow">${t('hub.oneAtATime')}</span>
+          <button class="btn btn-small btn-primary" onClick=${() => navigate(paths.game(rid, active.id))}>${t('hub.seeGame')}</button>
+        </div>`}
+        <div class="hub-grid">
+          ${GAME_CATALOG.filter((g) => g.mode === 'sync').map((gm) => html`<${Tile} key=${gm.id} gm=${gm} disabled=${!!active || busy} onClick=${() => launch(gm.id)} />`)}
+        </div>
+        <div class="hub-head">
+          <h2 class="section-title"><${Icon} name="chat" size=${22} /> ${t('hub.async')}</h2>
+          <p class="small muted">${t('hub.asyncHint')}</p>
+        </div>
+        <div class="hub-grid">
+          ${GAME_CATALOG.filter((g) => g.mode === 'async').map(
+            (gm) => html`<${Tile} key=${gm.id} gm=${gm} disabled=${!r?.info} onClick=${() => openModal('asyncSetup', { type: gm.id, rid })} />`,
+          )}
+        </div>
       </div>
     </div>
   </section>`

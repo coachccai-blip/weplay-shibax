@@ -3,6 +3,8 @@ import { signal } from '@preact/signals'
 import { api, ApiError } from '../lib/transport.js'
 import { serverNow } from '../lib/clock.js'
 import { me, toast, errorToast } from './core.js'
+import { rememberPeople } from './people.js'
+import { t, errorText } from '../i18n/index.js'
 import { play } from '../lib/fx.js'
 import { LIMITS } from '../../shared/constants.js'
 import { graphemeLength, cleanMessage } from '../../shared/text.js'
@@ -36,6 +38,19 @@ function mergeMessages(current, incoming) {
   }
   for (const m of incoming) map.set(m.id, m)
   return sortMessages([...map.values()])
+}
+
+/** Fusionne des états de jeux de conversation (la version la plus récente l'emporte). */
+export function mergeAsync(current, games, onChange) {
+  if (!games?.length) return current
+  const out = { ...current }
+  for (const g of games) {
+    const prev = out[g.id]
+    if (prev && !prev.missing && prev.v > g.v) continue
+    onChange?.(prev, g)
+    out[g.id] = g
+  }
+  return out
 }
 
 export function updateRoom(patch) {
@@ -82,7 +97,7 @@ export async function joinByCode(code) {
 
 export async function openRoom(rid) {
   if (room.value?.rid === rid && !room.value.error) return
-  room.value = { rid, loading: true, messages: [], members: [], reactions: {}, rxHash: {}, presence: {}, info: null, hasMore: false }
+  room.value = { rid, loading: true, messages: [], members: [], reactions: {}, rxHash: {}, presence: {}, info: null, hasMore: false, asyncGames: {}, asyncVersions: {} }
   try {
     const res = await api.get(`rooms/${rid}`)
     if (room.value?.rid !== rid) return
@@ -103,11 +118,14 @@ export async function openRoom(rid) {
       readTs: res.readTs || 0,
       separatorTs: res.readTs || 0,
       game: null,
+      asyncGames: mergeAsync({}, res.async?.games),
+      asyncVersions: res.async?.versions || {},
     }
     rooms.value = rooms.value.map((r) => (r.id === rid ? { ...r, unread: 0 } : r))
+    rememberPeople(res.members)
   } catch (err) {
     if (room.value?.rid !== rid) return
-    room.value = { rid, loading: false, error: err, messages: [], members: [], reactions: {}, rxHash: {}, presence: {} }
+    room.value = { rid, loading: false, error: err, messages: [], members: [], reactions: {}, rxHash: {}, presence: {}, asyncGames: {}, asyncVersions: {} }
   }
 }
 
@@ -126,7 +144,10 @@ export function roomCursor({ reading }) {
   const days = [...new Set(confirmed.slice(-60).map((m) => utcDay(m.ts)))].slice(-3)
   const rx = {}
   for (const d of days) rx[d] = r.rxHash[d] || ''
-  const cursor = { rid: r.rid, after: last?.id || null, recent, rx, mv: r.info.mv }
+  // Jeux de conversation déjà connus : le serveur ne renvoie que ceux qui ont changé.
+  const av = {}
+  for (const id of Object.keys(r.asyncVersions || {})) if (r.asyncGames?.[id]?.v) av[id] = r.asyncGames[id].v
+  const cursor = { rid: r.rid, after: last?.id || null, recent, rx, mv: r.info.mv, av }
   if (reading && last && last.ts > (r.readTs || 0)) cursor.read = last.ts
   return cursor
 }
@@ -162,7 +183,17 @@ export function applyRoomSync(res, sent) {
     rxHash,
     game: res.game,
   }
-  if (res.members) next.members = res.members
+  if (res.async) {
+    next.asyncGames = mergeAsync(r.asyncGames || {}, res.async.games, (prev, g) => {
+      // Son discret quand c'est à moi de jouer après le coup d'un autre membre.
+      if (prev && prev.v < g.v && !prev.data?.myTurn && g.data?.myTurn) play('turn')
+    })
+    next.asyncVersions = res.async.versions || r.asyncVersions
+  }
+  if (res.members) {
+    next.members = res.members
+    rememberPeople(res.members)
+  }
   if (sent.read) next.readTs = Math.max(r.readTs || 0, sent.read)
   room.value = next
   if (fromOthers.length) play('pop')
@@ -240,7 +271,7 @@ async function deliver(rid, local) {
     if (room.value?.rid !== rid) return
     if (err instanceof ApiError && err.code === 'slow_down') slowUntil.value = Date.now() + (err.retryAfterMs || 5000)
     updateRoom((cur) => ({
-      messages: cur.messages.map((m) => (m.id === local.id ? { ...m, pending: false, failed: true, error: err.message } : m)),
+      messages: cur.messages.map((m) => (m.id === local.id ? { ...m, pending: false, failed: true, error: errorText(err) } : m)),
     }))
   }
 }
@@ -250,7 +281,7 @@ export function sendMessage(rawText) {
   const text = cleanMessage(rawText)
   if (!r || !text) return false
   if (graphemeLength(text) > LIMITS.messageMax) {
-    toast('500 caractères au plus par message.', 'error')
+    toast(t('err.too_long', { max: LIMITS.messageMax }), 'error')
     return false
   }
   if (!canSendNow()) return false
@@ -339,5 +370,7 @@ export async function leaveRoom(rid) {
 }
 
 export async function fetchLeaderboard(rid, scope) {
-  return api.get(`rooms/${rid}/leaderboard?scope=${scope}`)
+  const board = await api.get(`rooms/${rid}/leaderboard?scope=${scope}`)
+  rememberPeople(board.entries.map((e) => ({ id: e.uid, pseudo: e.pseudo, coat: e.coat, acc: e.acc, photoUrl: e.photoUrl })))
+  return board
 }

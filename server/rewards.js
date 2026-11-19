@@ -5,7 +5,7 @@ import { K, makeMsgId } from './keys.js'
 import { SKIP, pMap } from './db.js'
 import { postMessage } from './messages.js'
 import { parisDay, dayDiff, parisWeek, previousWeek, weekLabel } from '../shared/time.js'
-import { computeGameXp, levelFromXp, ACCESSORIES } from '../shared/progression.js'
+import { computeGameXp, computeAsyncXp, levelFromXp, ACCESSORIES } from '../shared/progression.js'
 
 /** Applique les récompenses d'un joueur (une seule fois par partie). */
 export async function applyPlayerRewards(db, state, entry, mod) {
@@ -186,4 +186,70 @@ export async function weeklyPodium(db, rid, now = Date.now()) {
     })
     .catch(() => {})
   return claimed
+}
+
+// ---------- Jeux dans la conversation ----------
+
+/** XP d'un jeu de conversation : 10 jeux par jour au plus rapportent de l'XP (pas de farming). */
+export async function applyAsyncRewards(db, state, uid, won) {
+  const endedAt = state.endedAt || Date.now()
+  const today = parisDay(endedAt)
+  let outcome = null
+  const res = await db.mutate(K.user(uid), (u) => {
+    u.applied ||= []
+    u.recent ||= {}
+    if (u.applied.includes(state.id)) {
+      outcome = u.recent[state.id] || null
+      return SKIP
+    }
+    const day = u.asyncDay?.day === today ? u.asyncDay : { day: today, count: 0 }
+    const counts = day.count < 10
+    day.count += 1
+    u.asyncDay = day
+    const prev = u.streak || { count: 0, last: null }
+    let streak = prev.count || 0
+    if (counts) {
+      if (prev.last === today) streak = Math.max(1, prev.count)
+      else if (prev.last && dayDiff(prev.last, today) === 1) streak = prev.count + 1
+      else streak = 1
+    }
+    const firstGameOfDay = counts && u.lastGameDay !== today
+    const xp = computeAsyncXp({ played: counts, won, firstGameOfDay, streak })
+    const levelBefore = levelFromXp(u.xp || 0).level
+    u.xp = (u.xp || 0) + xp.total
+    const levelAfter = levelFromXp(u.xp).level
+    u.level = levelAfter
+    u.stats ||= { games: 0, wins: 0, msgs: 0, found: 0, drawn: 0 }
+    u.badges ||= {}
+    const badges = []
+    if (counts) {
+      u.streak = { count: streak, last: today }
+      u.lastGameDay = today
+      u.stats.games = (u.stats.games || 0) + 1
+      if (won) u.stats.wins = (u.stats.wins || 0) + 1
+      const earned = []
+      if (u.stats.games >= 1) earned.push('premiere_patte')
+      if (u.stats.wins >= 10) earned.push('chef_de_meute')
+      if (u.stats.games >= 50) earned.push('marathonien')
+      if (streak >= 7) earned.push('fidele')
+      for (const id of earned) if (!u.badges[id]) {
+        u.badges[id] = endedAt
+        badges.push(id)
+      }
+    }
+    const accessories = ACCESSORIES.filter((a) => a.level > levelBefore && a.level <= levelAfter).map((a) => a.id)
+    outcome = { xp: xp.total, lines: xp.lines, levelBefore, levelAfter, xpAfter: u.xp, badges, accessories, streak, valid: counts }
+    u.applied = [...u.applied, state.id].slice(-60)
+    const recent = { ...u.recent, [state.id]: outcome }
+    const keys = Object.keys(recent)
+    for (const k of keys.slice(0, Math.max(0, keys.length - 6))) delete recent[k]
+    u.recent = recent
+  })
+  if (!res.changed && !outcome) outcome = res.value?.recent?.[state.id] || null
+  return outcome
+}
+
+export async function addAsyncToLeaderboards(db, state, gains) {
+  const at = state.endedAt || Date.now()
+  await Promise.all([addToLeaderboard(db, K.lbWeek(state.rid, parisWeek(at)), state.id, gains), addToLeaderboard(db, K.lbAll(state.rid), state.id, gains)])
 }

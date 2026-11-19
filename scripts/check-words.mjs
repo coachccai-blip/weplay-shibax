@@ -1,12 +1,14 @@
-// Vérifie la banque de mots : 300 entrées, 6 thèmes × 3 difficultés, sans doublon ni terme interdit.
+// Vérifie les banques de mots (français et anglais) : 300 entrées, 6 thèmes × 3 difficultés,
+// sans doublon ni terme interdit.
 import { readFileSync } from 'node:fs'
 import { compactWord } from '../shared/text.js'
 import { containsBanned } from '../shared/moderation.js'
 import { THEME_IDS } from '../shared/constants.js'
 import { DIFFICULTIES } from '../shared/scoring.js'
 
-const bank = JSON.parse(readFileSync(new URL('../data/mots.json', import.meta.url), 'utf8'))
 const errors = []
+for (const file of ['mots.json', 'words-en.json']) {
+const bank = JSON.parse(readFileSync(new URL(`../data/${file}`, import.meta.url), 'utf8'))
 const seen = new Map()
 let total = 0
 
@@ -32,10 +34,12 @@ for (const theme of THEME_IDS) {
   }
 }
 
-if (total !== 300) errors.push(`La banque compte ${total} mots au lieu de 300`)
+if (total !== 300) errors.push(`${file} : la banque compte ${total} mots au lieu de 300`)
+console.log(`${file} : ${total} mots, ${THEME_IDS.length} thèmes.`)
+}
 
 if (errors.length) {
   console.error(errors.join('\n'))
   process.exit(1)
 }
-console.log(`Banque de mots valide : ${total} mots, ${THEME_IDS.length} thèmes.`)
+console.log('Banques de mots valides.')

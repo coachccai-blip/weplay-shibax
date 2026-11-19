@@ -1,6 +1,7 @@
 // Draw It : un joueur dessine un mot, les autres le devinent le plus vite possible.
 // Le serveur fait foi : le mot n'est jamais envoyé aux devineurs avant la fin de la manche.
-import bank from '../../data/mots.json' with { type: 'json' }
+import bankFr from '../../data/mots.json' with { type: 'json' }
+import bankEn from '../../data/words-en.json' with { type: 'json' }
 import { K } from '../keys.js'
 import { fail, ensure, str, int } from '../http.js'
 import { activeIds, isPresent, shuffle, randomInt, ABSENT_MS, ACTIVE_MS } from './common.js'
@@ -16,7 +17,10 @@ function parseEntry(entry, difficulty, theme) {
   return { display: answers[0], answers, difficulty, theme, custom: false }
 }
 
-function poolFor(themes, difficulty) {
+const bankFor = (lang) => (lang === 'en' ? bankEn : bankFr)
+
+function poolFor(themes, difficulty, lang) {
+  const bank = bankFor(lang)
   return themes.flatMap((t) => (bank.themes[t]?.[difficulty] || []).map((e) => parseEntry(e, difficulty, t)))
 }
 
@@ -25,11 +29,12 @@ function pickChoices(state) {
   const g = state.g
   const themes = state.settings.themes === 'all' ? THEME_IDS : state.settings.themes
   const used = new Set(g.used)
+  const lang = state.settings.lang
   const out = []
   for (const diff of DIFFICULTIES) {
-    let pool = poolFor(themes, diff).filter((w) => !used.has(w.display))
-    if (!pool.length) pool = poolFor(THEME_IDS, diff).filter((w) => !used.has(w.display))
-    if (!pool.length) pool = poolFor(THEME_IDS, diff)
+    let pool = poolFor(themes, diff, lang).filter((w) => !used.has(w.display))
+    if (!pool.length) pool = poolFor(THEME_IDS, diff, lang).filter((w) => !used.has(w.display))
+    if (!pool.length) pool = poolFor(THEME_IDS, diff, lang)
     const pick = pool[randomInt(pool.length)]
     used.add(pick.display)
     out.push(pick)
@@ -184,6 +189,7 @@ function sanitizeSettings(input = {}, base = drawit.defaultSettings()) {
   if (input.tours !== undefined) s.tours = input.tours === 'auto' ? 'auto' : DRAWIT.tourChoices.includes(int(input.tours)) ? int(input.tours) : base.tours
   if (input.drawTime !== undefined) s.drawTime = DRAWIT.drawTimes.includes(int(input.drawTime)) ? int(input.drawTime) : base.drawTime
   if (input.custom !== undefined) s.custom = !!input.custom
+  if (input.lang !== undefined) s.lang = input.lang === 'en' ? 'en' : input.lang === 'fr' ? 'fr' : base.lang || 'fr'
   if (input.themes !== undefined) {
     if (input.themes === 'all') s.themes = 'all'
     else if (Array.isArray(input.themes)) {
@@ -227,7 +233,8 @@ const drawit = {
   xp: true,
   needsFounds: true,
 
-  defaultSettings: () => ({ tours: 'auto', drawTime: DRAWIT.defaultDrawTime, custom: true, themes: 'all' }),
+  kind: 'sync',
+  defaultSettings: (ctx = {}) => ({ tours: 'auto', drawTime: DRAWIT.defaultDrawTime, custom: true, themes: 'all', lang: ctx.lang === 'en' ? 'en' : 'fr' }),
   sanitizeSettings,
   estimate: (settings, n) => drawItDuration(settings, n),
 

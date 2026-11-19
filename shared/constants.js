@@ -6,6 +6,7 @@ export const LIMITS = {
   roomNameMin: 3,
   roomNameMax: 30,
   roomMaxMembers: 20,
+  maxGroupsPerUser: 50, // groupes qu'un compte peut créer ou rejoindre
   messageMax: 500,
   pageSize: 50,
   burstCount: 5, // messages…
@@ -67,33 +68,38 @@ export const THEMES = [
 ]
 export const THEME_IDS = THEMES.map((t) => t.id)
 
-/** Catalogue du hub. Les jeux « Bientôt » sont grisés. */
+/**
+ * Catalogue du hub (noms, accroches et règles : traductions « game.<id>.* » côté interface).
+ * `mode` : « sync » = en direct, tout le monde au même moment (lobby puis partie) ;
+ * « async » = dans la conversation, chacun joue à son rythme depuis la carte du fil.
+ */
 export const GAME_CATALOG = [
-  {
-    id: 'drawit',
-    name: 'Draw It',
-    tagline: 'Dessine un mot, fais-le deviner à la meute !',
-    players: '2 à 8 joueurs',
-    duration: '5 à 11 min',
-    available: true,
-  },
-  {
-    id: 'quiz',
-    name: 'Quiz de la meute',
-    tagline: 'Questions express, réponses en équipe.',
-    players: '2 à 8 joueurs',
-    duration: '5 min',
-    available: false,
-  },
-  {
-    id: 'cache',
-    name: 'Cache-truffe',
-    tagline: 'Retrouve l’os caché avant les autres.',
-    players: '3 à 8 joueurs',
-    duration: '8 min',
-    available: false,
-  },
+  { id: 'drawit', mode: 'sync', emoji: '🎨', min: 2, max: 8, minutes: [5, 11] },
+  { id: 'quiz', mode: 'sync', emoji: '❓', min: 2, max: 8, minutes: [3, 5] },
+  { id: 'reflexe', mode: 'sync', emoji: '⚡', min: 2, max: 8, minutes: [1, 2] },
+  { id: 'justenombre', mode: 'sync', emoji: '🎯', min: 2, max: 8, minutes: [2, 4] },
+  { id: 'petitbac', mode: 'sync', emoji: '📝', min: 2, max: 8, minutes: [4, 8] },
+  { id: 'calcul', mode: 'sync', emoji: '🧮', min: 2, max: 8, minutes: [2, 4] },
+  { id: 'anagramme', mode: 'sync', emoji: '🔤', min: 2, max: 8, minutes: [2, 4] },
+  { id: 'dessin', mode: 'async', emoji: '🖌️', min: 2, max: 20, hours: 24 },
+  { id: 'morpion', mode: 'async', emoji: '❌', min: 2, max: 2, hours: 168, duel: true },
+  { id: 'puissance4', mode: 'async', emoji: '🔴', min: 2, max: 2, hours: 168, duel: true },
+  { id: 'shifumi', mode: 'async', emoji: '✊', min: 2, max: 2, hours: 72, duel: true },
+  { id: 'tupreferes', mode: 'async', emoji: '🤔', min: 2, max: 20, hours: 24 },
+  { id: 'pendu', mode: 'async', emoji: '🪢', min: 1, max: 20, hours: 72 },
+  { id: 'devine', mode: 'async', emoji: '🔢', min: 1, max: 20, hours: 48 },
 ]
+/** Jeux en direct « par manches » : nombres de manches proposés et valeur par défaut. */
+export const LIVE_ROUNDS = {
+  quiz: { choices: [5, 10, 15], def: 10, content: true },
+  reflexe: { choices: [5, 8, 10], def: 8, content: false },
+  justenombre: { choices: [4, 6, 8], def: 6, content: true },
+  petitbac: { choices: [3, 4, 5], def: 3, content: true },
+  calcul: { choices: [8, 10, 15], def: 10, content: false },
+  anagramme: { choices: [5, 8, 10], def: 6, content: true },
+}
+export const SYNC_GAMES = GAME_CATALOG.filter((g) => g.mode === 'sync').map((g) => g.id)
+export const ASYNC_GAME_IDS = GAME_CATALOG.filter((g) => g.mode === 'async').map((g) => g.id)
 
 /** Réglages de Draw It. */
 export const DRAWIT = {

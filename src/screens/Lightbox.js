@@ -3,6 +3,7 @@ import { signal } from '@preact/signals'
 import { useEffect } from 'preact/hooks'
 import { html } from '../lib/html.js'
 import { Icon } from '../components/icons.js'
+import { t } from '../i18n/index.js'
 
 const state = signal(null)
 
@@ -24,16 +25,16 @@ export function Lightbox() {
   }, [s])
   if (!s) return null
   const item = s.items[s.index]
-  return html`<div class="lightbox" role="dialog" aria-modal="true" aria-label=${`Dessin : ${item.word}`} onClick=${(e) => e.target === e.currentTarget && (state.value = null)}>
+  return html`<div class="lightbox" role="dialog" aria-modal="true" aria-label=${t('card.drawingAlt', { word: item.word })} onClick=${(e) => e.target === e.currentTarget && (state.value = null)}>
     <figure>
-      <img src=${item.src} alt=${`Dessin : ${item.word}`} />
+      <img src=${item.src} alt=${t('card.drawingAlt', { word: item.word })} />
       <figcaption>
         <span>${item.word}</span>
         <span class="row">
           ${s.items.length > 1 &&
-          html`<button class="icon-btn" aria-label="Dessin précédent" onClick=${() => (state.value = { ...s, index: (s.index - 1 + s.items.length) % s.items.length })}><${Icon} name="back" /></button>
-            <button class="icon-btn" aria-label="Dessin suivant" onClick=${() => (state.value = { ...s, index: (s.index + 1) % s.items.length })}><${Icon} name="chevron" /></button>`}
-          <button class="icon-btn" autofocus aria-label="Fermer" onClick=${() => (state.value = null)}><${Icon} name="close" /></button>
+          html`<button class="icon-btn" aria-label=${t('lightbox.prev')} onClick=${() => (state.value = { ...s, index: (s.index - 1 + s.items.length) % s.items.length })}><${Icon} name="back" /></button>
+            <button class="icon-btn" aria-label=${t('lightbox.next')} onClick=${() => (state.value = { ...s, index: (s.index + 1) % s.items.length })}><${Icon} name="chevron" /></button>`}
+          <button class="icon-btn" autofocus aria-label=${t('common.close')} onClick=${() => (state.value = null)}><${Icon} name="close" /></button>
         </span>
       </figcaption>
     </figure>

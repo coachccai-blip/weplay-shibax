@@ -1,7 +1,7 @@
 // XP, niveaux, rangs, accessoires, série (brief : « Gamification »).
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { totalXpForLevel, levelFromXp, xpToNext, rankFor, unlockedAccessories, sanitizeAccessories, computeGameXp, streakBonusPercent, currentStreak } from '../../shared/progression.js'
+import { totalXpForLevel, levelFromXp, xpToNext, rankFor, unlockedAccessories, sanitizeAccessories, computeGameXp, computeAsyncXp, streakBonusPercent, currentStreak } from '../../shared/progression.js'
 import { parisDay, parisWeek, previousWeek, dayDiff, addDays, weekLabel } from '../../shared/time.js'
 
 test('niveaux : 100 XP pour le niveau 2, 1 800 XP cumulés pour le niveau 10', () => {
@@ -50,6 +50,15 @@ test('bonus de série : +10 % par jour consécutif, plafonné à +50 %', () => {
   assert.equal(streakBonusPercent(30), 50)
   const xp = computeGameXp({ valid: true, finished: true, points: 0, rank: 4, firstGameOfDay: false, streak: 3 })
   assert.equal(xp.total, 20 + 4) // 20 × 1,2
+})
+
+test('XP des jeux dans la conversation : participation, victoire, lignes traduisibles', () => {
+  const x = computeAsyncXp({ played: true, won: true, firstGameOfDay: false, streak: 1 })
+  assert.equal(x.total, 15)
+  assert.deepEqual(x.lines.map((l) => l.key), ['asyncPlayed', 'asyncWon'])
+  assert.equal(computeAsyncXp({ played: false }).total, 0)
+  const g = computeGameXp({ valid: true, finished: true, points: 120, rank: 2, firstGameOfDay: true, streak: 2 })
+  assert.deepEqual(g.lines.map((l) => l.key), ['finished', 'points', 'podium', 'firstOfDay', 'streak'])
 })
 
 test('une partie de moins de 3 manches ne rapporte pas d’XP', () => {

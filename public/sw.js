@@ -2,7 +2,7 @@
 // - Page : réseau d'abord (toujours la dernière version), cache en secours hors ligne.
 // - Fichiers versionnés (/assets/), polices, icônes : cache d'abord.
 // - L'API (/api/) n'est jamais mise en cache.
-const CACHE = 'shibax-v1'
+const CACHE = 'shibax-v2'
 const SHELL = ['/', '/manifest.webmanifest', '/img/logo-256.webp', '/img/logo-512.webp', '/icons/icon-192.png']
 
 self.addEventListener('install', (event) => {

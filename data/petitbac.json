@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "categories": [
+    { "id": "animal", "fr": "Animal", "en": "Animal" },
+    { "id": "fruit_legume", "fr": "Fruit ou légume", "en": "Fruit or vegetable" },
+    { "id": "pays", "fr": "Pays", "en": "Country" },
+    { "id": "ville", "fr": "Ville", "en": "City or town" },
+    { "id": "prenom", "fr": "Prénom", "en": "First name" },
+    { "id": "metier", "fr": "Métier", "en": "Job" },
+    { "id": "objet", "fr": "Objet", "en": "Object" },
+    { "id": "sport", "fr": "Sport", "en": "Sport" },
+    { "id": "couleur", "fr": "Couleur", "en": "Colour" },
+    { "id": "plat", "fr": "Plat ou dessert", "en": "Dish or dessert" },
+    { "id": "instrument", "fr": "Instrument de musique", "en": "Musical instrument" },
+    { "id": "corps", "fr": "Partie du corps", "en": "Body part" },
+    { "id": "transport", "fr": "Moyen de transport", "en": "Means of transport" },
+    { "id": "vetement", "fr": "Vêtement", "en": "Piece of clothing" },
+    { "id": "plante", "fr": "Plante ou fleur", "en": "Plant or flower" },
+    { "id": "cuisine", "fr": "Dans la cuisine", "en": "In the kitchen" }
+  ],
+  "letters": { "fr": "ABCDEFGHIJLMNOPRSTV", "en": "ABCDEFGHIJLMNOPRSTW" }
+}

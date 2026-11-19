@@ -51,6 +51,14 @@ async function addUserRoom(db, uid, rid, now) {
   )
 }
 
+/** Un compte peut appartenir à plusieurs groupes (50 au plus). */
+async function ensureGroupSlot(db, uid, rid = null) {
+  const u = await db.get(K.urooms(uid))
+  const ids = Object.keys(u?.rooms || {})
+  if (rid && ids.includes(rid)) return
+  ensure(ids.length < LIMITS.maxGroupsPerUser, 409, 'too_many_groups', `Tu fais déjà partie de ${LIMITS.maxGroupsPerUser} groupes : quittes-en un pour en rejoindre un autre.`, { max: LIMITS.maxGroupsPerUser })
+}
+
 async function removeUserRoom(db, uid, rid) {
   await db
     .mutate(K.urooms(uid), (u) => {
@@ -85,6 +93,7 @@ export async function roomMembers(db, room, { fresh = false } = {}) {
 
 export async function createRoom(db, auth, body) {
   const name = validateRoomName(body.name)
+  await ensureGroupSlot(db, auth.uid)
   const now = Date.now()
   const user = await db.get(K.user(auth.uid))
   let rid = null
@@ -135,6 +144,7 @@ export async function joinRoom(db, auth, codeInput) {
   const inv = await db.get(K.invite(code))
   ensure(inv, 404, 'invite_unknown', 'Ce code d’invitation n’existe pas.')
   ensure(inv.active, 410, 'invite_expired', 'Invitation expirée : demande un nouveau lien à l’hôte du salon.')
+  await ensureGroupSlot(db, auth.uid, inv.rid)
   const now = Date.now()
   let already = false
   let becameGolden = null
@@ -298,7 +308,7 @@ export async function listMyRooms(db, auth, now = Date.now()) {
         name: room.name,
         hostId: room.hostId,
         memberCount: room.members.length,
-        last: last?.id ? { ts: last.ts, author: last.author, pseudo: last.pseudo, preview: last.preview, type: last.type } : null,
+        last: last?.id ? { ts: last.ts, author: last.author, pseudo: last.pseudo, type: last.type, text: last.text, sys: last.sys, kind: last.kind, gtype: last.gtype, winner: last.winner } : null,
         unread,
         readTs: info.readTs || 0,
         game: room.game ? { id: room.game.id, type: room.game.type, status: room.game.status } : null,

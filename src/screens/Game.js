@@ -13,6 +13,8 @@ import { Lobby } from './Lobby.js'
 import { Results } from './Results.js'
 import { GAME_UI } from '../games/registry.js'
 import { listCollapsed } from './Room.js'
+import { t } from '../i18n/index.js'
+import { gameName } from '../i18n/texts.js'
 
 export function GameScreen({ rid, gid }) {
   useEffect(() => {
@@ -21,15 +23,15 @@ export function GameScreen({ rid, gid }) {
   }, [gid])
   useEffect(() => () => closeGame(), [])
   const g = game.value
-  const title = room.value?.info?.name || 'Partie'
+  const title = room.value?.info?.name || ''
   const v = g?.gid === gid ? g.view : null
   const playing = v?.status === 'playing'
   const quit = () => {
     if (playing && v.me.isPlayer) {
       openModal('confirm', {
-        title: 'Quitter la partie ?',
-        text: 'Tes points acquis comptent. Tu pourras revenir via le bandeau du salon (dès la manche suivante).',
-        confirm: 'Quitter',
+        title: t('game.quitTitle'),
+        text: t('game.quitText'),
+        confirm: t('game.quit'),
         danger: true,
         onConfirm: async () => {
           await leaveGame()
@@ -38,20 +40,20 @@ export function GameScreen({ rid, gid }) {
       })
     } else navigate(paths.room(rid))
   }
-  return html`<section class="screen" aria-label="Partie">
+  return html`<section class="screen" aria-label=${t('game.aria')}>
     <header class="screen-header">
       ${layout.value === 'tablet' &&
       html`<button class="icon-btn" aria-pressed=${String(!listCollapsed.value)} onClick=${() => (listCollapsed.value = !listCollapsed.value)}
-        aria-label="Afficher ou replier la liste des salons"><${Icon} name="sidebar" /></button>`}
-      <button class="icon-btn" onClick=${() => back(paths.room(rid))} aria-label="Retour au salon"><${Icon} name="back" /></button>
+        aria-label=${t('rooms.toggleList')}><${Icon} name="sidebar" /></button>`}
+      <button class="icon-btn" onClick=${() => back(paths.room(rid))} aria-label=${t('room.backToGroup')}><${Icon} name="back" /></button>
       <div class="titles">
-        <h1 class="ellipsis">Draw It</h1>
+        <h1 class="ellipsis">${gameName(v?.type || g?.view?.type || 'drawit')}</h1>
         <p class="subtitle ellipsis">${title}</p>
       </div>
-      ${playing && v.me.isPlayer && html`<button class="btn btn-ghost btn-small" onClick=${quit}><${Icon} name="door" /> Quitter</button>`}
+      ${playing && v.me.isPlayer && html`<button class="btn btn-ghost btn-small" onClick=${quit}><${Icon} name="door" /> ${t('game.quit')}</button>`}
     </header>
     ${!g || g.gid !== gid || g.loading
-      ? html`<div class="fill-center"><${Shiba} body wag size=${100} label="Chargement de la partie" /></div>`
+      ? html`<div class="fill-center"><${Shiba} body wag size=${100} label=${t('game.loading')} /></div>`
       : g.error
         ? html`<div class="fill-center"><${ErrorState} error=${g.error} onRetry=${() => {
             closeGame()
@@ -65,12 +67,12 @@ function GameBody({ rid, v }) {
   if (v.status === 'lobby') return html`<${Lobby} rid=${rid} />`
   if (v.status === 'finished') return html`<${Results} rid=${rid} />`
   if (v.status === 'cancelled') {
-    return html`<div class="fill-center"><${EmptyState} mood="triste" title="Partie annulée"
-      text=${v.endReason === 'timeout' ? 'Le lobby est resté 10 minutes sans lancement.' : 'Tout le monde a quitté le lobby.'}>
-      <button class="btn btn-primary" onClick=${() => navigate(paths.hub(rid))}>Relancer une partie</button>
-      <button class="btn btn-secondary" onClick=${() => navigate(paths.room(rid))}>Retour au salon</button>
+    return html`<div class="fill-center"><${EmptyState} mood="triste" title=${t('game.cancelled')}
+      text=${v.endReason === 'timeout' ? t('game.cancelledTimeout') : t('game.cancelledEmpty')}>
+      <button class="btn btn-primary" onClick=${() => navigate(paths.hub(rid))}>${t('game.relaunch')}</button>
+      <button class="btn btn-secondary" onClick=${() => navigate(paths.room(rid))}>${t('room.backToGroup')}</button>
     </${EmptyState}></div>`
   }
   const UI = GAME_UI[v.type]
-  return UI ? html`<${UI} />` : html`<p class="center">Jeu inconnu.</p>`
+  return UI ? html`<${UI} />` : html`<p class="center">${t('game.unknown')}</p>`
 }

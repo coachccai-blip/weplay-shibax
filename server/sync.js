@@ -6,6 +6,7 @@ import { isMember, newMessagesSince, reactionsForDay } from './messages.js'
 import { listMyRooms, roomInfo, roomMembers, presenceMap, touchPresence, markRead } from './rooms.js'
 import { weeklyPodium } from './rewards.js'
 import { syncGame, gameSummary, advanceGame } from './games/index.js'
+import { asyncChanges } from './async/index.js'
 import { parisWeek, previousWeek } from '../shared/time.js'
 
 function needsNudge(game, now) {
@@ -27,7 +28,7 @@ export async function syncRoom(db, auth, body, ctx) {
   const room = await db.get(K.room(rid))
   if (!room || !isMember(room, auth.uid)) return { removed: true }
   const rxDays = body.rx && typeof body.rx === 'object' ? Object.entries(body.rx).slice(0, 3) : []
-  const [news, pres, rx, gameState] = await Promise.all([
+  const [news, pres, rx, gameState, asyncPart] = await Promise.all([
     newMessagesSince(db, rid, str(body.after, 64), body.recent, now),
     db.get(K.presence(rid)),
     Promise.all(
@@ -38,6 +39,7 @@ export async function syncRoom(db, auth, body, ctx) {
       }),
     ),
     room.game ? db.get(K.game(room.game.id)) : null,
+    asyncChanges(db, auth, rid, body.av && typeof body.av === 'object' ? body.av : {}).catch(() => null),
   ])
   let game = gameState
   if (needsNudge(game, now)) game = (await advanceGame(db, game.id, { full: true }).catch(() => ({ state: game }))).state
@@ -55,6 +57,7 @@ export async function syncRoom(db, auth, body, ctx) {
     presence: { ...presenceMap(pres, room), [auth.uid]: now },
     reactions: rx.filter(Boolean),
     game: game ? gameSummary(game) : null,
+    async: asyncPart,
   }
   if (int(body.mv, -1) !== room.mv) out.members = await roomMembers(db, room)
   return out
@@ -84,6 +87,8 @@ export async function sync(db, auth, body, ctx) {
   if (body.room?.rid) part('room', () => syncRoom(db, auth, body.room, ctx))
   if (body.game?.gid) part('game', () => syncGame(db, auth, body.game, ctx))
   await Promise.all(jobs)
+  // Révision du profil : un autre appareil du compte a changé pseudo, photo ou réglages → il se met à jour.
+  out.meRev = auth.acct.rev || 0
   out.now = Date.now()
   return out
 }

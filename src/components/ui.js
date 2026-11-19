@@ -5,6 +5,8 @@ import { Icon } from './icons.js'
 import { Shiba } from './Shiba.js'
 import { toasts, toast, closeModal, modal } from '../state/core.js'
 import { online } from '../lib/transport.js'
+import { t, errorText } from '../i18n/index.js'
+import { route } from '../lib/router.js'
 
 /** Fenêtre (feuille sur mobile, boîte centrée sur PC) avec focus piégé et Échap. */
 export function Sheet({ title, onClose, children, drawer = false, labelledBy }) {
@@ -45,7 +47,7 @@ export function Sheet({ title, onClose, children, drawer = false, labelledBy }) 
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby=${id} ref=${ref} tabindex="-1">
       <div class="sheet-header">
         <h2 id=${id}>${title}</h2>
-        ${onClose && html`<button class="icon-btn" onClick=${onClose} aria-label="Fermer"><${Icon} name="close" /></button>`}
+        ${onClose && html`<button class="icon-btn" onClick=${onClose} aria-label=${t('common.close')}><${Icon} name="close" /></button>`}
       </div>
       <div class="sheet-body">${children}</div>
     </div>
@@ -53,7 +55,7 @@ export function Sheet({ title, onClose, children, drawer = false, labelledBy }) 
 }
 
 /** Confirmation (une seule action principale). */
-export function ConfirmSheet({ title, text, confirm = 'Confirmer', danger = false, onConfirm }) {
+export function ConfirmSheet({ title, text, confirm, danger = false, onConfirm }) {
   const [busy, setBusy] = useState(false)
   const run = async () => {
     setBusy(true)
@@ -67,8 +69,8 @@ export function ConfirmSheet({ title, text, confirm = 'Confirmer', danger = fals
   return html`<${Sheet} title=${title} onClose=${closeModal}>
     <p>${text}</p>
     <div class="sheet-actions">
-      <button class="btn btn-ghost" onClick=${closeModal}>Annuler</button>
-      <button class=${`btn ${danger ? 'btn-danger' : 'btn-primary'}`} onClick=${run} disabled=${busy}>${confirm}</button>
+      <button class="btn btn-ghost" onClick=${closeModal}>${t('common.cancel')}</button>
+      <button class=${`btn ${danger ? 'btn-danger' : 'btn-primary'}`} onClick=${run} disabled=${busy}>${confirm || t('common.confirm')}</button>
     </div>
   </${Sheet}>`
 }
@@ -81,7 +83,7 @@ export function Toasts() {
 
 export function NetBanner() {
   if (online.value) return null
-  return html`<div class="net-banner" role="alert"><${Icon} name="alert" size=${18} /> Connexion perdue… on réessaie.</div>`
+  return html`<div class="net-banner" role="alert"><${Icon} name="alert" size=${18} /> ${t('net.lost')}</div>`
 }
 
 export function EmptyState({ mood = 'content', coat = 'creme', title, text, children, body = true }) {
@@ -93,13 +95,14 @@ export function EmptyState({ mood = 'content', coat = 'creme', title, text, chil
   </div>`
 }
 
-export function ErrorState({ error, onRetry, title = 'Oups !' }) {
-  return html`<${EmptyState} mood="triste" coat="sesame" title=${title} text=${error?.message || 'Une erreur est survenue.'}>
-    ${onRetry && html`<button class="btn btn-primary" onClick=${onRetry}><${Icon} name="refresh" /> Réessayer</button>`}
+export function ErrorState({ error, onRetry, title }) {
+  return html`<${EmptyState} mood="triste" coat="sesame" title=${title || t('common.oops')} text=${error?.text || errorText(error)}>
+    ${onRetry && html`<button class="btn btn-primary" onClick=${onRetry}><${Icon} name="refresh" /> ${t('common.retry')}</button>`}
   </${EmptyState}>`
 }
 
-export async function copyText(text, done = 'Copié !') {
+export async function copyText(text, done) {
+  done ||= t('common.copied')
   try {
     await navigator.clipboard.writeText(text)
     toast(done, 'success', 2000)
@@ -112,7 +115,7 @@ export async function copyText(text, done = 'Copié !') {
       document.execCommand('copy')
       toast(done, 'success', 2000)
     } catch {
-      toast('Copie impossible : sélectionne le texte à la main.', 'error')
+      toast(t('common.copyFailed'), 'error')
     }
     ta.remove()
   }
@@ -134,7 +137,7 @@ export function Switch({ checked, onChange, label, disabled = false }) {
 
 export function XpBar({ progress, label }) {
   const pct = Math.round(Math.max(0, Math.min(1, progress || 0)) * 100)
-  return html`<div class="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=${pct} aria-label=${label || 'Progression vers le niveau suivant'}>
+  return html`<div class="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=${pct} aria-label=${label || t('profile.xpProgress')}>
     <span style=${{ width: `${pct}%` }}></span>
   </div>`
 }
@@ -142,6 +145,11 @@ export function XpBar({ progress, label }) {
 /** Fenêtres globales ouvertes par `openModal(type, props)`. */
 export function ModalHost({ registry }) {
   const m = modal.value
+  const r = route.value
+  useEffect(() => {
+    const norm = (h) => (h || '').replace(/^#/, '').replace(/\/$/, '') || '/'
+    if (m && m.at !== undefined && norm(location.hash) !== norm(m.at)) closeModal()
+  }, [r])
   if (!m) return null
   const Comp = registry[m.type]
   return Comp ? html`<${Comp} ...${m.props} />` : null

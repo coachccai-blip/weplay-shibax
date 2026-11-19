@@ -15,7 +15,9 @@ import { RoomScreen, ReactionPicker, RoomInfoSheet, MembersSheet, LeaderboardShe
 import { RoomSide } from './screens/RoomSide.js'
 import { Hub } from './screens/Hub.js'
 import { GameScreen } from './screens/Game.js'
-import { Profile, QrSheet, KeyReminderSheet } from './screens/Profile.js'
+import { Profile, QrSheet, KeyReminderSheet, PhotoSheet } from './screens/Profile.js'
+import { AsyncSetupSheet } from './games/async/Setup.js'
+import { t } from './i18n/index.js'
 import { JoinScreen, LinkScreen, Privacy, Celebration } from './screens/Misc.js'
 import { Lightbox } from './screens/Lightbox.js'
 import { invitePending } from './state/invite.js'
@@ -32,6 +34,8 @@ const MODALS = {
   confirm: ConfirmSheet,
   qr: QrSheet,
   keyReminder: KeyReminderSheet,
+  photo: PhotoSheet,
+  asyncSetup: AsyncSetupSheet,
 }
 
 function Overlays() {
@@ -48,10 +52,10 @@ function Overlays() {
 function TabBar() {
   const r = route.value.name
   const unread = rooms.value.reduce((s, x) => s + (x.unread || 0), 0)
-  return html`<nav class="tabbar" aria-label="Navigation principale">
-    <a href="#/" aria-current=${r === 'home' ? 'page' : undefined}><${Icon} name="chat" /> Salons
-      ${unread > 0 && html`<span class="badge-count" aria-label=${`${unread} non lus`}>${unread > 99 ? '99+' : unread}</span>`}</a>
-    <a href="#/profil" aria-current=${r === 'profile' ? 'page' : undefined}><${Icon} name="user" /> Profil</a>
+  return html`<nav class="tabbar" aria-label=${t('nav.main')}>
+    <a href="#/" aria-current=${r === 'home' ? 'page' : undefined}><${Icon} name="chat" /> ${t('nav.groups')}
+      ${unread > 0 && html`<span class="badge-count" aria-label=${t('nav.unread', { n: unread })}>${unread > 99 ? '99+' : unread}</span>`}</a>
+    <a href="#/profil" aria-current=${r === 'profile' ? 'page' : undefined}><${Icon} name="user" /> ${t('nav.profile')}</a>
   </nav>`
 }
 
@@ -60,7 +64,7 @@ function Shell() {
   const lay = layout.value
   const rid = r.params?.rid
 
-  // Un seul salon ouvert à la fois : on referme l'ancien quand on en change.
+  // Un seul groupe ouvert à la fois : on referme l'ancien quand on en change.
   useEffect(() => {
     if (room.value && room.value.rid !== rid) closeRoom()
   }, [rid])
@@ -68,9 +72,9 @@ function Shell() {
   useEffect(() => {
     loadRooms()
     startSync()
-    const t = setInterval(() => !document.hidden && refreshMe(), 60000)
+    const timer = setInterval(() => !document.hidden && refreshMe(), 60000)
     return () => {
-      clearInterval(t)
+      clearInterval(timer)
       stopSync()
     }
   }, [])
@@ -102,9 +106,9 @@ function Shell() {
   const sideOn = lay === 'desktop' && (r.name === 'room' || r.name === 'hub') && room.value?.info
   const tabs = lay === 'mobile' && (r.name === 'home' || r.name === 'profile' || r.name === 'privacy')
   return html`<div class="shell" data-list=${lay === 'tablet' && listCollapsed.value ? 'collapsed' : 'open'} data-side=${sideOn ? 'on' : 'off'}>
-    ${showList && html`<aside class="pane pane-list" aria-label="Mes salons"><${RoomsList} /></aside>`}
+    ${showList && html`<aside class="pane pane-list" aria-label=${t('rooms.title')}><${RoomsList} /></aside>`}
     <main class="pane pane-main" id="main">${content}</main>
-    ${sideOn && html`<aside class="pane pane-side" aria-label="Membres et classement"><${RoomSide} /></aside>`}
+    ${sideOn && html`<aside class="pane pane-side" aria-label=${t('room.sideAria')}><${RoomSide} /></aside>`}
     ${tabs && html`<${TabBar} />`}
   </div>`
 }
@@ -125,13 +129,13 @@ export function App() {
 
   if (r.name === 'link') return html`<${LinkScreen} token=${r.params.token} /><${Overlays} />`
   if (b.status === 'loading') {
-    return html`<div class="boot"><${Shiba} body wag size=${120} label="Chargement" /><p class="boot-title">Weplay Shibax</p><p class="boot-text">Le shiba remue la queue…</p></div>`
+    return html`<div class="boot"><${Shiba} body wag size=${120} label=${t('common.loading')} /><p class="boot-title">Weplay Shibax</p><p class="boot-text">${t('boot.wag')}</p></div>`
   }
   if (b.status === 'error') {
-    return html`<div class="fill-center" style=${{ height: '100%' }}><${ErrorState} title="Serveur injoignable" error=${{ message: b.message }} onRetry=${initApp} /></div>`
+    return html`<div class="fill-center" style=${{ height: '100%' }}><${ErrorState} title=${t('boot.unreachable')} error=${{ message: b.messageKey ? t(b.messageKey) : b.message }} onRetry=${initApp} /></div>`
   }
   if (b.status === 'revoked') {
-    return html`${r.name === 'login' ? html`<${Login} />` : html`<${Revoked} message=${b.message} />`}<${Overlays} />`
+    return html`${r.name === 'login' ? html`<${Login} />` : html`<${Revoked} message=${b.messageKey ? t(b.messageKey) : b.message} />`}<${Overlays} />`
   }
   const user = me.value
   if (!user) return null

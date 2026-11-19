@@ -11,6 +11,7 @@ import './styles/layout.css'
 import './styles/chat.css'
 import './styles/game.css'
 import './styles/profile.css'
+import './styles/play.css'
 
 // Le lien du QR code connecte l'appareil à un compte existant : pas de compte neuf dans ce cas.
 if (route.value.name !== 'link') initApp()

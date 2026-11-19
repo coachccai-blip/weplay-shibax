@@ -50,10 +50,10 @@ try {
   await pc.getByRole('button', { name: /C’est parti/ }).waitFor()
   await shot(pc, 'e2e-01-welcome-pc')
   await pc.getByRole('button', { name: /C’est parti/ }).click()
-  await pc.getByRole('button', { name: 'Créer un salon' }).first().click()
-  await pc.getByLabel('Nom du salon').fill('La meute E2E')
-  await pc.getByRole('button', { name: 'Créer le salon' }).click()
-  const sheet = pc.getByRole('dialog', { name: 'Salon créé ! Invite ta meute' })
+  await pc.getByRole('button', { name: 'Créer un groupe' }).first().click()
+  await pc.getByLabel('Nom du groupe').fill('La meute E2E')
+  await pc.getByRole('button', { name: 'Créer le groupe' }).click()
+  const sheet = pc.getByRole('dialog', { name: 'Groupe créé ! Invite tes amis' })
   await sheet.waitFor({ timeout: 10000 })
   const code = (await sheet.locator('.invite-code').textContent()).trim()
   log('salon créé, code', code)
@@ -63,7 +63,7 @@ try {
   // 2. Les amis ouvrent le lien d'invitation : bienvenue, « C'est parti », arrivée directe dans le salon.
   for (const p of [phone, tablet]) {
     await p.goto(`${BASE}/#/rejoindre/${code}`)
-    await p.getByText('Tu es invité dans le salon « La meute E2E »').waitFor({ timeout: 15000 })
+    await p.getByText('Tu es invité dans le groupe « La meute E2E »').waitFor({ timeout: 15000 })
     if (p === phone) await shot(p, 'e2e-02-welcome-invite-phone')
     await p.getByRole('button', { name: /C’est parti/ }).click()
     await p.locator('.room-screen h1', { hasText: 'La meute E2E' }).waitFor({ timeout: 15000 })
@@ -86,13 +86,13 @@ try {
   await pc.getByRole('button', { name: 'Jouer' }).click()
   await pc.getByRole('button', { name: 'Lancer Draw It' }).click()
   await pc.getByText('Draw It · Lobby').waitFor()
-  const oneTour = pc.getByRole('group', { name: 'Nombre de tours' }).getByRole('button', { name: '1', exact: true })
+  const oneTour = pc.getByRole('group', { name: 'Tours', exact: true }).getByRole('button', { name: '1', exact: true })
   const fast = pc.getByRole('group', { name: 'Temps de dessin' }).getByRole('button', { name: '45 s' })
   await oneTour.click()
   await fast.click()
   await pc.waitForFunction(() => {
     const q = (label, name) => [...document.querySelectorAll(`[aria-label="${label}"] button`)].find((b) => b.textContent.trim() === name)
-    return q('Nombre de tours', '1')?.getAttribute('aria-pressed') === 'true' && q('Temps de dessin', '45 s')?.getAttribute('aria-pressed') === 'true'
+    return q('Tours', '1')?.getAttribute('aria-pressed') === 'true' && q('Temps de dessin', '45 s')?.getAttribute('aria-pressed') === 'true'
   }, null, { timeout: 8000 })
   for (const p of [phone, tablet]) {
     const join = p.locator('.game-card').getByRole('button', { name: 'Rejoindre' })
@@ -197,7 +197,7 @@ try {
   await Promise.all(all.map(dismissAll))
   await shot(phone, 'e2e-08-results-phone')
   await shot(pc, 'e2e-09-results-pc')
-  await pc.locator('.results-actions').getByRole('button', { name: 'Retour au salon' }).click()
+  await pc.locator('.results-actions').getByRole('button', { name: 'Retour au groupe' }).click()
   await pc.locator('.game-card.results').waitFor({ timeout: 10000 })
   await sleep(1500)
   await shot(pc, 'e2e-10-room-results-card')

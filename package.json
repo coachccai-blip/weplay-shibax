@@ -15,7 +15,8 @@
     "test:api": "node tests/api/run.mjs",
     "test:e2e": "node tests/e2e/drawit.e2e.mjs",
     "check:words": "node scripts/check-words.mjs",
-    "zip": "bash scripts/make-zip.sh"
+    "zip": "bash scripts/make-zip.sh",
+    "test:e2e:v2": "node tests/e2e/v2.e2e.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "11.1.9",

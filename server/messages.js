@@ -5,7 +5,6 @@ import { fail, ensure, str } from './http.js'
 import { randomString, LOWER_ALPHABET } from '../shared/ids.js'
 import { cleanMessage, graphemeLength } from '../shared/text.js'
 import { LIMITS, REACTION_IDS } from '../shared/constants.js'
-import { previewOf } from '../shared/messages.js'
 import { utcBucket } from '../shared/time.js'
 
 const HOUR = 3600000
@@ -21,14 +20,14 @@ function snapshot(user) {
 }
 
 /** Crée un message (clé neuve) puis met à jour l'aperçu du salon. */
-export async function postMessage(db, rid, { author, type, text, cid, sys, kind, gid, gtype, podium, drawings, user, ts, id }) {
+export async function postMessage(db, rid, { author, type, text, cid, sys, kind, gid, agid, gtype, podium, drawings, user, ts, id }) {
   const at = ts || Date.now()
   const msgId = id || makeMsgId(at, author, randomString(5, LOWER_ALPHABET))
   const msg = { id: msgId, ts: at, author, type }
   if (type === 'text') msg.text = text
   if (cid) msg.cid = cid
   if (type === 'sys') msg.sys = sys
-  if (type === 'game') Object.assign(msg, { kind, gid, gtype, ...(podium ? { podium } : {}), ...(drawings ? { drawings } : {}) })
+  if (type === 'game') Object.assign(msg, { kind, gtype, ...(gid ? { gid } : {}), ...(agid ? { agid } : {}), ...(podium ? { podium } : {}), ...(drawings ? { drawings } : {}) })
   if (user) msg.a = snapshot(user)
   const created = await db.create(K.msg(rid, msgId), msg)
   if (created) await updateLast(db, rid, msg)
@@ -42,7 +41,12 @@ export async function updateLast(db, rid, msg) {
       K.roomLast(rid),
       (cur) => {
         if (cur.id && cur.id >= msg.id) return SKIP
-        return { id: msg.id, ts: msg.ts, author: msg.author, pseudo: msg.a?.p || null, type: msg.type, preview: previewOf(msg) }
+        // Aperçu structuré : le texte affiché est composé par l'appli, dans la langue de chacun.
+        const last = { id: msg.id, ts: msg.ts, author: msg.author, pseudo: msg.a?.p || null, type: msg.type }
+        if (msg.type === 'text') last.text = String(msg.text || '').replace(/\s+/g, ' ').slice(0, 90)
+        if (msg.type === 'sys') last.sys = msg.sys
+        if (msg.type === 'game') Object.assign(last, { kind: msg.kind, gtype: msg.gtype, winner: msg.podium?.[0]?.pseudo || msg.winner || null })
+        return last
       },
       { create: () => ({}), attempts: 6 },
     )

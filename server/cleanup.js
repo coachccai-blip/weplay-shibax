@@ -68,7 +68,20 @@ export async function runCleanup(db, { budgetMs = 22000, now = Date.now() } = {}
     }, { create: () => ({ tempDoneUpTo: '00000000' }) })
   }
 
-  // 3. QR codes de connexion expirés.
+  // 3. Jeux de conversation de plus de 30 jours (état, dessin).
+  const asyncIds = (await db.keys('ag/')).map(lastSegment)
+  for (const id of asyncIds) {
+    if (Date.now() > deadline) {
+      report.partial = true
+      break
+    }
+    if (id.slice(0, 8) < drawLimit) {
+      await Promise.all([db.del(K.asyncGame(id)), db.del(K.asyncImage(id))]).catch(() => {})
+      report.games++
+    }
+  }
+
+  // 4. QR codes de connexion expirés.
   const links = await db.keys('link/')
   await pMap(links, async (key) => {
     if (Date.now() > deadline) return

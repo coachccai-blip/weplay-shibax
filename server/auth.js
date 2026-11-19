@@ -48,6 +48,25 @@ async function verifySession(db, token) {
   }
 }
 
+// ---------- Photos de profil : adresses signées, valables une à deux semaines ----------
+
+const WEEK = 7 * 86400000
+
+/** Adresse de la photo d'un membre (donnée seulement aux membres de ses groupes). */
+export async function photoUrl(db, uid, v, now = Date.now()) {
+  if (!v) return null
+  const exp = Math.floor(now / WEEK) * WEEK + 2 * WEEK
+  const sig = createHmac('sha256', await getSecret(db)).update(`ph:${uid}:${v}:${exp}`).digest('base64url').slice(0, 22)
+  return `/api/photos/${uid}/${v}?e=${exp}&s=${sig}`
+}
+
+export async function checkPhotoSignature(db, uid, v, exp, sig) {
+  const e = Number(exp)
+  if (!Number.isFinite(e) || e < Date.now() || typeof sig !== 'string' || sig.length !== 22) return false
+  const expected = createHmac('sha256', await getSecret(db)).update(`ph:${uid}:${v}:${e}`).digest('base64url').slice(0, 22)
+  return timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
+}
+
 export async function hashKey(key) {
   const salt = randomBytes(16)
   const hash = await scrypt(key, salt, 32, SCRYPT)

@@ -96,17 +96,17 @@ export function cleanMessage(input) {
 /**
  * Valide un mot perso : 2 à 25 caractères, trois mots au plus,
  * uniquement lettres, espaces, traits d'union et apostrophes.
- * Retourne { ok, value, error }.
+ * Retourne { ok, value, error, code } (code : length | chars | words | short, traduit par l'interface).
  */
 export function validateCustomWord(input) {
   const value = cleanLine(input).replace(/’/g, "'")
   const len = Array.from(value).length
-  if (len < 2 || len > 25) return { ok: false, value, error: 'Ton mot doit faire entre 2 et 25 caractères.' }
+  if (len < 2 || len > 25) return { ok: false, value, code: 'length', error: 'Ton mot doit faire entre 2 et 25 caractères.' }
   if (!/^[\p{L}][\p{L} '\-]*$/u.test(value) || !/\p{L}$/u.test(value)) {
-    return { ok: false, value, error: 'Seulement des lettres, espaces, traits d’union et apostrophes.' }
+    return { ok: false, value, code: 'chars', error: 'Seulement des lettres, espaces, traits d’union et apostrophes.' }
   }
-  if (value.split(' ').filter(Boolean).length > 3) return { ok: false, value, error: 'Trois mots au plus.' }
-  if (compactWord(value).length < 2) return { ok: false, value, error: 'Ton mot est trop court.' }
+  if (value.split(' ').filter(Boolean).length > 3) return { ok: false, value, code: 'words', error: 'Trois mots au plus.' }
+  if (compactWord(value).length < 2) return { ok: false, value, code: 'short', error: 'Ton mot est trop court.' }
   return { ok: true, value }
 }
 
