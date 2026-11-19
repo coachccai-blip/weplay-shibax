@@ -8,7 +8,7 @@ import { loadMemberRoom } from '../rooms.js'
 import { postMessage } from '../messages.js'
 import { loadProfiles } from '../users.js'
 import { applyAsyncRewards, addAsyncToLeaderboards } from '../rewards.js'
-import { ASYNC_GAMES, suggestWords } from './games.js'
+import { ASYNC_GAMES, suggestWords, nextSeries } from './games.js'
 import { newGameId, GAME_ID_RE } from '../../shared/ids.js'
 
 const MAX_OPEN_PER_ROOM = 20
@@ -50,6 +50,8 @@ async function bumpIndex(db, rid, state) {
       (idx) => {
         idx.games ||= {}
         idx.games[state.id] = { type: state.type, status: state.status, v: state.v, at: state.updatedAt }
+        // Derniers dilemmes posés dans le groupe : on évite de les reproposer.
+        if (state.type === 'tupreferes' && state.data?.item && !(idx.dilemmas || []).includes(state.data.item)) idx.dilemmas = [state.data.item, ...(idx.dilemmas || [])].slice(0, 60)
         const now = Date.now()
         const keep = Object.entries(idx.games)
           .filter(([, g]) => g.status === 'open' || now - g.at < 3 * 86400000)
@@ -114,17 +116,50 @@ async function finishAsync(db, state) {
   })
 }
 
+/** Revanche d'un duel terminé : mêmes joueurs, l'autre commence, la série continue. */
+async function prepareRematch(db, auth, rid, type, room, fromId) {
+  ensure(GAME_ID_RE.test(fromId), 404, 'game_not_found', 'Partie introuvable.')
+  const prev = await db.get(K.asyncGame(fromId))
+  ensure(prev && prev.rid === rid && prev.type === type, 404, 'game_not_found', 'Partie introuvable.')
+  ensure(prev.status !== 'open', 409, 'game_active', 'Termine d’abord cette partie !')
+  ensure(prev.order.length === 2 && prev.order.includes(auth.uid), 403, 'not_player', 'Tu ne jouais pas dans ce duel.')
+  ensure(prev.order.every((u) => room.members.some((m) => m.id === u)), 409, 'opponent', 'Ton adversaire n’est plus dans le groupe.')
+  const existing = prev.data.rematch ? await db.get(K.asyncGame(prev.data.rematch)) : null
+  return { prev, existing, rematch: { players: [prev.order[1], prev.order[0]], series: nextSeries(prev), target: prev.data.target } }
+}
+
 export async function createAsync(db, auth, rid, body) {
   const type = str(body.type, 20)
   const mod = modFor(type)
   const room = await loadMemberRoom(db, auth, rid)
+  const options = body.options && typeof body.options === 'object' ? body.options : {}
+  const fromId = mod.duel && options.from ? str(options.from, 40) : null
+  const ctx = { uid: auth.uid, room, lang: auth.acct.settings?.lang === 'en' ? 'en' : 'fr', now: Date.now() }
+  let prevId = null
+  if (fromId) {
+    const r = await prepareRematch(db, auth, rid, type, room, fromId)
+    if (r.existing) return { game: asyncView(r.existing, auth.uid), existing: true }
+    ctx.rematch = r.rematch
+    prevId = fromId
+  }
   const idx = await db.get(K.asyncIndex(rid))
   const openCount = Object.values(idx?.games || {}).filter((g) => g.status === 'open').length
   ensure(openCount < MAX_OPEN_PER_ROOM, 409, 'too_many_async', 'Trop de jeux en cours dans ce groupe : terminez-en quelques-uns !')
-  const now = Date.now()
-  const lang = auth.acct.settings?.lang === 'en' ? 'en' : 'fr'
-  const init = mod.create({ uid: auth.uid, room, lang, now }, body.options || {})
+  ctx.recentDilemmas = idx?.dilemmas || []
+  const now = ctx.now
+  const lang = ctx.lang
+  const init = mod.create(ctx, options)
   const id = newGameId(now)
+  if (prevId) {
+    // Une seule revanche par partie : deux demandes simultanées obtiennent la même.
+    const locked = await db.create(K.asyncRematch(prevId), { id })
+    if (!locked) {
+      const lock = await db.get(K.asyncRematch(prevId))
+      const other = lock?.id ? await db.get(K.asyncGame(lock.id)) : null
+      if (other) return { game: asyncView(other, auth.uid), existing: true }
+      fail(409, 'busy', 'La revanche est en cours de création : réessaie dans un instant.')
+    }
+  }
   if (mod.needsImage) {
     const m = /^data:(image\/(?:jpeg|webp|png));base64,([A-Za-z0-9+/=]+)$/.exec(str(body.image, 900000))
     ensure(m, 400, 'image', 'Ajoute ton dessin.')
@@ -153,6 +188,18 @@ export async function createAsync(db, auth, rid, body) {
   const user = await db.get(K.user(auth.uid))
   await postMessage(db, rid, { author: auth.uid, type: 'game', kind: 'async', agid: id, gtype: type, user })
   await bumpIndex(db, rid, state)
+  if (prevId) {
+    // L'ancienne carte affiche « Revanche lancée ».
+    const res = await db
+      .mutate(K.asyncGame(prevId), (s) => {
+        if (s.data.rematch) return SKIP
+        s.data.rematch = id
+        s.v = (s.v || 0) + 1
+        s.updatedAt = Date.now()
+      })
+      .catch(() => null)
+    if (res?.changed) await bumpIndex(db, rid, res.value)
+  }
   return { game: asyncView(state, auth.uid) }
 }
 

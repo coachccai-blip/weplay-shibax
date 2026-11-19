@@ -555,4 +555,97 @@ await test('Quiz en direct : question sans la réponse, fin de manche dès que t
   for (const u of [ctx.p, ctx.q]) await ok(u.token, 'POST', `games/${gid}/leave`)
 })
 
+// ---------- v3 : revanches, contestations du Petit Bac, autres mots de Draw It ----------
+
+async function v3Group(name) {
+  const g = await ok(ctx.p.token, 'POST', 'rooms', { name })
+  for (const u of [ctx.q, ctx.r]) await ok(u.token, 'POST', `invites/${g.room.invite}/join`)
+  return g.room.id
+}
+
+await test('Revanche d’un duel : l’autre commence, série cumulée, une seule revanche par partie', async () => {
+  const rid = await v3Group('Revanches')
+  const first = await ok(ctx.p.token, 'POST', `rooms/${rid}/async`, { type: 'morpion', options: { opponent: ctx.q.me.id } })
+  const id = first.game.id
+  const early = await call(ctx.q.token, 'POST', `rooms/${rid}/async`, { type: 'morpion', options: { from: id } })
+  assert.equal(early.data.error.code, 'game_active', 'pas de revanche avant la fin')
+  for (const [u, cell] of [[ctx.p, 0], [ctx.q, 3], [ctx.p, 1], [ctx.q, 4], [ctx.p, 2]]) await ok(u.token, 'POST', `async/${id}/act`, { type: 'move', cell })
+  const outsider = await call(ctx.r.token, 'POST', `rooms/${rid}/async`, { type: 'morpion', options: { from: id } })
+  assert.equal(outsider.data.error.code, 'not_player')
+  const [a, b] = await Promise.all([
+    ok(ctx.q.token, 'POST', `rooms/${rid}/async`, { type: 'morpion', options: { from: id } }),
+    ok(ctx.p.token, 'POST', `rooms/${rid}/async`, { type: 'morpion', options: { from: id } }),
+  ])
+  assert.equal(a.game.id, b.game.id, 'deux demandes simultanées → la même revanche')
+  const re = a.game
+  assert.deepEqual(re.players, [ctx.q.me.id, ctx.p.me.id], 'le perdant… enfin l’autre joueur commence')
+  assert.deepEqual(re.data.series, { wins: { [ctx.p.me.id]: 1 }, draws: 0, games: 1 })
+  const forQ = await ok(ctx.q.token, 'GET', `async/${re.id}`)
+  assert.equal(forQ.game.data.myTurn, true)
+  const old = await ok(ctx.r.token, 'GET', `async/${id}`)
+  assert.equal(old.game.data.rematch, re.id, 'l’ancienne carte pointe vers la revanche')
+})
+
+await test('Petit Bac : contestation à la majorité pendant la vérification, scores recalculés', async () => {
+  const rid = await v3Group('Petit Bac')
+  const players = [ctx.p, ctx.q, ctx.r]
+  const g = await ok(ctx.p.token, 'POST', `rooms/${rid}/games`, { type: 'petitbac' })
+  const gid = g.game.id
+  for (const u of [ctx.q, ctx.r]) await ok(u.token, 'POST', `games/${gid}/join`)
+  for (const u of players) await ok(u.token, 'POST', 'sync', { game: { gid, beat: true } })
+  await ok(ctx.p.token, 'POST', `games/${gid}/start`)
+  const v = (await ok(ctx.p.token, 'GET', `games/${gid}`)).game
+  const { letter, categories } = v.g.prompt
+  const words = (tag) => Object.fromEntries(categories.map((c, i) => [c.id, `${letter}${'abcde'[i]}${tag}w`]))
+  await ok(ctx.p.token, 'POST', `games/${gid}/act`, { type: 'answer', round: 0, value: words('p') })
+  const mid = await ok(ctx.q.token, 'POST', 'sync', { game: { gid, beat: true, full: true } })
+  assert.deepEqual(mid.game.answeredIds, [ctx.p.me.id], 'on voit qui a déjà répondu')
+  for (const [u, tag] of [[ctx.q, 'q'], [ctx.r, 'r']]) await ok(u.token, 'POST', `games/${gid}/act`, { type: 'answer', round: 0, value: words(tag) }).catch(() => null)
+  let view = null
+  for (let i = 0; i < 20; i++) {
+    view = (await ok(ctx.p.token, 'POST', 'sync', { game: { gid, beat: true, full: true } })).game.game
+    if (view.g.phase === 'reveal') break
+    await sleep(400)
+  }
+  assert.equal(view.g.phase, 'reveal')
+  assert.equal(view.players.find((x) => x.id === ctx.p.me.id).score, 50)
+  const target = `${ctx.p.me.id}:${categories[0].id}`
+  const self = await ok(ctx.p.token, 'POST', `games/${gid}/act`, { type: 'vote', round: 0, targets: [target] })
+  assert.deepEqual(self.targets, [], 'on ne conteste pas ses propres réponses')
+  for (const u of [ctx.q, ctx.r]) await ok(u.token, 'POST', `games/${gid}/act`, { type: 'vote', round: 0, targets: [target] })
+  const tally = await ok(ctx.p.token, 'POST', 'sync', { game: { gid, beat: true } })
+  assert.equal(tally.game.votes.tally[target], 2)
+  assert.equal(tally.game.votes.need, 2)
+  for (let i = 0; i < 40; i++) {
+    view = (await ok(ctx.p.token, 'POST', 'sync', { game: { gid, beat: true, full: true } })).game.game
+    for (const u of [ctx.q, ctx.r]) await ok(u.token, 'POST', 'sync', { game: { gid, beat: true } })
+    if (view.g.phase === 'question' && view.g.round === 1) break
+    await sleep(600)
+  }
+  assert.equal(view.g.round, 1, 'manche suivante après la vérification')
+  assert.equal(view.players.find((x) => x.id === ctx.p.me.id).score, 40, 'la réponse contestée ne compte plus')
+  assert.equal(view.players.find((x) => x.id === ctx.q.me.id).score, 50)
+  for (const u of players) await ok(u.token, 'POST', `games/${gid}/leave`).catch(() => null)
+})
+
+await test('Draw It : « Autres mots » une fois par tour', async () => {
+  const rid = await v3Group('Draw It v3')
+  const g = await ok(ctx.p.token, 'POST', `rooms/${rid}/games`, { type: 'drawit' })
+  const gid = g.game.id
+  await ok(ctx.q.token, 'POST', `games/${gid}/join`)
+  for (const u of [ctx.p, ctx.q]) await ok(u.token, 'POST', 'sync', { game: { gid, beat: true } })
+  await ok(ctx.p.token, 'POST', `games/${gid}/start`)
+  const base = (await ok(ctx.p.token, 'GET', `games/${gid}`)).game
+  const drawer = base.g.drawerId === ctx.p.me.id ? ctx.p : ctx.q
+  const before = (await ok(drawer.token, 'GET', `games/${gid}`)).game.g
+  assert.equal(before.canReroll, true)
+  await ok(drawer.token, 'POST', `games/${gid}/act`, { type: 'reroll', round: before.round })
+  const after = (await ok(drawer.token, 'GET', `games/${gid}`)).game.g
+  assert.equal(after.canReroll, false)
+  assert.notDeepEqual(after.choices.map((c) => c.word), before.choices.map((c) => c.word))
+  const again = await call(drawer.token, 'POST', `games/${gid}/act`, { type: 'reroll', round: before.round })
+  assert.equal(again.data.error.code, 'reroll_used')
+  for (const u of [ctx.p, ctx.q]) await ok(u.token, 'POST', `games/${gid}/leave`).catch(() => null)
+})
+
 console.log(`\n${passed}/${results.length} tests réussis`)

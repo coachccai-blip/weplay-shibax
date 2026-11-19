@@ -98,6 +98,9 @@ export const LIVE_ROUNDS = {
   calcul: { choices: [8, 10, 15], def: 10, content: false },
   anagramme: { choices: [5, 8, 10], def: 6, content: true },
 }
+/** Catégories du quiz (data/quiz.json), au choix de l'hôte dans le lobby. */
+export const QUIZ_CATS = ['animaux', 'geo', 'science', 'nature', 'cuisine', 'sport', 'culture', 'corps']
+
 export const SYNC_GAMES = GAME_CATALOG.filter((g) => g.mode === 'sync').map((g) => g.id)
 export const ASYNC_GAME_IDS = GAME_CATALOG.filter((g) => g.mode === 'async').map((g) => g.id)
 

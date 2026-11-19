@@ -62,6 +62,7 @@ function beginRound(state, now, uid) {
   g.phaseEnd = now + DRAWIT.chooseMs
   g.word = null
   g.hintSlots = []
+  g.rerolled = false
   g.choices = pickChoices(state)
 }
 
@@ -366,6 +367,7 @@ const drawit = {
     if (state.status !== 'playing') return v
     if (g.phase === 'choosing' && isDrawer && g.choices) {
       v.choices = g.choices.map((c) => ({ word: c.display, difficulty: c.difficulty, mult: MULTIPLIERS[c.difficulty] }))
+      v.canReroll = !g.rerolled
     }
     if (g.phase === 'drawing' && g.word) {
       v.difficulty = g.word.difficulty
@@ -427,6 +429,22 @@ const drawit = {
         const chosen = word || g.choices[index]
         ensure(chosen, 400, 'choice', 'Choisis un des trois mots.')
         startDrawing(state, now, chosen)
+        return true
+      })
+      return { ok: true, v: res.state.v }
+    }
+
+    // Trois autres mots, une fois par tour (avec quelques secondes de plus pour choisir).
+    if (type === 'reroll') {
+      const res = await transition((state) => {
+        const g = state.g
+        ensure(state.status === 'playing' && g?.phase === 'choosing', 409, 'not_choosing', 'Le choix du mot est terminé.')
+        ensure(g.drawerId === auth.uid, 403, 'not_drawer', 'Ce n’est pas à toi de dessiner.')
+        ensure(int(body.round, -1) === g.round, 409, 'round_over', 'Cette manche est terminée.')
+        ensure(!g.rerolled, 409, 'reroll_used', 'Tu as déjà demandé d’autres mots.')
+        g.rerolled = true
+        g.choices = pickChoices(state)
+        g.phaseEnd = Math.max(g.phaseEnd, now + 8000)
         return true
       })
       return { ok: true, v: res.state.v }

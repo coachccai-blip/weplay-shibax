@@ -138,11 +138,19 @@ export function applyGameSync(res, sent) {
     if (ng.phase === 'choosing' && ng.drawerId === myId) play('turn')
     if (ng.phase === 'reveal') play('reveal')
   }
+  // Jeux par manches : qui a répondu (ou trouvé) ; Petit Bac : contestations en cours.
+  const answeredIds = view.status === 'playing' && Array.isArray(res.answeredIds) ? res.answeredIds : []
+  if (ng?.phase === 'question' && pg?.round === ng.round) {
+    const before = new Set(g.answeredIds || [])
+    if (answeredIds.some((u) => u !== myId && !before.has(u))) play('other')
+  }
   game.value = {
     ...g,
     view,
     guesses,
     foundIds: view.status === 'playing' ? foundIds : [],
+    answeredIds,
+    votes: res.votes && res.votes.round === ng?.round ? res.votes : ng?.phase === 'reveal' && g.votes?.round === ng.round ? g.votes : null,
     presence: res.presence ? { ...g.presence, ...res.presence } : g.presence,
   }
 }

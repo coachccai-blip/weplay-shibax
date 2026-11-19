@@ -62,6 +62,8 @@ test('familles de clés construites dynamiquement', () => {
   for (const k of ['length', 'chars', 'words', 'short']) need.push(`word.${k}`)
   for (const k of ['pierre', 'feuille', 'ciseaux']) need.push(`ag.shifumi.${k}`)
   for (const k of ['fr', 'en']) need.push(`lang.content.${k}`)
+  for (const k of ['sync', 'async']) need.push(`hub.tab.${k}`)
+  for (const k of ['brulant', 'chaud', 'tiede', 'froid']) need.push(`ag.devine.heat.${k}`)
   const quiz = JSON.parse(fs.readFileSync(path.join(root, 'data/quiz.json'), 'utf8'))
   for (const cat of new Set(quiz.questions.map((q) => q.cat))) need.push(`quiz.cat.${cat}`)
   for (const k of ['created', 'join', 'leave', 'kick', 'host', 'rename', 'weekly']) need.push(`sys.${k}`)

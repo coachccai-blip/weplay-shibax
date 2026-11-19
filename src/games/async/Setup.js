@@ -3,10 +3,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks'
 import { html } from '../../lib/html.js'
 import { Icon } from '../../components/icons.js'
 import { Avatar } from '../../components/Shiba.js'
-import { Sheet, Segmented } from '../../components/ui.js'
+import { Sheet, Segmented, Switch } from '../../components/ui.js'
 import { me, closeModal, toast } from '../../state/core.js'
 import { room } from '../../state/rooms.js'
-import { createAsync, fetchSuggestions } from '../../state/async.js'
+import { createAsync, fetchSuggestions, focusAsync } from '../../state/async.js'
 import { t, lang, errorText } from '../../i18n/index.js'
 import { gameName } from '../../i18n/texts.js'
 import { navigate, paths } from '../../lib/router.js'
@@ -24,8 +24,9 @@ export function AsyncSetupSheet({ type, rid }) {
     setBusy(true)
     setError(null)
     try {
-      await createAsync(rid, type, options, image)
+      const g = await createAsync(rid, type, options, image)
       closeModal()
+      focusAsync(g.id)
       navigate(paths.room(rid))
       toast(t('ag.created'), 'success', 2200)
     } catch (err) {
@@ -36,7 +37,7 @@ export function AsyncSetupSheet({ type, rid }) {
   const Form = FORMS[type] || SimpleForm
   return html`<${Sheet} title=${`${emojiOf(type)} ${gameName(type)}`} onClose=${closeModal}>
     <p class="small">${t(`game.${type}.rules`)}</p>
-    <${Form} launch=${launch} busy=${busy} setError=${setError} />
+    <${Form} launch=${launch} busy=${busy} setError=${setError} type=${type} />
     ${error && html`<p class="field-error" role="alert">${error}</p>`}
   </${Sheet}>`
 }
@@ -54,10 +55,11 @@ function SimpleForm({ launch, busy }) {
 
 // ---------- Duels : un adversaire du groupe, ou un défi ouvert ----------
 
-function DuelForm({ launch, busy }) {
+function DuelForm({ launch, busy, type }) {
   const myId = me.value.id
   const members = (room.value?.members || []).filter((m) => m.id !== myId)
   const [who, setWho] = useState('')
+  const [target, setTarget] = useState(2)
   return html`<div class="col">
     <p class="label">${t('ag.setup.opponent')}</p>
     <div class="pick-list" role="radiogroup" aria-label=${t('ag.setup.opponent')}>
@@ -73,7 +75,11 @@ function DuelForm({ launch, busy }) {
       )}
     </div>
     ${members.length === 0 && html`<p class="tiny muted">${t('ag.setup.alone')}</p>`}
-    <${Actions} busy=${busy} label=${t('ag.setup.challenge')} onGo=${() => launch(who ? { opponent: who } : {})} />
+    ${type === 'shifumi' &&
+    html`<p class="label">${t('ag.setup.target')}</p>
+      <${Segmented} label=${t('ag.setup.target')} value=${target} onChange=${setTarget}
+        options=${[{ value: 2, label: t('ag.setup.firstTo', { n: 2 }) }, { value: 3, label: t('ag.setup.firstTo', { n: 3 }) }]} />`}
+    <${Actions} busy=${busy} label=${t('ag.setup.challenge')} onGo=${() => launch({ ...(who ? { opponent: who } : {}), ...(type === 'shifumi' ? { target } : {}) })} />
   </div>`
 }
 
@@ -83,6 +89,7 @@ function PollForm({ launch, busy }) {
   const [mode, setMode] = useState('random')
   const [a, setA] = useState('')
   const [b, setB] = useState('')
+  const [anonymous, setAnonymous] = useState(false)
   const ok = mode === 'random' || (a.trim().length >= 2 && b.trim().length >= 2)
   return html`<div class="col">
     <${Segmented} label=${t('ag.setup.pollMode')} value=${mode} onChange=${setMode}
@@ -92,7 +99,11 @@ function PollForm({ launch, busy }) {
       <input id="opt-a" class="input" maxlength="80" value=${a} placeholder=${t('ag.setup.optionAHint')} onInput=${(e) => setA(e.currentTarget.value)} />
       <label class="label" for="opt-b">${t('ag.setup.optionB')}</label>
       <input id="opt-b" class="input" maxlength="80" value=${b} placeholder=${t('ag.setup.optionBHint')} onInput=${(e) => setB(e.currentTarget.value)} />`}
-    <${Actions} busy=${busy} disabled=${!ok} onGo=${() => launch(mode === 'custom' ? { options: [a.trim(), b.trim()] } : {})} />
+    <div class="switch-row">
+      <span><b>🙈 ${t('ag.setup.anonymous')}</b><br /><span class="field-hint">${t('ag.setup.anonymousHint')}</span></span>
+      <${Switch} label=${t('ag.setup.anonymous')} checked=${anonymous} onChange=${setAnonymous} />
+    </div>
+    <${Actions} busy=${busy} disabled=${!ok} onGo=${() => launch({ ...(mode === 'custom' ? { options: [a.trim(), b.trim()] } : {}), anonymous })} />
   </div>`
 }
 
@@ -101,22 +112,29 @@ function PollForm({ launch, busy }) {
 function PenduForm({ launch, busy, setError }) {
   const [mode, setMode] = useState('random')
   const [word, setWord] = useState('')
+  const [hint, setHint] = useState('')
+  const [difficulty, setDifficulty] = useState('any')
   const go = () => {
-    if (mode === 'random') return launch({})
+    if (mode === 'random') return launch(difficulty === 'any' ? {} : { difficulty })
     const check = validateCustomWord(word)
     if (!check.ok) return setError(wordError(check))
-    launch({ word: check.value })
+    launch({ word: check.value, ...(hint.trim() ? { hint: hint.trim() } : {}) })
   }
   return html`<div class="col">
     <${Segmented} label=${t('ag.setup.wordMode')} value=${mode} onChange=${setMode}
       options=${[{ value: 'random', label: t('ag.setup.surpriseWord') }, { value: 'custom', label: t('ag.setup.myWord') }]} />
     <p class="tiny muted">${mode === 'random' ? t('ag.setup.surpriseWordHint') : t('ag.setup.myWordHint')}</p>
+    ${mode === 'random' &&
+    html`<${Segmented} label=${t('ag.setup.difficulty')} value=${difficulty} onChange=${setDifficulty}
+      options=${[{ value: 'any', label: t('ag.setup.anyLevel') }, { value: 'facile', label: t('drawit.diff.facile') }, { value: 'moyen', label: t('drawit.diff.moyen') }, { value: 'difficile', label: t('drawit.diff.difficile') }]} />`}
     ${mode === 'custom' &&
     html`<label class="sr-only" for="hang-word">${t('ag.setup.myWord')}</label>
       <input id="hang-word" class="input" maxlength="25" value=${word} autocomplete="off" placeholder=${t('ag.setup.myWord')} onInput=${(e) => {
         setWord(e.currentTarget.value)
         setError(null)
-      }} />`}
+      }} />
+      <label class="label" for="hang-hint">${t('ag.setup.hint')}</label>
+      <input id="hang-hint" class="input" maxlength="40" value=${hint} autocomplete="off" placeholder=${t('ag.setup.hintPlaceholder')} onInput=${(e) => setHint(e.currentTarget.value)} />`}
     <${Actions} busy=${busy} disabled=${mode === 'custom' && !word.trim()} onGo=${go} />
   </div>`
 }

@@ -122,7 +122,10 @@ try {
 
   // 3. Morpion dans la conversation, lancé depuis le hub (PC), joué par les deux.
   await pc.getByRole('button', { name: 'Play' }).click()
-  await pc.getByRole('heading', { name: 'In the chat' }).waitFor()
+  await pc.getByRole('tab', { name: /Live/ }).waitFor()
+  await shot(pc, 'v2-04a-hub-live-en')
+  await pc.getByRole('tab', { name: /Async/ }).click()
+  await pc.getByRole('heading', { name: 'In progress in this group' }).waitFor()
   await shot(pc, 'v2-04-hub-en')
   await pc.getByRole('button', { name: 'Start Tic-tac-toe' }).click()
   const setup = pc.getByRole('dialog', { name: /Tic-tac-toe/ })
@@ -154,9 +157,23 @@ try {
   await pc.locator('.sys-msg', { hasText: '“Tic-tac-toe”' }).waitFor({ timeout: 10000 })
   await shot(pc, 'v2-06-morpion-won-pc')
   log('morpion gagné ; résultat affiché dans chaque langue')
+  // Revanche : nouvelle carte « Partie 2 », c'est au téléphone de commencer.
+  await phoneCard.getByRole('button', { name: 'Revanche' }).click()
+  await phone.locator('.ag-card.ag-morpion', { hasText: 'Partie 2' }).getByText('À toi de jouer !').waitFor({ timeout: 10000 })
+  await pc.locator('.ag-card.ag-morpion', { hasText: 'Game 2' }).waitFor({ timeout: 10000 })
+  await pc.locator('.ag-card.ag-morpion', { hasText: 'Game 2' }).locator('.series-line', { hasText: /1 – 0|0 – 1/ }).waitFor({ timeout: 10000 })
+  log('revanche lancée, série affichée')
+  // Hub du téléphone, onglet Asynchrone : « En cours dans ce groupe » ramène à la carte dans le fil.
+  await phone.getByRole('button', { name: 'Jouer' }).click()
+  await phone.getByRole('tab', { name: /Asynchrone/ }).click()
+  await phone.locator('.ongoing-item', { hasText: 'Morpion' }).first().click()
+  await phone.locator('.ag-card.flash').waitFor({ timeout: 8000 })
+  assert.ok(await phone.locator('.ag-card.flash').isVisible(), 'la carte est mise en avant à l’écran')
+  log('liste « En cours » : retour à la carte dans le fil')
 
   // 4. Quiz en direct : lobby, une question, révélation.
   await pc.getByRole('button', { name: 'Play' }).click()
+  await pc.getByRole('tab', { name: /Live/ }).click()
   await pc.getByRole('button', { name: 'Start Pack Quiz' }).click()
   await pc.getByText('Pack Quiz · Lobby').waitFor({ timeout: 10000 })
   await shot(pc, 'v2-07-quiz-lobby-en')
@@ -171,6 +188,7 @@ try {
   for (const p of [pc, phone]) await p.locator('.quiz-choice').first().waitFor({ timeout: 10000 })
   await shot(phone, 'v2-08-quiz-question-phone')
   await pc.locator('.quiz-choice').nth(0).click()
+  await phone.getByText('1/2 ont répondu').waitFor({ timeout: 8000 })
   await phone.locator('.quiz-choice').nth(1).click()
   for (const p of [pc, phone]) await p.locator('.quiz-choice.correct').waitFor({ timeout: 10000 })
   await shot(pc, 'v2-09-quiz-reveal-pc')

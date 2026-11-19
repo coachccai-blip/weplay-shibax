@@ -76,7 +76,7 @@ export async function runCleanup(db, { budgetMs = 22000, now = Date.now() } = {}
       break
     }
     if (id.slice(0, 8) < drawLimit) {
-      await Promise.all([db.del(K.asyncGame(id)), db.del(K.asyncImage(id))]).catch(() => {})
+      await Promise.all([db.del(K.asyncGame(id)), db.del(K.asyncImage(id)), db.del(K.asyncRematch(id))]).catch(() => {})
       report.games++
     }
   }

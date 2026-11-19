@@ -1,8 +1,15 @@
 // Jeux dans la conversation : création depuis le hub, coups joués depuis la carte du fil.
 // L'état de chaque jeu vit dans le salon ouvert (room.asyncGames) et suit l'interrogation du salon.
+import { signal } from '@preact/signals'
 import { api } from '../lib/transport.js'
 import { room, updateRoom, mergeAsync } from './rooms.js'
 import { syncSoon } from './bus.js'
+
+/** Carte à faire défiler jusqu'à l'écran (depuis le hub, après une revanche…). */
+export const asyncFocus = signal(null)
+export function focusAsync(id) {
+  asyncFocus.value = id ? { id, at: Date.now() } : null
+}
 
 /** Range un état de jeu reçu (réponse d'un coup, chargement d'une carte). */
 export function putAsync(game) {

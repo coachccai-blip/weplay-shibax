@@ -8,6 +8,8 @@ import { rankPlayers } from '../../shared/scoring.js'
 import { LIMITS } from '../../shared/constants.js'
 
 export const REVEAL_MS = 6000
+/** Après une mauvaise réponse dans une course : courte pause (pas d'essais au hasard en rafale). */
+export const WRONG_COOLDOWN_MS = 1200
 
 function eligible(state) {
   const g = state.g
@@ -38,6 +40,8 @@ export function roundGame(def) {
     xp: true,
     needsFounds: false,
     needsAnswers: true,
+    needsVotes: !!def.votes,
+    voteView: def.votes ? (state, votes, uid) => def.votes.view(state, state.g, votes, uid) : null,
     /** Règles propres au jeu (lecture d'une réponse, vérification), exposées pour les tests. */
     rules: def,
 
@@ -49,7 +53,7 @@ export function roundGame(def) {
       def.sanitizeExtra?.(s, input, base)
       return s
     },
-    estimate: (s) => Math.round((s.rounds * (def.answerMs(s) + REVEAL_MS + 800)) / 1000),
+    estimate: (s) => Math.round((s.rounds * (def.answerMs(s) + (def.revealMs ?? REVEAL_MS) + 800)) / 1000),
 
     roundIndex: (state) => (state.g ? state.g.round : -1),
     watchUid: () => null,
@@ -89,6 +93,11 @@ export function roundGame(def) {
         return false
       }
       if (g.phase === 'reveal' && now >= g.phaseEnd) {
+        // Petit Bac : les réponses contestées par la majorité sont retirées avant la manche suivante.
+        if (def.votes) {
+          if (!facts.votes) return false
+          def.votes.settle(state, g, facts.votes)
+        }
         if (g.round + 1 >= g.total) {
           api.endGame(state, now, 'complete')
           return true
@@ -129,6 +138,15 @@ export function roundGame(def) {
       const { db, auth, gid, body, now, advance, transition } = ctx
       const state = ctx.state
       const g = state.g
+      if (str(body.type, 20) === 'vote') {
+        ensure(def.votes, 400, 'action', 'Action inconnue.')
+        ensure(state.status === 'playing' && g?.phase === 'reveal' && int(body.round, -1) === g.round && now < g.phaseEnd, 409, 'round_over', 'La vérification est terminée.')
+        const voter = state.players[auth.uid]
+        ensure(voter && !voter.left, 403, 'not_player', 'Tu ne joues pas dans cette partie.')
+        const targets = def.votes.sanitize(state, g, auth.uid, body.targets)
+        await db.put(K.vote(gid, g.round, auth.uid), { uid: auth.uid, targets, at: now })
+        return { ok: true, targets }
+      }
       ensure(str(body.type, 20) === 'answer', 400, 'action', 'Action inconnue.')
       ensure(state.status === 'playing' && g?.phase === 'question', 409, 'round_over', 'Cette manche est terminée.')
       ensure(int(body.round, -1) === g.round, 409, 'round_over', 'Cette manche est terminée.')
@@ -139,13 +157,15 @@ export function roundGame(def) {
       const key = K.answer(gid, g.round, auth.uid)
 
       if (def.mode === 'race') {
-        const hb = await db.get(K.heartbeat(gid, auth.uid))
-        if (hb?.lg && now - hb.lg < 450) fail(429, 'too_fast', 'Pas si vite !', { retryAfterMs: 450 - (now - hb.lg) })
-        db.put(K.heartbeat(gid, auth.uid), { ts: now, lg: now }).catch(() => {})
+        const tk = K.raceThrottle(gid, auth.uid)
+        const th = await db.get(tk)
+        if (th?.lg && now - th.lg < 450) fail(429, 'too_fast', 'Pas si vite !', { retryAfterMs: 450 - (now - th.lg) })
+        if (th?.lw && now - th.lw < WRONG_COOLDOWN_MS) fail(429, 'too_fast', 'Pas si vite !', { retryAfterMs: WRONG_COOLDOWN_MS - (now - th.lw) })
         const already = await db.get(key)
         ensure(!already, 409, 'already_found', 'Tu as déjà trouvé !')
         const ok = def.check(state, g.cur, body.value)
-        if (!ok) return { result: 'wrong' }
+        db.put(tk, { lg: now, lw: ok ? th?.lw || 0 : now }).catch(() => {})
+        if (!ok) return { result: 'wrong', retryAfterMs: WRONG_COOLDOWN_MS }
         const created = await db.create(key, { uid: auth.uid, at: now, ok: true })
         ensure(created, 409, 'already_found', 'Tu as déjà trouvé !')
         const count = (await db.keys(`${K.roundPrefix(gid, g.round)}a/`)).length
@@ -203,7 +223,7 @@ export function roundGame(def) {
     g.played = (g.played || 0) + 1
     g.phase = 'reveal'
     g.phaseStart = now
-    g.phaseEnd = now + REVEAL_MS
+    g.phaseEnd = now + (def.revealMs ?? REVEAL_MS)
   }
 
   return mod

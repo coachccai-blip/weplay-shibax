@@ -101,7 +101,7 @@ export function gameSummary(state) {
 // ---------- Faits nécessaires aux transitions ----------
 
 function parseRoundKeys(prefix, keys) {
-  const out = { strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], hasFirst: false }
+  const out = { strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], voteIds: [], hasFirst: false }
   for (const key of keys) {
     const rest = key.slice(prefix.length)
     if (rest === 'first') out.hasFirst = true
@@ -115,6 +115,7 @@ function parseRoundKeys(prefix, keys) {
     } else if (rest.startsWith('f/')) out.foundIds.push(rest.slice(2))
     else if (rest.startsWith('t/')) out.taps.push(rest.slice(2))
     else if (rest.startsWith('a/')) out.answerIds.push(rest.slice(2))
+    else if (rest.startsWith('v/')) out.voteIds.push(rest.slice(2))
   }
   return out
 }
@@ -135,7 +136,7 @@ function mergeSeen(facts, seen) {
 }
 
 export async function gatherFacts(db, state, now, { full = false, seen = null } = {}) {
-  const facts = { now, hb: {}, hbLoaded: false, round: -1, keys: [], strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], founds: null, first: null, answers: null }
+  const facts = { now, hb: {}, hbLoaded: false, round: -1, keys: [], strokes: [], guesses: [], foundIds: [], taps: [], answerIds: [], voteIds: [], founds: null, first: null, answers: null, votes: null }
   if (state.status === 'lobby') {
     if (full || now >= state.lobbyExpiresAt) {
       facts.hb = await loadHeartbeats(db, state)
@@ -153,17 +154,19 @@ export async function gatherFacts(db, state, now, { full = false, seen = null } 
   if (watched?.ts) facts.hb[watch] = watched.ts
   mergeSeen(facts, seen)
   if (full || mod.needsFullFacts(state, now, facts)) {
-    const [hb, founds, first, answers] = await Promise.all([
+    const [hb, founds, first, answers, votes] = await Promise.all([
       loadHeartbeats(db, state),
       mod.needsFounds && r >= 0 ? pMap(facts.foundIds, (uid) => db.get(K.found(state.id, r, uid)), 8) : [],
       mod.needsFounds && facts.hasFirst ? db.get(K.first(state.id, r)) : null,
       mod.needsAnswers && r >= 0 ? pMap(facts.answerIds, (uid) => db.get(K.answer(state.id, r, uid)), 8) : [],
+      mod.needsVotes && r >= 0 ? pMap(facts.voteIds, (uid) => db.get(K.vote(state.id, r, uid)), 8) : [],
     ])
     facts.hb = { ...facts.hb, ...hb }
     facts.hbLoaded = true
     facts.founds = founds.filter(Boolean)
     facts.first = first
     facts.answers = answers.filter(Boolean)
+    facts.votes = votes.filter(Boolean)
     mergeSeen(facts, seen)
   }
   return facts
@@ -538,6 +541,14 @@ export async function syncGame(db, auth, body, ctx) {
     const r = facts.round
     out.round = r
     out.foundIds = facts.foundIds
+    // Jeux par manches : qui a déjà répondu (ou trouvé, pour les courses) — jamais la réponse elle-même.
+    if (MODULES[state.type].needsAnswers) out.answeredIds = facts.answerIds
+    // Petit Bac : contestations en cours, comptées pour tous pendant la vérification.
+    const vmod = MODULES[state.type]
+    if (vmod.voteView && state.g?.phase === 'reveal' && facts.voteIds.length) {
+      const votes = (await pMap(facts.voteIds, (uid) => db.get(K.vote(gid, r, uid)), 8)).filter(Boolean)
+      out.votes = vmod.voteView(state, votes, auth.uid)
+    }
     // Traits : lots de chaque appareil au-delà du curseur du client.
     const cursor = int(body.round, -2) === r && body.strokes && typeof body.strokes === 'object' ? body.strokes : {}
     const wanted = facts.strokes

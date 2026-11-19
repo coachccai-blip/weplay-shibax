@@ -12,7 +12,7 @@ import { serverNow } from '../lib/clock.js'
 import { mmss, minutesLabel } from '../lib/format.js'
 import { t, tn } from '../i18n/index.js'
 import { gameName } from '../i18n/texts.js'
-import { THEMES, THEME_IDS, DRAWIT, defaultTours, LIMITS, LIVE_ROUNDS, GAME_CATALOG } from '../../shared/constants.js'
+import { THEMES, THEME_IDS, DRAWIT, defaultTours, LIMITS, LIVE_ROUNDS, GAME_CATALOG, QUIZ_CATS } from '../../shared/constants.js'
 
 export function Lobby({ rid }) {
   const g = game.value
@@ -107,6 +107,29 @@ function RoundSettings({ v, editable }) {
         options=${[{ value: 'fr', label: 'Français' }, { value: 'en', label: 'English' }]} />
       <span class="field-hint">${t('lobby.contentLangHint')}</span>
     </div>`}
+    ${v.type === 'quiz' && html`<${QuizCats} s=${s} editable=${editable} update=${update} />`}
+  </div>`
+}
+
+/** Quiz : catégories de questions au choix de l'hôte (au moins une). */
+function QuizCats({ s, editable, update }) {
+  const cats = s.cats === 'all' || !Array.isArray(s.cats) ? QUIZ_CATS : s.cats
+  const toggle = (id) => {
+    const set = new Set(cats)
+    if (set.has(id)) {
+      if (set.size === 1) return
+      set.delete(id)
+    } else set.add(id)
+    update({ cats: set.size === QUIZ_CATS.length ? 'all' : [...set] })
+  }
+  return html`<div class="setting">
+    <div class="setting-head"><span>${t('lobby.quizCats')}</span><span class="pill white">${s.cats === 'all' ? t('lobby.allThemes') : `${cats.length}/${QUIZ_CATS.length}`}</span></div>
+    <div class="chips" role="group" aria-label=${t('lobby.quizCats')}>
+      ${QUIZ_CATS.map(
+        (id) => html`<button type="button" class="chip" key=${id} aria-pressed=${String(cats.includes(id))} disabled=${!editable} onClick=${() => toggle(id)}>
+          ${cats.includes(id) && html`<${Icon} name="check" size=${16} />`} ${t(`quiz.cat.${id}`)}</button>`,
+      )}
+    </div>
   </div>`
 }
 

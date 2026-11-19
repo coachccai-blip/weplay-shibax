@@ -17,14 +17,14 @@ const rnd = (n) => {
 function wordEntries(lang, { singleWord = false, maxLen = 25 } = {}) {
   const bank = lang === 'en' ? wordsEn : wordsFr
   const out = []
-  for (const diffs of Object.values(bank.themes)) {
+  for (const [theme, diffs] of Object.entries(bank.themes)) {
     for (const diff of ['facile', 'moyen', 'difficile']) {
       for (const entry of diffs[diff] || []) {
         const answers = String(entry).split('|')
         const display = answers[0]
         if (singleWord && !/^\p{L}+$/u.test(display)) continue
         if (compactWord(display).length > maxLen) continue
-        out.push({ display, answers, difficulty: diff })
+        out.push({ display, answers, difficulty: diff, theme })
       }
     }
   }
@@ -41,8 +41,18 @@ export function suggestWords(lang, n = 3) {
   return out
 }
 
-/** Duel : adversaire choisi parmi les membres, ou défi ouvert au premier qui accepte. */
+/** Série entre deux joueurs, d'une revanche à l'autre : victoires de chacun, matchs nuls. */
+export function nextSeries(prev) {
+  const series = { wins: { ...(prev?.data?.series?.wins || {}) }, draws: prev?.data?.series?.draws || 0, games: (prev?.data?.series?.games || 0) + 1 }
+  const res = prev?.result
+  if (res?.outcome === 'win' && res.winners?.[0]) series.wins[res.winners[0]] = (series.wins[res.winners[0]] || 0) + 1
+  else if (res?.outcome === 'draw') series.draws += 1
+  return series
+}
+
+/** Duel : adversaire choisi parmi les membres, défi ouvert au premier qui accepte, ou revanche. */
 function duelPlayers(ctx, options) {
+  if (ctx.rematch) return { players: ctx.rematch.players, open: false }
   const opponent = str(options?.opponent, 20)
   if (opponent) {
     ensure(USER_ID_RE.test(opponent) && opponent !== ctx.uid, 400, 'opponent', 'Choisis un adversaire du groupe.')
@@ -91,7 +101,7 @@ export const morpion = {
   duel: true,
   create(ctx, options) {
     const { players, open } = duelPlayers(ctx, options)
-    return { players, open, data: { board: Array(9).fill(null), turn: 0, moves: 0, line: null }, ttl: 7 * 24 * HOUR }
+    return { players, open, data: { board: Array(9).fill(null), turn: 0, moves: 0, line: null, last: null, series: ctx.rematch?.series || null }, ttl: 7 * 24 * HOUR }
   },
   act(state, uid, body) {
     const d = state.data
@@ -102,6 +112,7 @@ export const morpion = {
     const cell = int(body.cell, -1)
     ensure(cell >= 0 && cell < 9 && !d.board[cell], 400, 'cell', 'Case déjà prise.')
     d.board[cell] = d.turn === 0 ? 'X' : 'O'
+    d.last = cell
     d.moves++
     const found = lines(d.board, 3, 3, 3)
     if (found.length) d.line = found[0]
@@ -123,7 +134,7 @@ export const puissance4 = {
   duel: true,
   create(ctx, options) {
     const { players, open } = duelPlayers(ctx, options)
-    return { players, open, data: { board: Array(42).fill(null), turn: 0, moves: 0, line: null, last: null }, ttl: 7 * 24 * HOUR }
+    return { players, open, data: { board: Array(42).fill(null), turn: 0, moves: 0, line: null, last: null, series: ctx.rematch?.series || null }, ttl: 7 * 24 * HOUR }
   },
   act(state, uid, body) {
     const d = state.data
@@ -164,7 +175,8 @@ export const shifumi = {
   duel: true,
   create(ctx, options) {
     const { players, open } = duelPlayers(ctx, options)
-    return { players, open, data: { rounds: [{ picks: {} }], score: {} }, ttl: 3 * 24 * HOUR }
+    const target = int(options?.target ?? ctx.rematch?.target, 2) === 3 ? 3 : 2
+    return { players, open, data: { rounds: [{ picks: {} }], score: {}, target, series: ctx.rematch?.series || null }, ttl: 3 * 24 * HOUR }
   },
   act(state, uid, body) {
     const d = state.data
@@ -187,7 +199,10 @@ export const shifumi = {
     }
     return true
   },
-  isOver: (s) => Object.values(s.data.score).some((n) => n >= 2) || s.data.rounds.filter((r) => r.picks && Object.keys(r.picks).length === 2).length >= 7,
+  isOver: (s) => {
+    const target = s.data.target || 2
+    return Object.values(s.data.score).some((n) => n >= target) || s.data.rounds.filter((r) => r.picks && Object.keys(r.picks).length === 2).length >= target * 4 - 1
+  },
   result(s) {
     const [a, b] = s.order
     const sa = s.data.score[a] || 0
@@ -205,7 +220,7 @@ export const shifumi = {
       return { picks }
     })
     const current = s.data.rounds[s.data.rounds.length - 1]
-    return { rounds, score: s.data.score, myTurn: !s.open && s.status === 'open' && s.order.includes(uid) && !current.picks[uid] }
+    return { rounds, score: s.data.score, target: s.data.target || 2, series: s.data.series || null, rematch: s.data.rematch || null, myTurn: !s.open && s.status === 'open' && s.order.includes(uid) && !current.picks[uid] }
   },
 }
 
@@ -257,11 +272,23 @@ export const dessin = {
     const over = s.status !== 'open'
     const mine = uid === s.createdBy
     const found = d.finders.some((f) => f.uid === uid)
+    // Indices personnels : la première lettre après 5 essais, la dernière après 10, une du milieu après 15.
+    const tries = d.attempts[uid] || 0
+    const pattern = hintPattern(d.word)
+    const letters = pattern.filter((p) => p.t === 'l')
+    const shown = new Set()
+    if (!mine && !found && !over) {
+      if (tries >= 5 && letters[0]) shown.add(letters[0].i)
+      if (tries >= 10 && letters.length > 2) shown.add(letters[letters.length - 1].i)
+      if (tries >= 15 && letters.length > 4) shown.add(letters[Math.floor(letters.length / 2)].i)
+    }
+    const chars = Array.from(d.word)
     return {
-      hint: hintPattern(d.word).map((p) => p.t),
+      hint: pattern.map((p) => (p.t === 'l' && shown.has(p.i) ? { t: 'l', c: chars[p.i].toUpperCase() } : { t: p.t })),
+      nextHintAt: mine || found || over ? null : [5, 10, 15].find((n) => n > tries && (n < 10 || letters.length > (n === 10 ? 2 : 4))) || null,
       word: over || mine || found ? d.word : null,
-      finders: d.finders,
-      tries: d.attempts[uid] || 0,
+      finders: d.finders.map((f) => ({ ...f, tries: d.attempts[f.uid] || 1 })),
+      tries,
       found,
       image: `/api/async/${s.id}/image`,
     }
@@ -275,13 +302,18 @@ export const tupreferes = {
   poll: true,
   create(ctx, options) {
     const custom = Array.isArray(options?.options) ? options.options.map((o) => cleanLine(str(o, 120)).slice(0, 80)) : null
+    const anonymous = options?.anonymous === true
     if (custom) {
       ensure(custom.length === 2 && custom.every((o) => o.length >= 2), 400, 'poll_options', 'Écris deux propositions.')
       ensure(!custom.some(containsBanned), 400, 'custom_banned', 'Ce texte n’est pas autorisé.')
-      return { players: [ctx.uid], data: { custom, item: null, votes: {} }, ttl: 24 * HOUR }
+      return { players: [ctx.uid], data: { custom, item: null, votes: {}, anonymous }, ttl: 24 * HOUR }
     }
-    const item = dilemmaBank.items[rnd(dilemmaBank.items.length)]
-    return { players: [ctx.uid], data: { custom: null, item: item.id, fr: item.fr, en: item.en, votes: {} }, ttl: 24 * HOUR }
+    // Un dilemme pas encore posé dans ce groupe, si possible.
+    const recent = new Set(ctx.recentDilemmas || [])
+    const pool = dilemmaBank.items.filter((x) => !recent.has(x.id))
+    const from = pool.length ? pool : dilemmaBank.items
+    const item = from[rnd(from.length)]
+    return { players: [ctx.uid], data: { custom: null, item: item.id, fr: item.fr, en: item.en, votes: {}, anonymous }, ttl: 24 * HOUR }
   },
   act(state, uid, body, now, ctx) {
     const d = state.data
@@ -310,7 +342,16 @@ export const tupreferes = {
       counts[c]++
       voters[c].push(u)
     }
-    return { custom: d.custom, fr: d.fr, en: d.en, myVote: voted ? d.votes[uid] : null, total: Object.keys(d.votes).length, counts: showResults ? counts : null, voters: showResults ? voters : null }
+    return {
+      custom: d.custom,
+      fr: d.fr,
+      en: d.en,
+      anonymous: !!d.anonymous,
+      myVote: voted ? d.votes[uid] : null,
+      total: Object.keys(d.votes).length,
+      counts: showResults ? counts : null,
+      voters: showResults && !d.anonymous ? voters : null,
+    }
   },
 }
 
@@ -323,17 +364,26 @@ export const pendu = {
   create(ctx, options) {
     let word
     let setter = null
+    let hint = null
     if (options?.word) {
       const check = validateCustomWord(str(options.word, 80))
       ensure(check.ok, 400, 'custom_word', check.error)
       ensure(!containsBanned(check.value), 400, 'custom_banned', 'Ce mot n’est pas autorisé. Choisis-en un autre.')
-      word = { display: check.value, answers: [check.value] }
+      word = { display: check.value, answers: [check.value], theme: null }
       setter = ctx.uid
+      hint = cleanLine(str(options.hint, 80)).slice(0, 40) || null
+      ensure(!hint || !containsBanned(hint), 400, 'custom_banned', 'Ce texte n’est pas autorisé.')
     } else {
-      const list = wordEntries(ctx.lang, { singleWord: true, maxLen: 12 }).filter((w) => compactWord(w.display).length >= 4)
-      word = list[rnd(list.length)]
+      const diff = ['facile', 'moyen', 'difficile'].includes(options?.difficulty) ? options.difficulty : null
+      const all = wordEntries(ctx.lang, { singleWord: true, maxLen: 12 }).filter((w) => compactWord(w.display).length >= 4)
+      const list = diff ? all.filter((w) => w.difficulty === diff) : all
+      word = (list.length ? list : all)[rnd((list.length ? list : all).length)]
     }
-    return { players: setter ? [] : [ctx.uid], data: { word: word.display, answers: word.answers, setter, tried: [], wrong: 0, max: 7, by: {}, solvedBy: null }, ttl: 3 * 24 * HOUR }
+    return {
+      players: setter ? [] : [ctx.uid],
+      data: { word: word.display, answers: word.answers, theme: word.theme || null, hint, setter, tried: [], wrong: 0, max: 7, by: {}, hits: {}, solvedBy: null },
+      ttl: 3 * 24 * HOUR,
+    }
   },
   act(state, uid, body) {
     const d = state.data
@@ -347,6 +397,10 @@ export const pendu = {
       d.tried.push(l)
       d.by[uid] = (d.by[uid] || 0) + 1
       if (!letters.has(l)) d.wrong++
+      else {
+        d.hits ||= {}
+        d.hits[uid] = (d.hits[uid] || 0) + 1
+      }
       return { result: letters.has(l) ? 'hit' : 'miss' }
     }
     ensure(body.type === 'word', 400, 'action', 'Action inconnue.')
@@ -375,7 +429,7 @@ export const pendu = {
       const l = letterOf(chars[p.i])
       return over || d.tried.includes(l) ? { t: 'l', c: chars[p.i].toUpperCase() } : { t: 'l' }
     })
-    return { cells, tried: d.tried, wrong: d.wrong, max: d.max, word: over ? d.word : null, setter: d.setter, solvedBy: d.solvedBy, by: d.by }
+    return { cells, tried: d.tried, wrong: d.wrong, max: d.max, word: over ? d.word : null, theme: d.theme || null, hint: d.hint || null, setter: d.setter, solvedBy: d.solvedBy, by: d.by, hits: d.hits || {} }
   },
 }
 
@@ -396,10 +450,15 @@ export const devine = {
     d.last[uid] = now
     if (!state.order.includes(uid)) state.order.push(uid)
     const hint = n === d.secret ? 'bingo' : n < d.secret ? 'plus' : 'moins'
-    d.guesses.push({ uid, n, hint, at: now })
+    // Chaud ou froid : écart rapporté à l'étendue du jeu.
+    const gap = Math.abs(n - d.secret) / d.max
+    const heat = hint === 'bingo' ? null : gap <= 0.02 ? 'brulant' : gap <= 0.06 ? 'chaud' : gap <= 0.15 ? 'tiede' : 'froid'
+    d.counts ||= {}
+    d.counts[uid] = (d.counts[uid] || 0) + 1
+    d.guesses.push({ uid, n, hint, heat, at: now })
     if (d.guesses.length > 200) d.guesses = d.guesses.slice(-200)
     if (hint === 'bingo') d.finder = uid
-    return { result: hint }
+    return { result: hint, heat }
   },
   isOver: (s) => !!s.data.finder,
   result: (s) => ({ outcome: 'win', winners: [s.data.finder] }),
@@ -411,7 +470,7 @@ export const devine = {
       if (g.hint === 'plus') lo = Math.max(lo, g.n + 1)
       if (g.hint === 'moins') hi = Math.min(hi, g.n - 1)
     }
-    return { max: d.max, guesses: d.guesses.slice(-30), count: d.guesses.length, lo, hi, finder: d.finder, secret: s.status !== 'open' ? d.secret : null }
+    return { max: d.max, guesses: d.guesses.slice(-30), count: d.guesses.length, counts: d.counts || {}, lo, hi, finder: d.finder, secret: s.status !== 'open' ? d.secret : null }
   },
 }
 

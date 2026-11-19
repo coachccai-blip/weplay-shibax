@@ -76,11 +76,11 @@ function WordZone({ v, gs, isDrawer, now }) {
   if (gs.phase === 'reveal') return html`<span class="pill butter">${t('drawit.wordWas', { word: gs.last?.word || '—' })}</span>`
   if (isDrawer) {
     return html`<span class="secret-word" aria-label=${t('drawit.yourWord', { word: gs.word })}>${gs.word}</span>
-      <span class="pill">${diffLabel(gs.difficulty)} ${t('drawit.mult', { m: gs.mult })}</span>`
+      <span class="pill">${diffLabel(gs.difficulty)} ${t('drawit.mult', { m: gs.mult })}</span><${FoundCount} v=${v} gs=${gs} />`
   }
   const cells = gs.hint?.cells || []
   const letters = cells.filter((c) => c.t === 'l').length
-  return html`<div class="hint" aria-label=${tn('drawit.wordOf', letters)}>
+  return html`<${FoundCount} v=${v} gs=${gs} /><div class="hint" aria-label=${tn('drawit.wordOf', letters)}>
     ${cells.map((c, i) =>
       c.t === 'l'
         ? html`<span key=${i} class=${`cell ${c.c ? 'revealed' : ''}`}>${c.c || ''}</span>`
@@ -90,6 +90,14 @@ function WordZone({ v, gs, isDrawer, now }) {
     )}
     <span class="pill white" style=${{ marginLeft: '6px' }}>${tn('common.letters', letters)}${gs.mult > 1 ? ` · ${t('drawit.mult', { m: gs.mult })}` : ''}</span>
   </div>`
+}
+
+/** « 2/3 ont trouvé » pendant le dessin. */
+function FoundCount({ v, gs }) {
+  const guessers = v.players.filter((p) => !p.left && p.id !== gs.drawerId && (p.fromRound || 0) <= gs.round).length
+  const found = game.value.foundIds.length
+  if (!guessers) return null
+  return html`<span class=${`pill ${found ? 'mint' : 'white'} found-count`} aria-live="polite">👀 ${t('drawit.foundCount', { n: found, total: guessers })}</span>`
 }
 
 // ---------- Zone de dessin ----------
@@ -392,6 +400,16 @@ function ChoosingOverlay({ v, gs, isDrawer, now }) {
       setBusy(false)
     }
   }
+  const reroll = async () => {
+    setBusy(true)
+    try {
+      await act({ type: 'reroll', round: gs.round })
+      play('pop')
+    } catch (err) {
+      setError(errorText(err))
+    }
+    setBusy(false)
+  }
   if (!isDrawer) {
     const drawer = v.players.find((p) => p.id === gs.drawerId)
     return html`<div class="stage-overlay"><div class="stage-card">
@@ -416,6 +434,7 @@ function ChoosingOverlay({ v, gs, isDrawer, now }) {
         </button>`,
       )}
     </div>
+    ${gs.canReroll && html`<button class="btn btn-ghost btn-small" disabled=${busy} onClick=${reroll}><${Icon} name="refresh" /> ${t('drawit.reroll')}</button>`}
     ${gs.canCustom &&
     html`<form class="guess-form" onSubmit=${submitCustom}>
       <label for="custom-word" class="sr-only">${t('drawit.ownWord')}</label>
@@ -433,7 +452,10 @@ function ChoosingOverlay({ v, gs, isDrawer, now }) {
 
 function RevealOverlay({ v, gs }) {
   const last = gs.last
+  const now = useNow(250)
   if (!last) return null
+  const left = Math.max(0, Math.ceil((gs.phaseEnd - now) / 1000))
+  const final = gs.round + 1 >= gs.totalRounds
   const rows = Object.entries(last.points || {}).sort((a, b) => b[1] - a[1])
   return html`<div class="stage-overlay"><div class="stage-card">
     ${last.word ? html`<p class="small muted">${t('drawit.wordWasShort')}</p><p class="reveal-word">${last.word}</p>` : html`<${Shiba} mood="surpris" size=${70} />`}
@@ -448,6 +470,7 @@ function RevealOverlay({ v, gs }) {
           <span class=${`pts ${pts > 0 ? 'plus' : ''}`}>+${pts}</span></li>`
       })}
     </ul>`}
+    <p class="tiny muted">${final ? t('live.finalIn', { s: left }) : t('drawit.nextDrawer', { s: left })}</p>
   </div></div>`
 }
 

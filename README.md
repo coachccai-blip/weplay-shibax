@@ -53,29 +53,31 @@ Netlify Blobs est activé automatiquement pour le site (magasin `weplay-shibax`)
 
 ### Les 14 jeux
 
-**En direct** (tout le monde en même temps : lobby, réglages, chrono calé sur le serveur, scores en continu, révélation après chaque manche, podium et XP) :
+Le bouton « Jouer » ouvre le hub, organisé en **deux onglets** pour filtrer d'un geste : **Direct** et **Asynchrone**. Chaque onglet affiche son nombre de jeux ; l'onglet Asynchrone signale par une pastille les jeux qui attendent ton coup et liste les **jeux en cours dans le groupe** (un toucher ramène à la carte dans la conversation). Le dernier onglet utilisé est retenu sur l'appareil. Sur téléphone, les tuiles passent en liste compacte.
 
-| Jeu | Principe |
+**Direct** (tout le monde en même temps : lobby, réglages, chrono et barre de temps calés sur le serveur, « 2/4 ont répondu » en direct, révélation avec compte à rebours de la manche suivante, podium et XP) :
+
+| Jeu | Principe et nouveautés |
 | --- | --- |
-| Draw It | Un joueur dessine un mot (facile / moyen / difficile ou mot perso), les autres devinent dans le chat. |
-| Quiz de la meute | 4 réponses, 15 s, bonus de vitesse. 60 questions bilingues. |
-| Réflexe | Le shiba surgit d'un buisson : le plus rapide gagne ; trop tôt = 0 point. Temps mesuré sur l'appareil, borné par le serveur. |
-| Le juste nombre | Estimer un nombre : le plus proche gagne, la réponse exacte rapporte un bonus. 40 questions. |
-| Petit Bac | Une lettre, 5 catégories (parmi 16) ; « Stop ! » laisse 10 s aux autres ; 10 points par mot valide, 5 en double. |
-| Calcul express | Course : le premier qui trouve gagne, calculs de plus en plus corsés. |
-| Mots mélangés | Course : remettre les lettres dans l'ordre (lettres à toucher ou à taper), indice au bout de 15 s. |
+| Draw It | Un joueur dessine un mot (facile / moyen / difficile ou mot perso), les autres devinent dans le chat. « Autres mots » une fois par tour, compteur « 2/3 ont trouvé ». |
+| Quiz de la meute | 4 réponses, 15 s, bonus de vitesse **et de série** (+10 par bonne réponse d'affilée). L'hôte choisit les **catégories** ; le plus rapide est annoncé ; touches 1 à 4 au clavier. |
+| Réflexe | Le shiba surgit d'un buisson : le plus rapide gagne. **Chat-piège** : s'il sort un chat, ne pas toucher (40 points de sang-froid). Temps mesuré sur l'appareil, borné par le serveur. |
+| Le juste nombre | Estimer un nombre : le plus proche gagne, la réponse exacte rapporte un bonus. La révélation place chaque estimation sur une **droite graduée** (écart en %). |
+| Petit Bac | Une lettre, 5 catégories (parmi 16) ; « Stop ! » laisse 10 s aux autres. Puis **15 s de vérification** : chacun peut contester une réponse douteuse, retirée si la majorité des autres est d'accord. |
+| Calcul express | Course aux calculs, de plus en plus corsés (multiplications, carrés, **équations à trous**). **Pavé numérique** sur téléphone ; courte pause après une erreur (pas de réponses au hasard en rafale). |
+| Mots mélangés | Course : on **touche les lettres** pour remplir les cases (ou on tape au clavier). Indices : première lettre à 12 s, dernière à 21 s. |
 
-**Dans la conversation** (une carte jouable dans le fil, chacun joue quand il veut, la carte se met à jour en direct, résultat annoncé dans le fil) :
+**Asynchrone, dans la conversation** (une carte jouable dans le fil, chacun joue quand il veut, la carte se met à jour en direct, résultat annoncé dans le fil) :
 
-| Jeu | Principe |
+| Jeu | Principe et nouveautés |
 | --- | --- |
-| Devine mon dessin | On dessine un mot (3 suggestions ou mot perso) et on l'envoie ; chacun a 24 h et 20 essais pour deviner. |
-| Morpion | Duel contre un membre choisi, ou défi ouvert au premier qui accepte. |
-| Quatre en ligne | Duel : aligner 4 jetons qui tombent dans les colonnes. |
-| Shifumi | Duel en deux manches gagnantes ; le coup de l'adversaire reste caché jusqu'à ce que les deux aient joué. |
-| Tu préfères ? | Sondage à deux options (50 dilemmes bilingues ou propositions perso) ; résultats visibles après son vote. |
-| Le pendu | Tout le groupe cherche le même mot (mot surprise ou choisi par un membre), 7 erreurs permises. |
-| Le nombre mystère | Plus grand ? Plus petit ? Le premier qui trouve gagne (1–100 ou 1–1000). |
+| Devine mon dessin | On dessine un mot (3 suggestions ou mot perso) et on l'envoie ; 24 h et 20 essais pour deviner, avec des **lettres offertes** après 5, 10 et 15 essais. Les gagnants et leur nombre d'essais sont affichés. |
+| Morpion | Duel contre un membre choisi, ou défi ouvert. Dernier coup surligné ; **Revanche** en un geste (l'autre commence) avec la **série** comptée. |
+| Quatre en ligne | Duel : les jetons **tombent** dans les colonnes, aperçu du jeton au survol sur PC ; revanche et série. |
+| Shifumi | Duel en **2 ou 3 manches gagnantes** ; coups cachés jusqu'à ce que les deux aient joué, puis « Shi… fu… mi ! » ; revanche et série. |
+| Tu préfères ? | Sondage à deux options (dilemmes bilingues, jamais les mêmes coup sur coup dans un groupe, ou propositions perso) ; **vote anonyme** possible ; « Un autre dilemme » en un geste. |
+| Le pendu | Tout le groupe cherche le même mot : mot surprise avec son **thème** et sa **difficulté**, ou mot choisi par un membre avec un **indice** ; 7 erreurs permises ; les « détectives » sont mis à l'honneur. |
+| Le nombre mystère | Plus grand ? Plus petit ? Avec **chaud / froid** selon l'écart et une **barre** de l'intervalle restant (1–100 ou 1–1000). |
 
 Une seule partie **en direct** à la fois par groupe ; les jeux de conversation, eux, peuvent être nombreux en même temps (20 en cours par groupe au plus) et restent jouables même si une partie en direct est lancée.
 
